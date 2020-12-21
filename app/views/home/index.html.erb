@@ -1,0 +1,24 @@
+<h1>Winning Spreads</h1>
+<p>Find low risk high reward option spreads </p>
+
+<%= form_tag root_path, :method => 'POST' do %>
+	<%= text_field_tag 'ticker', nil, placeholder: "Enter Ticker Symbol", size: 50 %>
+	<%= submit_tag 'Lookup' %>
+<% end %>
+
+<br/>
+
+<% if @stock %>
+	
+	<%= @stock.company_name %>
+	$<%= @stock.latest_price %>
+<% elsif @nothing %>
+	<%= @nothing %>
+<% end %>
+
+
+<% if @error %>
+	<%= @error %>
+<% end %>
+
+

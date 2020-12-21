@@ -1,0 +1,16 @@
+
+<br/>
+<% flash.each do |name, msg| %>
+
+	<div class="alert alert-warning alert-dismissable" role="alert">
+	  <button class="close" data-dismiss="alert">
+	  	<small><sup>x</sup></small>
+	  </button>
+	  <%= content_tag(:div, msg) %>
+	  
+
+	</div>
+	
+
+
+<% end %>
