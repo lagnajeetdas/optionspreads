@@ -15,7 +15,7 @@ class StocksController < ApplicationController
     @stocks = Stock.all
     @finnhub_api_key = "sandbox_bv1u7mf48v6o5ed6gpdg"
     
-    @iexcloud_api_key = "pk_1f25165af56b44c6a0e3a2b713eefba4"
+    @iexcloud_api_key = "pk_34bbabe4cf054befa331a42b695e75b2"
     @baseurl_iexcloud = "https://cloud.iexapis.com/stable/stock/"
 
   end
