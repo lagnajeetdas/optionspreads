@@ -2,16 +2,36 @@ class StocksController < ApplicationController
   before_action :set_stock, only: [:show, :edit, :update, :destroy]
   before_action :correct_user, only: [:edit,:update, :destroy]
   before_action :authenticate_user!
+  require 'httparty'
+  require 'json'
+  require 'bootstrap-table-rails'
+
+
+
 
   # GET /stocks
   # GET /stocks.json
   def index
     @stocks = Stock.all
+    @finnhub_api_key = "sandbox_bv1u7mf48v6o5ed6gpdg"
+    
+    @iexcloud_api_key = "pk_1f25165af56b44c6a0e3a2b713eefba4"
+    @baseurl_iexcloud = "https://cloud.iexapis.com/stable/stock/"
+
   end
 
   # GET /stocks/1
   # GET /stocks/1.json
   def show
+    require 'uri'
+    require 'net/http'
+    @tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
+    @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
+
+
+
+
+
   end
 
   # GET /stocks/new

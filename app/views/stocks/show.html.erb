@@ -1,76 +1,230 @@
-<div class="col-md-6 offset-md-3">
-	<div class="jumbotron">
+<div class="container">
+	<div class="row">
+		<div class="col-md-8 offset-md-2">
+			<div class="jumbotron jumbotron-fluid">
+				<div class="container">
 
-		<% begin %>
-			<% @ticker = StockQuote::Stock.quote(@stock.ticker) %>
-			<% @ticker_logo = StockQuote::Stock.logo(@stock.ticker) %>
-			<% @ticker_news = StockQuote::Stock.news(@stock.ticker) %>
-			
-			            <% if !@ticker %>
-			              
-			                
-			                The ticker: <%= @stock.ticker %><br/> does not exist!
-
-
-			            <% else %>
+					<% begin %>
+						<% @ticker = StockQuote::Stock.quote(@stock.ticker) %>
+						<% @ticker_logo = StockQuote::Stock.logo(@stock.ticker) %>
+						<% @ticker_news = StockQuote::Stock.news(@stock.ticker) %>
+						<% @ticker_company = StockQuote::Stock.company(@stock.ticker) %>
+						<% price_target = -1 %>
 
 
-			              	<img src="<%= @ticker_logo.url %>" class="img-thumbnail rounded float-right" >
-			                <strong><%=  @ticker.company_name %></strong><br/>
-			                Ticker Symbol: <%= @ticker.symbol %><br/>
-			                Current Price: <%= @ticker.latest_price %><br/>	
-			                <br/>
+						<!-- Get expiry date of options from Tradier API -->
+						<% url_options_expiry_string = @baseurl_tradier + "options/expirations?symbol=" + @ticker.symbol + "&includeAllRoots=true&strikes=false" %>
+						<% response = HTTParty.get(url_options_expiry_string, {headers: {"Authorization" => 'Bearer ' + @tradier_api_key}}) %>
+						<% expirydates_data = response.parsed_response['expirations']['date'] %>
 
-			                Percent Change: <%= number_with_precision(@ticker.change_percent*100, :precision => 2, :delimiter => ',') %>%<br/>
-			                PE Ratio: <%= @ticker.pe_ratio %><br/>
-			                YtD Change: <%= number_with_precision(@ticker.ytd_change*100, :precision => 2, :delimiter => ',') %>%<br/>
+						
+						
 
-			                <br/><br/>
-			                <strong>News</strong> <br/><br/>
-			                <% @ticker_news.news.each do |child| %>
-			                	<!--<img src="<%= child['image'] %>" class="img-thumbnail rounded float-left" alt="...">
-			                	<strong><%= link_to child['headline'], child['url'] %></strong>
-							    <br/>-->
 
-								<div class="container">
-			  						<div class="row">
-									    <div class="card" style="width: 18rem;">
-										  <img src="<%= child['image'] %>" class="card-img-top" alt="...">
-										  <div class="card-body">
-										    <h5 class="card-title"><%= child['headline'] %></h5>
-										    <a href="<%= child['url'] %>" class="btn btn-primary"><%= child['source'] %></a>
-										    
-										  </div>
+						            <% if !@ticker %>
+						              
+						                
+						                The ticker: <%= @stock.ticker %><br/> does not exist!
+
+
+						            <% else %>
+						            	<div class="float-right">
+							              	<%= link_to 'Edit', edit_stock_path(@stock) %> |
+											<%= link_to 'Back', stocks_path %>
 										</div>
-										<br/><br/><br/>
+										<br/><br/>
 
-									</div>
-								</div>
-							<% end %>
+						              	<img src="<%= @ticker_logo.url %>" class="img-thumbnail rounded float-right" >
+						              	
+						                <strong><%=  @ticker.company_name %></strong><br/>
+						                Ticker Symbol: <%= @ticker.symbol %><br/>
+						                Current Price: <%= @ticker.latest_price %><br/>	
+						                
+						                <br/>
 
-			                
-			            <% end %>
-		<% rescue RuntimeError %>
-			<div class="alert alert-danger" role="alert">
-			  The stock ticker is not valid!
+						                Percent Change: <%= number_with_precision(@ticker.change_percent*100, :precision => 2, :delimiter => ',') %>%<br/>
+						                PE Ratio: <%= @ticker.pe_ratio %><br/>
+						                YtD Change: <%= number_with_precision(@ticker.ytd_change*100, :precision => 2, :delimiter => ',') %>%<br/>
+
+						                <br/>
+
+						                <strong>Option Spreads</strong><br/><br/>
+
+						                <table class="table table-bordered table-hover"   data-toggle="table" data-url="data1.json" data-pagination="true" data-search="true">
+										  <thead class="thead-dark">
+										    <tr>
+										      <th>Expiry</th>
+										      <th>Buy Strike</th>
+										      <th>Sell Strike</th>
+										      <th>Risk</th>
+										      <th>Reward</th>
+										      <th>Upside Reqd</th>
+										      <th>R/R</th>							      
+										      
+										    </tr>
+										  </thead>
+
+											<tbody>
+							                <!-- For each expiry date, get options chain -->
+												<% expirydates_data.each do |item| %>
+
+													<% url_options_chain_string = @baseurl_tradier + "options/chains?symbol=" + @ticker.symbol + "&expiration=" + item + "&greeks=false" %>
+													<% response = HTTParty.get(url_options_chain_string, {headers: {"Authorization" => 'Bearer ' + @tradier_api_key}}) %>
+													<% optionchain_data = response.parsed_response['options']['option'] %>
+
+													<% option_strikes_array = Array[] %>
+
+													<!-- Loop through all contracts in option chain of selected expiry date -->
+													<% optionchain_data.each do |contract_item| %>
+														<% if contract_item['option_type'] == "call" %>										
+															<!--create an array of option strikes -->
+															<% option_strikes_array.push(contract_item['strike']) %>
+														<% end %>
+													<% end %>
+
+
+
+													<!--find strike price closest to stock quote to set anchor-->
+													<% h = option_strikes_array.map(&:to_i).sort.group_by{|e| e <=> @ticker.latest_price} %>
+													<% anchor_strike = (h[-1].last || h[1].first) %>
+													<% higher_strike = (h[1][1]) %>
+													<% strike_gap = higher_strike-anchor_strike %>
+
+													<!-- Create a strike_gap set array -->
+													<% strike_gap_set = Array[] %>
+													<% strike_gap_set.push(strike_gap) %>
+													<% strike_gap_set.push(strike_gap * 2) %>
+													<% strike_gap_set.push(strike_gap * 3) %>
+
+													<% strike_gap_set.each do |sg| %>
+														<!-- Create an anchor set array -->
+														<% anchor_set =  (anchor_strike..anchor_strike*1.3).step(sg).to_a %>
+														<% threshold = [7, anchor_set.length()].min %>
+
+														<!-- Loop through each anchor price in anchor_set -->
+														<% anchor_set.take(threshold).each do |anc_price| %>
+															<% buy_contract_ask_price = -1 %>
+															<% sell_contract_bid_price = -1 %>
+															
+
+															<% risk = -1 %>
+															<% reward = -1 %>
+															<% rr_ratio = -1 %>
+															<% perc_change = -1 %>
+
+															<% buy_call_strike = anc_price %>
+															<% sell_call_strike = anc_price + sg %>
+
+															
+															
+															<!--Get ask price of buy option contract with strike price = buy_call_strike -->
+															<% t_contract_buy = optionchain_data.detect {|contract_item| contract_item['strike'].to_s == buy_call_strike.to_s && contract_item['option_type']=="call" } %>
+
+															<% unless t_contract_buy.nil? %>
+					  											<% buy_contract_ask_price =  t_contract_buy['ask'] %>
+															<% end %>
+
+															<!--Get bid price of sell option contract with strike price = sell_call_strike -->
+															<% t_contract_sell = optionchain_data.detect {|contract_item| contract_item['strike'].to_s == sell_call_strike.to_s && contract_item['option_type']=="call" } %>
+
+															<% unless t_contract_sell.nil? %>
+					  											<% sell_contract_bid_price =  t_contract_sell['bid'] %>
+															<% end %>
+
+
+															<!-- if both bid and ask of the 2 contracts are valid, calc risk and reward -->
+															<% if buy_contract_ask_price != -1 && sell_contract_bid_price != -1 %>
+																<% risk = number_with_precision(100 * (buy_contract_ask_price.to_f - sell_contract_bid_price.to_f), :precision =>2, :delimiter => ',') %>
+																<% reward = number_with_precision((100.0 * sg.to_f) - risk.to_f, :precision =>2, :delimiter => ',') %>
+																
+																<% if risk != 0 %>
+																	<% rr_ratio = number_with_precision(reward.to_f / risk.to_f, :precision => 2, :delimiter => ',') %>
+																<% end %>
+
+																<% perc_change = number_with_precision(100*((sell_call_strike.to_f - @ticker.latest_price)/@ticker.latest_price), :precision =>2, :delimiter => ',') %>
+
+																
+																	<tr>
+																		<td><%= item.to_s %></td>
+																		<td><%= buy_call_strike %></td>
+																		<td><%= sell_call_strike %></td>
+																		<td><%= risk %></td>
+																		<td><%= reward %></td>
+																		<td><%= perc_change %>%</td>
+																		<td><%= rr_ratio %></td>
+																	</tr>
+
+															<% end %>
+
+
+														<% end %>
+
+													<% end %>
+
+													
+													
+													
+
+												<% end %>
+											</tbody>
+										</table>
+					                
+
+
+						                
+
+
+
+						                <br/><br/>
+						                <strong>News</strong> <br/><br/>
+						                <% @ticker_news.news.each do |child| %>
+						                	<!--<img src="<%= child['image'] %>" class="img-thumbnail rounded float-left" alt="...">
+						                	<strong><%= link_to child['headline'], child['url'] %></strong>
+										    <br/>-->
+
+											<div class="container">
+						  						<div class="row">
+												    <div class="card" style="width: 18rem;">
+													  <img src="<%= child['image'] %>" class="card-img-top" alt="...">
+													  <div class="card-body">
+													    <h5 class="card-title"><%= child['headline'] %></h5>
+													    <a href="<%= child['url'] %>" class="btn btn-primary"><%= child['source'] %></a>
+													    
+													  </div>
+													</div>
+													<br/><br/><br/>
+
+												</div>
+											</div>
+										<% end %>
+
+						                
+						            <% end %>
+					<% rescue RuntimeError %>
+						<div class="alert alert-danger" role="alert">
+						  The stock ticker is not valid!
+						</div>
+					<% else %>
+			           
+			        <% ensure %>
+			           
+			      	<% end %>
+
+
+
+
+
+					        
+
+
+					<br/><br/>
+
+
+					<%= link_to 'Edit', edit_stock_path(@stock) %> |
+					<%= link_to 'Back', stocks_path %>
+				</div>
 			</div>
-		<% else %>
-           
-        <% ensure %>
-           
-      	<% end %>
-
-
-
-
-
-		        
-
-
-		<br/><br/>
-
-
-		<%= link_to 'Edit', edit_stock_path(@stock) %> |
-		<%= link_to 'Back', stocks_path %>
+		</div>
 	</div>
 </div>
+

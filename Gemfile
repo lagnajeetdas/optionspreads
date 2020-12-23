@@ -26,6 +26,8 @@ gem 'jquery-rails'
 gem 'stock_quote', '~> 3.0'
 gem 'httparty', '~> 0.18.1'
 gem 'devise', '~> 4.7', '>= 4.7.3'
+gem 'bootstrap-table-rails', '~> 1.13', '>= 1.13.4'
+
 
 
 group :production do
