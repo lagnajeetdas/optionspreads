@@ -9,7 +9,9 @@ class HomeController < ApplicationController
     	begin
   		    @stock = StockQuote::Stock.quote(params[:ticker])
   		rescue RuntimeError
-  		    @error =  "Hey That stock symbol doesn't exit. Please try again"
+  		    @error =  "Hey, That stock symbol doesn't exit. Please try again"
+      rescue NoMethodError
+          @error =  "Hey, The symbol exists but we cannot fetch the quote. Please try NYSE/NASDAQ tickers. "
   		else
   		    p "No error"	 
     		ensure

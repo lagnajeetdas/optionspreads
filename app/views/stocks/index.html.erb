@@ -28,7 +28,17 @@
           </tr>
         <% rescue RuntimeError %>
               <tr>
-                <td><%= link_to "Error", stock %></td>
+                <td><%= link_to "Error: Incorrect Symbol", stock %></td>
+                <td><%= stock.ticker %></td>
+                
+                <td>N/A</td>
+                
+                <td><center><%= link_to 'Edit', edit_stock_path(stock) %></center></td>
+                <td><center><%= link_to 'Delete', stock, method: :delete, data: { confirm: 'Are you sure?' } %></center></td>
+              </tr>
+        <% rescue NoMethodError %>
+              <tr>
+                <td><%= link_to "Error: Quote unavailable", stock %></td>
                 <td><%= stock.ticker %></td>
                 
                 <td>N/A</td>
@@ -40,20 +50,7 @@
            
         <% ensure %>
            
-      <% end %>
-
-
-
-
-
-
-
-            
-
-
-
-
-
+        <% end %>
         
       <% end %>
     <% end %>

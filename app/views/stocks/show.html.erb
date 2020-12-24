@@ -182,6 +182,10 @@
 						<div class="alert alert-danger" role="alert">
 						  The stock ticker is not valid!
 						</div>
+					<% rescue NoMethodError %>
+						<div class="alert alert-danger" role="alert">
+						  The stock ticker is not valid!
+						</div>
 					<% else %>
 			           
 			        <% ensure %>
