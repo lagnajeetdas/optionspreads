@@ -14,7 +14,13 @@
 						<!-- Get expiry date of options from Tradier API -->
 						<% url_options_expiry_string = @baseurl_tradier + "options/expirations?symbol=" + @ticker.symbol + "&includeAllRoots=true&strikes=false" %>
 						<% response = HTTParty.get(url_options_expiry_string, {headers: {"Authorization" => 'Bearer ' + @tradier_api_key}}) %>
-						<% expirydates_data = response.parsed_response['expirations']['date'] %>
+						
+						
+						
+						<% expirydates_data = Array[] %>
+						<% if response.parsed_response['expirations'] %>
+							<% expirydates_data = response.parsed_response['expirations']['date'] %>
+						<% end %>
 
 
 			            <% if !@ticker %>
@@ -46,145 +52,146 @@
 
 			                <strong>Option Spreads</strong><br/><br/>
 
+			                <% if !expirydates_data.empty? %>
+				                <table class="table table-bordered table-hover"   data-toggle="table" data-pagination="true" data-search="true" data-show-export="true" data-filter-control="true">
+								  <thead class="thead-dark">
+								    <tr>
+								      <th data-sortable="true" data-field="expiry_date" data-filter-control="select">Expiry</th>
+								      <th>Buy Strike</th>
+								      <th>Sell Strike</th>
+								      <th data-sortable="true" data-field="risk">Risk</th>
+								      <th data-sortable="true" data-field="reward">Reward</th>
+								      <th data-sortable="true" data-field="perc_change">Upside % Reqd</th>
+								      <th data-sortable="true" data-field="rr">R/R</th>							      
+								      
+								    </tr>
+								  </thead>
 
-			                <table class="table table-bordered table-hover"   data-toggle="table" data-pagination="true" data-search="true" data-show-export="true" data-filter-control="true">
-							  <thead class="thead-dark">
-							    <tr>
-							      <th data-sortable="true" data-field="expiry_date" data-filter-control="select">Expiry</th>
-							      <th>Buy Strike</th>
-							      <th>Sell Strike</th>
-							      <th data-sortable="true" data-field="risk">Risk</th>
-							      <th data-sortable="true" data-field="reward">Reward</th>
-							      <th data-sortable="true" data-field="perc_change">Upside % Reqd</th>
-							      <th data-sortable="true" data-field="rr">R/R</th>							      
-							      
-							    </tr>
-							  </thead>
+									<tbody>
+					                <!-- For each expiry date, get options chain -->
+										<% expirydates_data.each do |item| %>
 
-								<tbody>
-				                <!-- For each expiry date, get options chain -->
-									<% expirydates_data.each do |item| %>
+											<% url_options_chain_string = @baseurl_tradier + "options/chains?symbol=" + @ticker.symbol + "&expiration=" + item + "&greeks=false" %>
+											<% response = HTTParty.get(url_options_chain_string, {headers: {"Authorization" => 'Bearer ' + @tradier_api_key}}) %>
+											<% optionchain_data = response.parsed_response['options']['option'] %>
 
-										<% url_options_chain_string = @baseurl_tradier + "options/chains?symbol=" + @ticker.symbol + "&expiration=" + item + "&greeks=false" %>
-										<% response = HTTParty.get(url_options_chain_string, {headers: {"Authorization" => 'Bearer ' + @tradier_api_key}}) %>
-										<% optionchain_data = response.parsed_response['options']['option'] %>
+											<% option_strikes_array = Array[] %>
 
-										<% option_strikes_array = Array[] %>
-
-										<!-- Loop through all contracts in option chain of selected expiry date -->
-										<% optionchain_data.each do |contract_item| %>
-											<% if contract_item['option_type'] == "call" && contract_item['root_symbol'] == @ticker.symbol %>										
-												<!--create an array of option strikes -->
-												<% option_strikes_array.push(contract_item['strike']) %>
+											<!-- Loop through all contracts in option chain of selected expiry date -->
+											<% optionchain_data.each do |contract_item| %>
+												<% if contract_item['option_type'] == "call" && contract_item['root_symbol'] == @ticker.symbol %>										
+													<!--create an array of option strikes -->
+													<% option_strikes_array.push(contract_item['strike']) %>
+												<% end %>
 											<% end %>
-										<% end %>
 
-										
-
-										<!-- Check if option strikes array is not empty -->
-										<% if 1==1 && !option_strikes_array.empty? %>
-											<!--find strike price closest to stock quote to set anchor-->
-											<% h = option_strikes_array.map(&:to_i).sort.group_by{|e| e <=> @ticker.latest_price} %>
-											<% anchor_strike = (h[-1].last || h[1].first) %>
-											<% strike_gap = h[-1].last - h[-1][-2]  %>
 											
-											<!-- Create a strike_gap set array -->
-											<% strike_gap_set = Array[] %>
-											<% strike_gap_set.push(strike_gap) %>
-											<% strike_gap_set.push(strike_gap * 2) %>
-											<% strike_gap_set.push(strike_gap * 3) %>
 
-											<% strike_gap_set.each do |sg| %>
-												<!-- Create an anchor set array -->
-												<% anchor_set =  (anchor_strike..anchor_strike*1.3).step(sg).to_a %>
-												<% threshold = [7, anchor_set.length()].min %>
+											<!-- Check if option strikes array is not empty -->
+											<% if 1==1 && !option_strikes_array.empty? %>
+												<!--find strike price closest to stock quote to set anchor-->
+												<% h = option_strikes_array.map(&:to_i).sort.group_by{|e| e <=> @ticker.latest_price} %>
+												<% anchor_strike = (h[-1].last || h[1].first) %>
+												<% strike_gap = h[-1].last - h[-1][-2]  %>
+												
+												<!-- Create a strike_gap set array -->
+												<% strike_gap_set = Array[] %>
+												<% strike_gap_set.push(strike_gap) %>
+												<% strike_gap_set.push(strike_gap * 2) %>
+												<% strike_gap_set.push(strike_gap * 3) %>
 
-												<!-- Loop through each anchor price in anchor_set -->
-												<% anchor_set.take(threshold).each do |anc_price| %>
-													<% buy_contract_ask_price = -1 %>
-													<% sell_contract_bid_price = -1 %>
-													
+												<% strike_gap_set.each do |sg| %>
+													<!-- Create an anchor set array -->
+													<% anchor_set =  (anchor_strike..anchor_strike*1.3).step(sg).to_a %>
+													<% threshold = [7, anchor_set.length()].min %>
 
-													<% risk = -1 %>
-													<% reward = -1 %>
-													<% rr_ratio = -1 %>
-													<% perc_change = -1 %>
-
-													<% buy_call_strike = anc_price %>
-													<% sell_call_strike = anc_price + sg %>
-
-													
-													
-													<!--Get ask price of buy option contract with strike price = buy_call_strike -->
-													<% t_contract_buy = optionchain_data.detect {|contract_item| contract_item['strike'].to_s == buy_call_strike.to_s && contract_item['option_type']=="call" && contract_item['root_symbol'] == @ticker.symbol } %>
-
-													<% unless t_contract_buy.nil? %>
-			  											<% buy_contract_ask_price =  t_contract_buy['ask'] %>
-													<% end %>
-
-													<!--Get bid price of sell option contract with strike price = sell_call_strike -->
-													<% t_contract_sell = optionchain_data.detect {|contract_item| contract_item['strike'].to_s == sell_call_strike.to_s && contract_item['option_type']=="call" && contract_item['root_symbol'] == @ticker.symbol } %>
-
-													<% unless t_contract_sell.nil? %>
-			  											<% sell_contract_bid_price =  t_contract_sell['bid'] %>
-													<% end %>
-
-
-													<!-- if both bid and ask of the 2 contracts are valid, calc risk and reward -->
-													<% if buy_contract_ask_price != -1 && sell_contract_bid_price != -1 %>
-														<% risk = 100 * (buy_contract_ask_price.to_f - sell_contract_bid_price.to_f)%>
-														<% reward = (100.0 * sg.to_f) - risk.to_f %>
+													<!-- Loop through each anchor price in anchor_set -->
+													<% anchor_set.take(threshold).each do |anc_price| %>
+														<% buy_contract_ask_price = -1 %>
+														<% sell_contract_bid_price = -1 %>
 														
-														<% if risk != 0 %>
-															<% rr_ratio = reward.to_f / risk.to_f %>
+
+														<% risk = -1 %>
+														<% reward = -1 %>
+														<% rr_ratio = -1 %>
+														<% perc_change = -1 %>
+
+														<% buy_call_strike = anc_price %>
+														<% sell_call_strike = anc_price + sg %>
+
+														
+														
+														<!--Get ask price of buy option contract with strike price = buy_call_strike -->
+														<% t_contract_buy = optionchain_data.detect {|contract_item| contract_item['strike'].to_s == buy_call_strike.to_s && contract_item['option_type']=="call" && contract_item['root_symbol'] == @ticker.symbol } %>
+
+														<% unless t_contract_buy.nil? %>
+				  											<% buy_contract_ask_price =  t_contract_buy['ask'] %>
 														<% end %>
 
-														<% perc_change = 100*((sell_call_strike.to_f - @ticker.latest_price)/@ticker.latest_price) %>
+														<!--Get bid price of sell option contract with strike price = sell_call_strike -->
+														<% t_contract_sell = optionchain_data.detect {|contract_item| contract_item['strike'].to_s == sell_call_strike.to_s && contract_item['option_type']=="call" && contract_item['root_symbol'] == @ticker.symbol } %>
 
-														
-															<tr>
-																<td><%= item.to_s %></td>
-																<td><%= buy_call_strike %></td>
-																<td><%= sell_call_strike %></td>
-																<td><%= risk.round(1) %></td>
-																<td><%= reward.round(1) %></td>
-																<td><%= perc_change.round(1) %></td>
-																<td><%= rr_ratio.round(1) %></td>
-															</tr>
+														<% unless t_contract_sell.nil? %>
+				  											<% sell_contract_bid_price =  t_contract_sell['bid'] %>
+														<% end %>
+
+
+														<!-- if both bid and ask of the 2 contracts are valid, calc risk and reward -->
+														<% if buy_contract_ask_price != -1 && sell_contract_bid_price != -1 %>
+															<% risk = 100 * (buy_contract_ask_price.to_f - sell_contract_bid_price.to_f)%>
+															<% reward = (100.0 * sg.to_f) - risk.to_f %>
+															
+															<% if risk != 0 %>
+																<% rr_ratio = reward.to_f / risk.to_f %>
+															<% end %>
+
+															<% perc_change = 100*((sell_call_strike.to_f - @ticker.latest_price)/@ticker.latest_price) %>
+
+															
+																<tr>
+																	<td><%= item.to_s %></td>
+																	<td><%= buy_call_strike %></td>
+																	<td><%= sell_call_strike %></td>
+																	<td><%= risk.round(1) %></td>
+																	<td><%= reward.round(1) %></td>
+																	<td><%= perc_change.round(1) %></td>
+																	<td><%= rr_ratio.round(1) %></td>
+																</tr>
+
+														<% end %>
+
 
 													<% end %>
 
-
 												<% end %>
-
 											<% end %>
+											
+											
+											
+
 										<% end %>
-										
-										
-										
-
-									<% end %>
-								</tbody>
-							</table>
-		                
-
-
-			                
-
-
+									</tbody>
+								</table>
+							<% else %>
+								Options data unavailable.
+							<% end %>
 
 			                <br/><br/>
 
 
 			                
 			            <% end %>
-					<% rescue RuntimeError %>
+					<% rescue RuntimeError => e %>
 						<div class="alert alert-danger" role="alert">
-						  The stock ticker is not valid!
+						  The stock ticker is not valid! <br/>
+						  <%= e.inspect %> <br/><br/>
+						  <%= e.backtrace %>
 						</div>
-					<% rescue NoMethodError %>
+					<% rescue NoMethodError => e %>
 						<div class="alert alert-danger" role="alert">
-						  The stock ticker is not valid!
+						  The stock ticker is not valid! <br/>
+						  <%= e.inspect %> <br/><br/>
+						  <%= e.backtrace %>
 						</div>
 					<% else %>
 			           

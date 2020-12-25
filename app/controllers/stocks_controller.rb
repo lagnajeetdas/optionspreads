@@ -78,7 +78,7 @@ class StocksController < ApplicationController
   def destroy
     @stock.destroy
     respond_to do |format|
-      format.html { redirect_to stocks_url, notice: 'Stock was successfully destroyed.' }
+      format.html { redirect_to stocks_url, notice: 'Stock was successfully deleted.' }
       format.json { head :no_content }
     end
   end
@@ -96,6 +96,6 @@ class StocksController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def stock_params
-      params.require(:stock).permit(:ticker, :user_id)
+      params.require(:stock).permit(:ticker, :user_id, :target_price_auto)
     end
 end

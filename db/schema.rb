@@ -10,13 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_21_100910) do
+ActiveRecord::Schema.define(version: 2020_12_24_144246) do
 
   create_table "stocks", force: :cascade do |t|
     t.string "ticker"
     t.integer "user_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.float "target_price_auto"
+    t.float "target_price_manual"
     t.index ["user_id"], name: "index_stocks_on_user_id"
   end
 

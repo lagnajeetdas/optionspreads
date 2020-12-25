@@ -5,6 +5,7 @@
       <th>Company</th>
       <th>Ticker</th>
       <th>Current Price</th>
+      <th>Target Price</th>
       
       <th colspan="3"></th>
     </tr>
@@ -22,6 +23,7 @@
                 <td><%= link_to @ticker.company_name, stock %></td>
                 <td><%= @ticker.symbol %></td>
                 <td>$<%= number_with_precision(@ticker.latest_price, :precision => 2, :delimiter => ',') %></td>
+                <td>$<%= stock.target_price_auto %></td>
                 
                 <td><center><%= link_to 'Edit', edit_stock_path(stock) %></center></td>
                 <td><center><%= link_to 'Delete', stock, method: :delete, data: { confirm: 'Are you sure?' } %></center></td>
@@ -32,6 +34,7 @@
                 <td><%= stock.ticker %></td>
                 
                 <td>N/A</td>
+                <td>N/A</td>
                 
                 <td><center><%= link_to 'Edit', edit_stock_path(stock) %></center></td>
                 <td><center><%= link_to 'Delete', stock, method: :delete, data: { confirm: 'Are you sure?' } %></center></td>
@@ -41,6 +44,7 @@
                 <td><%= link_to "Error: Quote unavailable", stock %></td>
                 <td><%= stock.ticker %></td>
                 
+                <td>N/A</td>
                 <td>N/A</td>
                 
                 <td><center><%= link_to 'Edit', edit_stock_path(stock) %></center></td>

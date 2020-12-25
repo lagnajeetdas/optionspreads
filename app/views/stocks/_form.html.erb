@@ -17,6 +17,11 @@
   </div>
 
   <div class="field">
+    <%= form.label :target_price %>
+    <%= form.number_field :target_price_auto %>
+  </div>
+
+  <div class="field">
 
     <%= form.number_field :user_id, value: current_user.id, type: :hidden  %>
   </div>
