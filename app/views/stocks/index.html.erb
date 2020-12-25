@@ -1,13 +1,13 @@
 
-<table class="table table-bordered table-hover">
+<table class="table table-bordered table-hover" data-toggle="table" data-search="true" >
   <thead class="thead-dark">
     <tr>
-      <th>Company</th>
-      <th>Ticker</th>
-      <th>Current Price</th>
-      <th>Target Price</th>
+      <th data-sortable="true" data-field="company">Company</th>
+      <th data-sortable="true" data-field="symbol">Ticker</th>
+      <th data-sortable="true" data-field="quote">Quote $</th>
+      <th data-sortable="true" data-field="target">Target $</th>
       
-      <th colspan="3"></th>
+      
     </tr>
   </thead>
 
@@ -22,11 +22,10 @@
           <tr>
                 <td><%= link_to @ticker.company_name, stock %></td>
                 <td><%= @ticker.symbol %></td>
-                <td>$<%= number_with_precision(@ticker.latest_price, :precision => 2, :delimiter => ',') %></td>
-                <td>$<%= stock.target_price_auto %></td>
+                <td><%= number_with_precision(@ticker.latest_price, :precision => 2) %></td>
+                <td><%= stock.target_price_auto %></td>
                 
-                <td><center><%= link_to 'Edit', edit_stock_path(stock) %></center></td>
-                <td><center><%= link_to 'Delete', stock, method: :delete, data: { confirm: 'Are you sure?' } %></center></td>
+
           </tr>
         <% rescue RuntimeError %>
               <tr>
@@ -36,8 +35,7 @@
                 <td>N/A</td>
                 <td>N/A</td>
                 
-                <td><center><%= link_to 'Edit', edit_stock_path(stock) %></center></td>
-                <td><center><%= link_to 'Delete', stock, method: :delete, data: { confirm: 'Are you sure?' } %></center></td>
+
               </tr>
         <% rescue NoMethodError %>
               <tr>
@@ -47,8 +45,7 @@
                 <td>N/A</td>
                 <td>N/A</td>
                 
-                <td><center><%= link_to 'Edit', edit_stock_path(stock) %></center></td>
-                <td><center><%= link_to 'Delete', stock, method: :delete, data: { confirm: 'Are you sure?' } %></center></td>
+
               </tr>
         <% else %>
            

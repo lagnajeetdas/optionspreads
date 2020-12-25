@@ -31,7 +31,8 @@
 
 			            <% else %>
 			            	<div class="float-right">
-				              	<%= link_to 'Edit', edit_stock_path(@stock) %> |
+				              	<%= link_to 'Edit', edit_stock_path(@stock) %> | 
+								<%= link_to 'Delete', @stock, method: :delete, data: { confirm: 'Are you sure?' } %> | 
 								<%= link_to 'Back', stocks_path %>
 							</div>
 							<br/><br/>
@@ -209,8 +210,13 @@
 					<br/><br/>
 
 
-					<%= link_to 'Edit', edit_stock_path(@stock) %> |
+					<%= link_to 'Edit', edit_stock_path(@stock) %> | 
+					<%= link_to 'Delete', @stock, method: :delete, data: { confirm: 'Are you sure?' } %> | 
 					<%= link_to 'Back', stocks_path %>
+
+
+					
+                	
 				</div>
 			</div>
 		</div>
