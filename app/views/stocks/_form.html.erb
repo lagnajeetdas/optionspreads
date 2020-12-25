@@ -21,7 +21,13 @@
 
               <div class="field">
                 <%= form.label :target_price %>
-                <%= form.number_field :target_price_auto, class: "form-control" %>
+                <%= form.number_field :target_price_auto, :step => "0.01", class: "form-control" %>
+              </div>
+
+              <%= link_to 'Get Analyst Target Automatically', targetprice_path(:symbol => stock.ticker), method: :post, :remote => true %><br/>
+              
+              <div id="targetprice_viz" > 
+                
               </div>
 
               <div class="field">
@@ -30,7 +36,7 @@
               </div>
 
               <div class="actions">
-                <%= form.submit "Create", class: "btn btn-primary" %>
+                <%= form.submit "Save", class: "btn btn-primary" %>
               </div>
 
             </div>

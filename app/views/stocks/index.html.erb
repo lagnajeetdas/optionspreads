@@ -37,7 +37,7 @@
                 
 
               </tr>
-        <% rescue NoMethodError %>
+        <% rescue Errno::ETIMEDOUT, NoMethodError %>
               <tr>
                 <td><%= link_to "Error: Quote unavailable", stock %></td>
                 <td><%= stock.ticker %></td>

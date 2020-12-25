@@ -20,6 +20,7 @@
 						<% expirydates_data = Array[] %>
 						<% if response.parsed_response['expirations'] %>
 							<% expirydates_data = response.parsed_response['expirations']['date'] %>
+							<% p expirydates_data.length() %>
 						<% end %>
 
 
@@ -41,7 +42,8 @@
 			              	
 			                <strong><%=  @ticker.company_name %></strong><br/>
 			                Ticker Symbol: <%= @ticker.symbol %><br/>
-			                Current Price: <%= @ticker.latest_price %><br/>	
+			                Current Price: <strong><%= @ticker.latest_price %></strong><br/>	
+			                Target Price: <strong><%= @stock.target_price_auto %></strong><br/>	
 			                
 			                <br/>
 
@@ -104,6 +106,7 @@
 												<% strike_gap_set.each do |sg| %>
 													<!-- Create an anchor set array -->
 													<% anchor_set =  (anchor_strike..anchor_strike*1.3).step(sg).to_a %>
+													<% p anchor_set.length() %>
 													<% threshold = [7, anchor_set.length()].min %>
 
 													<!-- Loop through each anchor price in anchor_set -->
@@ -188,7 +191,7 @@
 						  <%= e.inspect %> <br/><br/>
 						  <%= e.backtrace %>
 						</div>
-					<% rescue NoMethodError => e %>
+					<% rescue Errno::ETIMEDOUT, NoMethodError => e %>
 						<div class="alert alert-danger" role="alert">
 						  The stock ticker is not valid! <br/>
 						  <%= e.inspect %> <br/><br/>

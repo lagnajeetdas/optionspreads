@@ -12,7 +12,10 @@ class StocksController < ApplicationController
   # GET /stocks
   # GET /stocks.json
   def index
+    
     @stocks = Stock.all
+
+    @api = StockQuote::Stock.new(api_key: 'pk_34bbabe4cf054befa331a42b695e75b2')
     @finnhub_api_key = "sandbox_bv1u7mf48v6o5ed6gpdg"
     
     @iexcloud_api_key = "pk_34bbabe4cf054befa331a42b695e75b2"
@@ -86,6 +89,35 @@ class StocksController < ApplicationController
   def correct_user
     @ticker = current_user.stocks.find_by(id: params[:id])
     redirect_to stocks_path, notice: "Not Authorized to edit this stock" if @ticker.nil?
+  end
+
+  def gettarget
+    # Call Alpha vantage API company profile to get target price
+    # https://www.alphavantage.co/query?function=OVERVIEW&symbol=LAZR&apikey=UQLYHKP646RJWFJ3
+    @baseurl_alphavantage = "https://www.alphavantage.co/query?"
+    @alphavantage_apikey = "UQLYHKP646RJWFJ3"
+    symbol = params[:symbol]
+    @url_alphavantage_company = @baseurl_alphavantage + "function=OVERVIEW&symbol=" + symbol + "&apikey=" + @alphavantage_apikey
+
+
+    response = HTTParty.get(@url_alphavantage_company)
+    @analyst_target_price = -1
+
+    p response
+    p response.code
+
+    if response.code == 200
+      @analyst_target_price = response.parsed_response['AnalystTargetPrice'] 
+    end
+    
+
+
+
+    respond_to do |format|
+        format.js
+    end
+
+   
   end
 
   private
