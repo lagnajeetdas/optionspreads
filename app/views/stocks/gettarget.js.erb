@@ -1,2 +1,9 @@
-$("#stock_target_price_auto").val("<%= escape_javascript( @analyst_target_price ) %>"); 
-$("#targetprice_viz").html("<%= escape_javascript("Price target from Alphavantage") %>"); 
+if ("<%= escape_javascript( @analyst_target_price ) %>"!="None")
+{
+	$("#stock_target_price_auto").val("<%= escape_javascript( @analyst_target_price ) %>"); 
+	$("#targetprice_viz").html("<%= escape_javascript("Analyst price target courtesy of Alphavantage") %>"); 
+}
+else
+{
+	$("#targetprice_viz").html("<%= escape_javascript("Analyst price target unavailable") %>"); 
+}

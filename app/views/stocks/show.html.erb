@@ -20,7 +20,7 @@
 						<% expirydates_data = Array[] %>
 						<% if response.parsed_response['expirations'] %>
 							<% expirydates_data = response.parsed_response['expirations']['date'] %>
-							<% p expirydates_data.length() %>
+							
 						<% end %>
 
 
@@ -84,6 +84,7 @@
 											<% optionchain_data.each do |contract_item| %>
 												<% if contract_item['option_type'] == "call" && contract_item['root_symbol'] == @ticker.symbol %>										
 													<!--create an array of option strikes -->
+
 													<% option_strikes_array.push(contract_item['strike']) %>
 												<% end %>
 											<% end %>
@@ -93,80 +94,86 @@
 											<!-- Check if option strikes array is not empty -->
 											<% if 1==1 && !option_strikes_array.empty? %>
 												<!--find strike price closest to stock quote to set anchor-->
-												<% h = option_strikes_array.map(&:to_i).sort.group_by{|e| e <=> @ticker.latest_price} %>
+												<% h = option_strikes_array.map(&:to_f).sort.group_by{|e| e <=> @ticker.latest_price} %>
+												
 												<% anchor_strike = (h[-1].last || h[1].first) %>
 												<% strike_gap = h[-1].last - h[-1][-2]  %>
 												
 												<!-- Create a strike_gap set array -->
 												<% strike_gap_set = Array[] %>
+												<% anchor_set = Array[] %>
 												<% strike_gap_set.push(strike_gap) %>
 												<% strike_gap_set.push(strike_gap * 2) %>
 												<% strike_gap_set.push(strike_gap * 3) %>
 
-												<% strike_gap_set.each do |sg| %>
-													<!-- Create an anchor set array -->
-													<% anchor_set =  (anchor_strike..anchor_strike*1.3).step(sg).to_a %>
-													<% p anchor_set.length() %>
-													<% threshold = [7, anchor_set.length()].min %>
+												
 
-													<!-- Loop through each anchor price in anchor_set -->
-													<% anchor_set.take(threshold).each do |anc_price| %>
-														<% buy_contract_ask_price = -1 %>
-														<% sell_contract_bid_price = -1 %>
+												<% if 1==1 %>
+													<% strike_gap_set.each do |sg| %>
+														<!-- Create an anchor set array -->
+														<% anchor_set =  (anchor_strike..anchor_strike*1.3).step(sg).to_a %>
 														
+														<% threshold = [7, anchor_set.length()].min %>
 
-														<% risk = -1 %>
-														<% reward = -1 %>
-														<% rr_ratio = -1 %>
-														<% perc_change = -1 %>
-
-														<% buy_call_strike = anc_price %>
-														<% sell_call_strike = anc_price + sg %>
-
-														
-														
-														<!--Get ask price of buy option contract with strike price = buy_call_strike -->
-														<% t_contract_buy = optionchain_data.detect {|contract_item| contract_item['strike'].to_s == buy_call_strike.to_s && contract_item['option_type']=="call" && contract_item['root_symbol'] == @ticker.symbol } %>
-
-														<% unless t_contract_buy.nil? %>
-				  											<% buy_contract_ask_price =  t_contract_buy['ask'] %>
-														<% end %>
-
-														<!--Get bid price of sell option contract with strike price = sell_call_strike -->
-														<% t_contract_sell = optionchain_data.detect {|contract_item| contract_item['strike'].to_s == sell_call_strike.to_s && contract_item['option_type']=="call" && contract_item['root_symbol'] == @ticker.symbol } %>
-
-														<% unless t_contract_sell.nil? %>
-				  											<% sell_contract_bid_price =  t_contract_sell['bid'] %>
-														<% end %>
-
-
-														<!-- if both bid and ask of the 2 contracts are valid, calc risk and reward -->
-														<% if buy_contract_ask_price != -1 && sell_contract_bid_price != -1 %>
-															<% risk = 100 * (buy_contract_ask_price.to_f - sell_contract_bid_price.to_f)%>
-															<% reward = (100.0 * sg.to_f) - risk.to_f %>
+														<!-- Loop through each anchor price in anchor_set -->
+														<% anchor_set.take(threshold).each do |anc_price| %>
+															<% buy_contract_ask_price = -1 %>
+															<% sell_contract_bid_price = -1 %>
 															
-															<% if risk != 0 %>
-																<% rr_ratio = reward.to_f / risk.to_f %>
+
+															<% risk = -1 %>
+															<% reward = -1 %>
+															<% rr_ratio = -1 %>
+															<% perc_change = -1 %>
+
+															<% buy_call_strike = anc_price %>
+															<% sell_call_strike = anc_price + sg %>
+
+															
+															
+															<!--Get ask price of buy option contract with strike price = buy_call_strike -->
+															<% t_contract_buy = optionchain_data.detect {|contract_item| contract_item['strike'].to_s == buy_call_strike.to_s && contract_item['option_type']=="call" && contract_item['root_symbol'] == @ticker.symbol } %>
+
+															<% unless t_contract_buy.nil? %>
+					  											<% buy_contract_ask_price =  t_contract_buy['ask'] %>
 															<% end %>
 
-															<% perc_change = 100*((sell_call_strike.to_f - @ticker.latest_price)/@ticker.latest_price) %>
+															<!--Get bid price of sell option contract with strike price = sell_call_strike -->
+															<% t_contract_sell = optionchain_data.detect {|contract_item| contract_item['strike'].to_s == sell_call_strike.to_s && contract_item['option_type']=="call" && contract_item['root_symbol'] == @ticker.symbol } %>
 
-															
-																<tr>
-																	<td><%= item.to_s %></td>
-																	<td><%= buy_call_strike %></td>
-																	<td><%= sell_call_strike %></td>
-																	<td><%= risk.round(1) %></td>
-																	<td><%= reward.round(1) %></td>
-																	<td><%= perc_change.round(1) %></td>
-																	<td><%= rr_ratio.round(1) %></td>
-																</tr>
+															<% unless t_contract_sell.nil? %>
+					  											<% sell_contract_bid_price =  t_contract_sell['bid'] %>
+															<% end %>
+
+
+															<!-- if both bid and ask of the 2 contracts are valid, calc risk and reward -->
+															<% if buy_contract_ask_price != -1 && sell_contract_bid_price != -1 %>
+																<% risk = 100 * (buy_contract_ask_price.to_f - sell_contract_bid_price.to_f)%>
+																<% reward = (100.0 * sg.to_f) - risk.to_f %>
+																
+																<% if risk != 0 %>
+																	<% rr_ratio = reward.to_f / risk.to_f %>
+																<% end %>
+
+																<% perc_change = 100*((sell_call_strike.to_f - @ticker.latest_price)/@ticker.latest_price) %>
+
+																
+																	<tr>
+																		<td><%= item.to_s %></td>
+																		<td><%= buy_call_strike %></td>
+																		<td><%= sell_call_strike %></td>
+																		<td><%= risk.round(1) %></td>
+																		<td><%= reward.round(1) %></td>
+																		<td><%= perc_change.round(1) %></td>
+																		<td><%= rr_ratio.round(1) %></td>
+																	</tr>
+
+															<% end %>
+
 
 														<% end %>
 
-
 													<% end %>
-
 												<% end %>
 											<% end %>
 											

@@ -101,7 +101,7 @@ class StocksController < ApplicationController
 
 
     response = HTTParty.get(@url_alphavantage_company)
-    @analyst_target_price = -1
+    @analyst_target_price = "None"
 
     p response
     p response.code
@@ -109,6 +109,8 @@ class StocksController < ApplicationController
     if response.code == 200
       @analyst_target_price = response.parsed_response['AnalystTargetPrice'] 
     end
+
+    p @analyst_target_price
     
 
 
