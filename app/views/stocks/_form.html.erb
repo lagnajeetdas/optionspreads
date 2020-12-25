@@ -1,32 +1,39 @@
-<%= form_with(model: stock) do |form| %>
-  <% if stock.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(stock.errors.count, "error") %> prohibited this stock from being saved:</h2>
+<div class="container">
+          <%= form_with(model: stock) do |form| %>
+            <% if stock.errors.any? %>
+              <div id="error_explanation">
+                <h2><%= pluralize(stock.errors.count, "error") %> prohibited this stock from being saved:</h2>
 
-      <ul>
-        <% stock.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+                <ul>
+                  <% stock.errors.each do |error| %>
+                    <li><%= error.full_message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
 
-  <div class="field">
-    <%= form.label :ticker %>
-    <%= form.text_field :ticker %>
-  </div>
+            <div class="form-group">
 
-  <div class="field">
-    <%= form.label :target_price %>
-    <%= form.number_field :target_price_auto %>
-  </div>
+              <div class="field">
+                <%= form.label :ticker %>
+                <%= form.text_field :ticker, class: "form-control" %>
+              </div>
 
-  <div class="field">
+              <div class="field">
+                <%= form.label :target_price %>
+                <%= form.number_field :target_price_auto, class: "form-control" %>
+              </div>
 
-    <%= form.number_field :user_id, value: current_user.id, type: :hidden  %>
-  </div>
+              <div class="field">
 
-  <div class="actions">
-    <%= form.submit %>
-  </div>
-<% end %>
+                <%= form.number_field :user_id, value: current_user.id, type: :hidden  %>
+              </div>
+
+              <div class="actions">
+                <%= form.submit "Create", class: "btn btn-primary" %>
+              </div>
+
+            </div>
+          <% end %>
+</div>
+
