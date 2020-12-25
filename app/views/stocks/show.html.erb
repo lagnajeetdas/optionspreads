@@ -43,9 +43,13 @@
 			                <strong><%=  @ticker.company_name %></strong><br/>
 			                Ticker Symbol: <%= @ticker.symbol %><br/>
 			                Current Price: <strong><%= @ticker.latest_price %></strong><br/>	
-			                Target Price: <strong><%= @stock.target_price_auto %></strong><br/>	
+			                Target Price: <strong><span id="stock_target_price_view"><%= @stock.target_price_auto %></span></strong> &nbsp;
+			                <%= link_to '(Update Target)', targetprice_path(:symbol => @ticker.symbol), method: :post, :remote => true %><br/>
+			                <i><div id="targetprice_viz" >               
+                			</div></i><br/>
+			                <br/>	
 			                
-			                <br/>
+
 
 			                Percent Change: <%= number_with_precision(@ticker.change_percent*100, :precision => 2, :delimiter => ',') %>%<br/>
 			                PE Ratio: <%= @ticker.pe_ratio %><br/>
@@ -56,7 +60,7 @@
 			                <strong>Option Spreads</strong><br/><br/>
 
 			                <% if !expirydates_data.empty? %>
-				                <table class="table table-bordered table-hover"   data-toggle="table" data-pagination="true" data-search="true" data-show-export="true" data-filter-control="true">
+				                <table class="table table-bordered table-hover"   data-toggle="table" data-pagination="true"  data-show-export="true" data-filter-control="true">
 								  <thead class="thead-dark">
 								    <tr>
 								      <th data-sortable="true" data-field="expiry_date" data-filter-control="select">Expiry</th>
@@ -157,8 +161,14 @@
 
 																<% perc_change = 100*((sell_call_strike.to_f - @ticker.latest_price)/@ticker.latest_price) %>
 
-																
-																	<tr>
+																		<% under_target = false %>
+																		<% if !@stock.target_price_auto.nil? %>
+																			<% if sell_call_strike<=@stock.target_price_auto %>
+																				<% under_target = true %>
+																			<% end %>
+																		<% end %>
+
+																	<tr class="<%= under_target ? 'undertargetprice' : 'normalprice' %>">
 																		<td><%= item.to_s %></td>
 																		<td><%= buy_call_strike %></td>
 																		<td><%= sell_call_strike %></td>

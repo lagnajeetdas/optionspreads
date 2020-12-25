@@ -49,6 +49,7 @@ class StocksController < ApplicationController
   # POST /stocks
   # POST /stocks.json
   def create
+
     @stock = Stock.new(stock_params)
 
     respond_to do |format|
@@ -115,12 +116,14 @@ class StocksController < ApplicationController
     if @analyst_target_price.nil?
       @analyst_target_price = "None" # because not sure how to make JS ERB handle nil
     end
-    
-
-
 
     respond_to do |format|
         format.js
+    end
+
+    if @analyst_target_price!="None"
+      Stock.find_by(ticker: params[:symbol]).update_column(:target_price_auto, @analyst_target_price.to_f)
+      p "updated in db"
     end
 
    

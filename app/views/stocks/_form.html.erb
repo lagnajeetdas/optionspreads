@@ -19,16 +19,20 @@
                 <%= form.text_field :ticker, class: "form-control" %>
               </div>
 
-              <div class="field">
-                <%= form.label :target_price %>
-                <%= form.number_field :target_price_auto, :step => "0.01", class: "form-control" %>
-              </div>
+              <% if type=="edit" %>
 
-              <%= link_to 'Get Analyst Target Automatically', targetprice_path(:symbol => stock.ticker), method: :post, :remote => true %><br/>
-              
-              <div id="targetprice_viz" > 
+                <div class="field">
+                  <%= form.label :target_price %>
+                  <%= form.number_field :target_price_auto, in: 0.00..100000.00, :step => "0.01", class: "form-control" %>
+                </div>
+
+                <%= link_to 'Get Analyst Target Automatically', targetprice_path(:symbol => stock.ticker), method: :post, :remote => true %><br/>
                 
-              </div>
+                <div id="targetprice_viz" > 
+                  
+                </div>
+                <span id="stock_target_price_view" hidden></span>
+              <% end %>
 
               <div class="field">
 

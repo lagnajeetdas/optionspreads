@@ -1,9 +1,10 @@
 if ("<%= escape_javascript( @analyst_target_price ) %>"!="None")
 {
 	$("#stock_target_price_auto").val("<%= escape_javascript( @analyst_target_price ) %>"); 
-	$("#targetprice_viz").html("<%= escape_javascript("Analyst price target courtesy of Alphavantage") %>"); 
+	$("#stock_target_price_view").html("<%= escape_javascript( @analyst_target_price ) %>"); 
+	$("#targetprice_viz").html("<%= escape_javascript("Analyst target price automatically retrieved from Alphavantage") %>"); 
 }
 else
 {
-	$("#targetprice_viz").html("<%= escape_javascript("Analyst price target unavailable") %>"); 
+	$("#targetprice_viz").html("<%= escape_javascript("Target price unavailable") %>"); 
 }
