@@ -111,6 +111,10 @@ class StocksController < ApplicationController
     end
 
     p @analyst_target_price
+
+    if @analyst_target_price.nil?
+      @analyst_target_price = "None" # because not sure how to make JS ERB handle nil
+    end
     
 
 
