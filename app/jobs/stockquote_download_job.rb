@@ -24,7 +24,7 @@ class StockquoteDownloadJob < ApplicationJob
   	#procesiing response
   	stocksuniverse_ary = Array[]
   	recommendation_ary_stock = Array[]
-  	
+
   	if response.code == 200
 		stocksuniverse_ary = response.parsed_response
 
@@ -32,7 +32,7 @@ class StockquoteDownloadJob < ApplicationJob
 		stocksuniverse_ary = stocksuniverse_ary.select{ |item| item["mic"] == "XNYS" || item["mic"] == "XNGS" }
 
 		#filter for security type - common stocks, exchange traded products, american depository receipts 
-		stocksuniverse_ary = stocksuniverse_ary.select{ |item| item["type"] == "Common Stock" || item["type"] == "ADR" || item["type"] == "ETP" || item["type"] == "ETN" }
+		stocksuniverse_ary = stocksuniverse_ary.select{ |item| item["type"] == "Common Stock" || item["type"] == "ADR" || item["type"] == "ETP" || item["type"] == "ETN" || item["type"] == "REIT" }
     end
 
     # API call to get all symbols from finnhub

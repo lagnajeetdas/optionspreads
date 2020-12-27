@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_26_162258) do
+ActiveRecord::Schema.define(version: 2020_12_27_142149) do
 
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer "priority", default: 0, null: false
@@ -27,6 +27,18 @@ ActiveRecord::Schema.define(version: 2020_12_26_162258) do
     t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
+  create_table "recommendations", force: :cascade do |t|
+    t.float "buy"
+    t.float "hold"
+    t.string "period"
+    t.float "sell"
+    t.float "strongbuy"
+    t.float "strongsell"
+    t.string "symbol"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "stocks", force: :cascade do |t|
     t.string "ticker"
     t.integer "user_id"
@@ -35,6 +47,17 @@ ActiveRecord::Schema.define(version: 2020_12_26_162258) do
     t.float "target_price_auto"
     t.float "target_price_manual"
     t.index ["user_id"], name: "index_stocks_on_user_id"
+  end
+
+  create_table "universes", force: :cascade do |t|
+    t.string "currency"
+    t.text "description"
+    t.string "displaysymbol"
+    t.text "figi"
+    t.string "mic"
+    t.string "type"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "users", force: :cascade do |t|
