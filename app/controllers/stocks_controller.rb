@@ -21,6 +21,9 @@ class StocksController < ApplicationController
     @iexcloud_api_key = "pk_34bbabe4cf054befa331a42b695e75b2"
     @baseurl_iexcloud = "https://cloud.iexapis.com/stable/stock/"
 
+    #StockquoteDownloadJob.set(wait: 1.minute).perform_later
+    StockquoteDownloadJob.perform_later
+    
   end
 
   # GET /stocks/1
@@ -128,6 +131,8 @@ class StocksController < ApplicationController
 
    
   end
+
+
 
   private
     # Use callbacks to share common setup or constraints between actions.
