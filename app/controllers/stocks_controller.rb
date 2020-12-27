@@ -22,7 +22,7 @@ class StocksController < ApplicationController
     @baseurl_iexcloud = "https://cloud.iexapis.com/stable/stock/"
 
     #StockquoteDownloadJob.set(wait: 1.minute).perform_later
-    StockquoteDownloadJob.perform_later
+    #StockquoteDownloadJob.perform_later
     
   end
 

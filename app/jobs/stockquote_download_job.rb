@@ -4,22 +4,26 @@ class StockquoteDownloadJob < ApplicationJob
   def perform(*args)
     # Do something later
     # Finnhub API base parameters
+    p "@@@@@@@@@@@@@@@@@@@@@ Background Job Initialized  @@@@@@@@@@@@@@@@@@@@"
+
     @finnhub_api_key = "sandbox_bv1u7mf48v6o5ed6gpdg"
   	@finnhub_baseurl = "https://finnhub.io/api/v1/stock/symbol?"
   	@finnhub_baseurl_2 = "https://finnhub.io/api/v1/stock/"
   	@exchange = "US"
   	@currency = "USD"
 
+  	#get models into instances
   	@universes = Universe.all
   	@recommendations = Recommendation.all
 
-    p "@@@@@@@@@@@@@@@@@@@@@ Starting download of stock universe @@@@@@@@@@@@@@@@@@@@"
-    #getstockuniverse
-  	#getrecommendations
+    #function calls
+    getstockuniverse
+  	getrecommendations
 
   end
 
-  def getstockuniverse  	
+  def getstockuniverse
+  	p "@@@@@@@@@@@@@@@@@@@@@ Stocks universe download starting.... @@@@@@@@@@@@@@@@@@@@"  	
   	# API call to get all symbols from finnhub
   	url_finnhub_stocksuniverse = @finnhub_baseurl + "exchange=" + @exchange + "&currency=" + @currency + "&token=" + @finnhub_api_key
   	response = HTTParty.get(url_finnhub_stocksuniverse)
@@ -47,11 +51,13 @@ class StockquoteDownloadJob < ApplicationJob
 		end
     end
 
+    p "@@@@@@@@@@@@@@@@@@@@@ Stocks universe download finished. @@@@@@@@@@@@@@@@@@@@"  	
+
 
   end
 
   def getrecommendations
-
+  	p "@@@@@@@@@@@@@@@@@@@@@ Analyst recommendations download starting @@@@@@@@@@@@@@@@@@@@"  	
     # API call to get analyst recommendations from finnhub for a given stock
     #https://finnhub.io/api/v1/stock/recommendation?symbol=AAPL&token=bv1u7mf48v6o5ed6gpd0
   	recommendation_ary = Array[]
@@ -75,9 +81,11 @@ class StockquoteDownloadJob < ApplicationJob
 	  	end
 	end
 
+	p "@@@@@@@@@@@@@@@@@@@@@ Analyst recommendations download finished @@@@@@@@@@@@@@@@@@@@"  	
 
 
-    p "@@@@@@@@@@@@@@@@@@@@@ Finished download of stock universe @@@@@@@@@@@@@@@@@@@@"
+
+    
 
 
   end
