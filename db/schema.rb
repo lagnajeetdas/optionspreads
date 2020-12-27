@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_27_142149) do
+ActiveRecord::Schema.define(version: 2020_12_27_152531) do
 
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer "priority", default: 0, null: false
@@ -55,9 +55,9 @@ ActiveRecord::Schema.define(version: 2020_12_27_142149) do
     t.string "displaysymbol"
     t.text "figi"
     t.string "mic"
-    t.string "type"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "security_type"
   end
 
   create_table "users", force: :cascade do |t|
