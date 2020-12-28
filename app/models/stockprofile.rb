@@ -1,0 +1,2 @@
+class Stockprofile < ApplicationRecord
+end
