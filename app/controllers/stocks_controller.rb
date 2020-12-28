@@ -23,7 +23,7 @@ class StocksController < ApplicationController
 
     #StockquoteDownloadJob.set(wait: 1.minute).perform_later
     #StockquoteDownloadJob.perform_later
-    StockquoteDownloadJob.perform_later("metadata")
+    #StockquoteDownloadJob.perform_later("metadata")
     
   end
 

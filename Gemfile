@@ -29,6 +29,7 @@ gem 'devise', '~> 4.7', '>= 4.7.3'
 gem 'bootstrap-table-rails', '~> 1.13', '>= 1.13.4'
 gem 'delayed_job', '~> 4.1', '>= 4.1.9'
 gem 'delayed_job_active_record'
+gem 'ruby-limiter', '~> 1.1'
 
 
 

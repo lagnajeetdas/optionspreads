@@ -1,12 +1,14 @@
 class StockquoteDownloadJob < ApplicationJob
   queue_as :default
-
+  extend Limiter::Mixin
+  
   def perform(service_name)
     # Do something later
     # Finnhub API base parameters
     p "@@@@@@@@@@@@@@@@@@@@@ Background Job Initialized  @@@@@@@@@@@@@@@@@@@@"
 
-    @finnhub_api_key = "bv1u7mf48v6o5ed6gpd0"
+    @finnhub_api_key = "sandbox_bv1u7mf48v6o5ed6gpdg"
+    @finnhub_api_key_prod = "bv1u7mf48v6o5ed6gpd0"
   	@finnhub_baseurl = "https://finnhub.io/api/v1/stock/symbol?"
   	@finnhub_baseurl_2 = "https://finnhub.io/api/v1/stock/"
   	@exchange = "US"
@@ -99,27 +101,41 @@ class StockquoteDownloadJob < ApplicationJob
   	
   	#API Call to get industry, market cap, logo
   	p "@@@@@@@@@@@@@@@@@@@@@ Stocks meta data download starting.... @@@@@@@@@@@@@@@@@@@@"  
+  	
+  	@universes.take(120).each do |security|
+  		getstockprofiledata_apicall(security: security) 
+	end
+	
+
+	p "@@@@@@@@@@@@@@@@@@@@@ Stocks meta data download finished. @@@@@@@@@@@@@@@@@@@@"  
+
+
+  end
+
+  def getstockprofiledata_apicall(security:)
   	stockprofile_ary = Array[]
   	_marketcaptype = ""
-  	@universes.take(10).each do |security|
-	  	url_finnhub_stockprofile = @finnhub_baseurl_2 + "profile2?symbol=" + security['displaysymbol'] + "&token=" + @finnhub_api_key
+  	url_finnhub_stockprofile = @finnhub_baseurl_2 + "profile2?symbol=" + security['displaysymbol'] + "&token=" + @finnhub_api_key
 	  	response = HTTParty.get(url_finnhub_stockprofile)
 	  	if response.code == 200
 	  		stockprofile_ary = response.parsed_response
 	  		if !stockprofile_ary.empty?
 	  			
+	  			
 	  			if @stockprofiles.select{ |s| s['symbol']==security['displaysymbol'] }.empty?
-	  				case stockprofile_ary['marketCapitalization']
-	  					when 0..3000 
-	  						_marketcaptype = "Small Cap"
-	  					when 3000..10000 
-	  						_marketcaptype = "Mid Cap"
-						when 10000.. 
-							_marketcaptype = "Large Cap"
-						else
-							_marketcaptype = ""
-	  				end
-	  				
+	  				p security['displaysymbol'] 
+	  				p (stockprofile_ary['marketCapitalization'])
+	  				if (stockprofile_ary['marketCapitalization']) && (stockprofile_ary['marketCapitalization'])!=""
+		  				if (stockprofile_ary['marketCapitalization']).to_f < 3000.0
+		  					_marketcaptype = "Small Cap"
+		  				elsif (stockprofile_ary['marketCapitalization']).to_f > 10000.0
+		  					_marketcaptype = "Large Cap"
+		  				else
+							_marketcaptype = "Mid Cap"
+		  				end
+		  			end
+		  			p _marketcaptype
+
 			    	@stockprofile = Stockprofile.new(symbol: stockprofile_ary['ticker'], industry: stockprofile_ary['finnhubIndustry'], marketcap: stockprofile_ary['marketCapitalization'], logo: stockprofile_ary['logo'], marketcap_type: _marketcaptype )
 			    	if @stockprofile.save
 				      p "Saved stock meta data to db " + security['displaysymbol'].to_s
@@ -129,9 +145,6 @@ class StockquoteDownloadJob < ApplicationJob
 				end
 	  		end
 	  	end
-	end
-	p "@@@@@@@@@@@@@@@@@@@@@ Stocks meta data download finished. @@@@@@@@@@@@@@@@@@@@"  
-
 
   end
 
