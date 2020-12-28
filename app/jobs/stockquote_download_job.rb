@@ -101,8 +101,10 @@ class StockquoteDownloadJob < ApplicationJob
   	
   	#API Call to get industry, market cap, logo
   	p "@@@@@@@@@@@@@@@@@@@@@ Stocks meta data download starting.... @@@@@@@@@@@@@@@@@@@@"  
-  	
+  	@queue = Limiter::RateQueue.new(60, interval: 60)
+
   	@universes.take(120).each do |security|
+  		@queue.shift
   		getstockprofiledata_apicall(security: security) 
 	end
 	
@@ -115,7 +117,7 @@ class StockquoteDownloadJob < ApplicationJob
   def getstockprofiledata_apicall(security:)
   	stockprofile_ary = Array[]
   	_marketcaptype = ""
-  	url_finnhub_stockprofile = @finnhub_baseurl_2 + "profile2?symbol=" + security['displaysymbol'] + "&token=" + @finnhub_api_key
+  	url_finnhub_stockprofile = @finnhub_baseurl_2 + "profile2?symbol=" + security['displaysymbol'] + "&token=" + @finnhub_api_key_prod
 	  	response = HTTParty.get(url_finnhub_stockprofile)
 	  	if response.code == 200
 	  		stockprofile_ary = response.parsed_response
