@@ -103,7 +103,7 @@ class StockquoteDownloadJob < ApplicationJob
   	p "@@@@@@@@@@@@@@@@@@@@@ Stocks meta data download starting.... @@@@@@@@@@@@@@@@@@@@"  
   	@queue = Limiter::RateQueue.new(60, interval: 60)
 
-  	@universes.take(120).each do |security|
+  	@universes.each do |security|
   		@queue.shift
   		getstockprofiledata_apicall(security: security) 
 	end
