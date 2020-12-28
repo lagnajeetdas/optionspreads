@@ -101,7 +101,7 @@ class StockquoteDownloadJob < ApplicationJob
   	
   	#API Call to get industry, market cap, logo
   	p "@@@@@@@@@@@@@@@@@@@@@ Stocks meta data download starting.... @@@@@@@@@@@@@@@@@@@@"  
-  	@queue = Limiter::RateQueue.new(60, interval: 60)
+  	@queue = Limiter::RateQueue.new(56, interval: 60)
 
   	@universes.each do |security|
   		@queue.shift
@@ -117,14 +117,12 @@ class StockquoteDownloadJob < ApplicationJob
   def getstockprofiledata_apicall(security:)
   	stockprofile_ary = Array[]
   	_marketcaptype = ""
-  	url_finnhub_stockprofile = @finnhub_baseurl_2 + "profile2?symbol=" + security['displaysymbol'] + "&token=" + @finnhub_api_key_prod
-	  	response = HTTParty.get(url_finnhub_stockprofile)
-	  	if response.code == 200
-	  		stockprofile_ary = response.parsed_response
-	  		if !stockprofile_ary.empty?
-	  			
-	  			
-	  			if @stockprofiles.select{ |s| s['symbol']==security['displaysymbol'] }.empty?
+  	if @stockprofiles.select{ |s| s['symbol']==security['displaysymbol'] }.empty?
+	  	url_finnhub_stockprofile = @finnhub_baseurl_2 + "profile2?symbol=" + security['displaysymbol'] + "&token=" + @finnhub_api_key_prod
+		  	response = HTTParty.get(url_finnhub_stockprofile)
+		  	if response.code == 200
+		  		stockprofile_ary = response.parsed_response
+		  		if !stockprofile_ary.empty?
 	  				p security['displaysymbol'] 
 	  				p (stockprofile_ary['marketCapitalization'])
 	  				if (stockprofile_ary['marketCapitalization']) && (stockprofile_ary['marketCapitalization'])!=""
@@ -144,10 +142,10 @@ class StockquoteDownloadJob < ApplicationJob
 				    else
 				      p "Did not save stock meta data to db " + security['displaysymbol'].to_s
 				    end
-				end
-	  		end
-	  	end
-
+					
+		  		end
+		  	end
+	end
   end
 
 end

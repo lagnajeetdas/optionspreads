@@ -14,6 +14,7 @@ class StocksController < ApplicationController
   def index
     
     @stocks = Stock.all
+    @recommendations = Recommendation.all
 
     @api = StockQuote::Stock.new(api_key: 'pk_34bbabe4cf054befa331a42b695e75b2')
     @finnhub_api_key = "sandbox_bv1u7mf48v6o5ed6gpdg"
@@ -34,10 +35,6 @@ class StocksController < ApplicationController
     require 'net/http'
     @tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
     @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
-
-
-
-
 
   end
 
@@ -131,6 +128,25 @@ class StocksController < ApplicationController
     end
 
    
+  end
+
+  def compute_buy_rating
+    symbol = params[:symbol]
+    reco = Array[]
+    reco = @recommendations.select{|r| r['symbol']==symbol.to_s}
+    
+    if !reco.empty?
+      num_buy = reco[0]['buy']
+      num_strongbuy reco[0]['strongbuy']
+      num_sell = reco[0]['sell']
+      num_strongsell = reco[0]['strongsell']
+      num_hold = reco[0]['hold']
+
+      num_total_ratings = num_buy + num_strongbuy + num_sell + num_strongsell + num_hold
+      @buy_rating = round(100 * ((num_buy + num_strongbuy)/num_total_ratings),1)
+    end
+
+
   end
 
 

@@ -1,3 +1,5 @@
+<%= link_to 'New Stock', new_stock_path %>
+<br/>
 
 <table class="table table-bordered table-hover" data-toggle="table" data-search="true" >
   <thead class="thead-dark">
@@ -7,6 +9,7 @@
       <th data-sortable="true" data-field="quote">Quote $</th>
       <th data-sortable="true" data-field="target">Target $</th>
       <th data-sortable="true" data-field="gaptotarget">Gap to Target %</th>
+      <th data-sortable="true" data-field="buy_rating">Buy %</th>
       
       
     </tr>
@@ -26,7 +29,22 @@
                 <td><%= number_with_precision(@ticker.latest_price, :precision => 2) %></td>
                 <td><%= stock.target_price_auto %></td>
                 <td><%= number_with_precision(100 * ((stock.target_price_auto.to_f - @ticker.latest_price.to_f)/@ticker.latest_price.to_f),  :precision => 2) %></td>
+
+
+                <% reco = Array[] %>
+                <% buy_rating = 0 %>
+                <% reco = @recommendations.select{ |r| r['symbol']==@ticker.symbol } %>
                 
+                <% if !reco.empty? %>
+                  <td><%=(100 * ( ((reco[0]["buy"]) +  (reco[0]["strongbuy"])) / ( (reco[0]["buy"]) +  (reco[0]["strongbuy"]) +   (reco[0]["sell"]) +  (reco[0]["strongsell"]) +  (reco[0]["hold"]) ) )).round(1) %></td>
+                <% else %>
+                  <td>0.0</td>
+                <% end %>
+
+
+                
+                
+
 
           </tr>
         <% rescue RuntimeError %>
@@ -34,6 +52,7 @@
                 <td><%= link_to "Error: Incorrect Symbol", stock %></td>
                 <td><%= stock.ticker %></td>
                 
+                <td>N/A</td>
                 <td>N/A</td>
                 <td>N/A</td>
                 <td>N/A</td>
@@ -46,6 +65,7 @@
                 <td><%= link_to "Error: Quote unavailable", stock %></td>
                 <td><%= stock.ticker %></td>
                 
+                <td>N/A</td>
                 <td>N/A</td>
                 <td>N/A</td>
                 <td>N/A</td>
