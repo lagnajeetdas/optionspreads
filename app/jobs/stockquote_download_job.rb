@@ -174,7 +174,7 @@ class StockquoteDownloadJob < ApplicationJob
 
 
   def getoptionexpiry_apicall(security:)
-  	@queue = Limiter::RateQueue.new(118, interval: 60) # rate limiter setup
+  	#@queue = Limiter::RateQueue.new(118, interval: 60) # rate limiter setup
 
 
   	url_options_expiry_string = @baseurl_tradier + "options/expirations?symbol=" + security['displaysymbol'] + "&includeAllRoots=true&strikes=false"
@@ -190,7 +190,7 @@ class StockquoteDownloadJob < ApplicationJob
 
 	if !expirydates_data.empty?
 		expirydates_data.each do |item|
-			@queue.shift # rate limiter block
+			#@queue.shift # rate limiter block
 			getoptionchains_apicall(symbol: security['displaysymbol'], expirydate: item, security: security)
 		end
 	end
