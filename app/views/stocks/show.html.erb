@@ -25,11 +25,7 @@
 
 
 			            <% if !@ticker %>
-			              
-			                
 			                The ticker: <%= @stock.ticker %><br/> does not exist!
-
-
 			            <% else %>
 			            	<div class="float-right">
 				              	<%= link_to 'Edit', edit_stock_path(@stock) %> | 
@@ -202,9 +198,9 @@
 
 			                
 			            <% end %>
-					<% rescue RuntimeError => e %>
+					<% rescue StandardError, RuntimeError => e %>
 						<div class="alert alert-danger" role="alert">
-						  The stock ticker is not valid! <br/>
+						  The stock ticker is not valid or there is a problem at our end! Please try again. <br/>
 						  <%= e.inspect %> <br/><br/>
 						  <%= e.backtrace %>
 						</div>

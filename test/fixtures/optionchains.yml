@@ -1,0 +1,49 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  symbol: MyString
+  description: MyText
+  exch: MyString
+  option_type: MyString
+  volume: 1.5
+  bid: 1.5
+  ask: 1.5
+  underlying: MyString
+  strike: 1.5
+  change_percentage: 1.5
+  average_volume: 1.5
+  last_volume: 1.5
+  bidsize: 1.5
+  asksize: 1.5
+  open_interest: 1.5
+  contract_size: 1.5
+  expiration_date: MyString
+  expiration_type: MyString
+  root_symbol: MyString
+  bid_iv: 1.5
+  mid_iv: 1.5
+  ask_iv: 1.5
+
+two:
+  symbol: MyString
+  description: MyText
+  exch: MyString
+  option_type: MyString
+  volume: 1.5
+  bid: 1.5
+  ask: 1.5
+  underlying: MyString
+  strike: 1.5
+  change_percentage: 1.5
+  average_volume: 1.5
+  last_volume: 1.5
+  bidsize: 1.5
+  asksize: 1.5
+  open_interest: 1.5
+  contract_size: 1.5
+  expiration_date: MyString
+  expiration_type: MyString
+  root_symbol: MyString
+  bid_iv: 1.5
+  mid_iv: 1.5
+  ask_iv: 1.5

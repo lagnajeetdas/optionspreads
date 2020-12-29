@@ -11,6 +11,8 @@ class StockquoteDownloadJob < ApplicationJob
     @finnhub_api_key_prod = "bv1u7mf48v6o5ed6gpd0"
   	@finnhub_baseurl = "https://finnhub.io/api/v1/stock/symbol?"
   	@finnhub_baseurl_2 = "https://finnhub.io/api/v1/stock/"
+  	@tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
+    @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
   	@exchange = "US"
   	@currency = "USD"
 
@@ -18,6 +20,7 @@ class StockquoteDownloadJob < ApplicationJob
   	@universes = Universe.all
   	@recommendations = Recommendation.all
   	@stockprofiles = Stockprofile.all
+  	@optionchains = Optionchain.all
 
     #function calls
     #getstockuniverse
@@ -29,6 +32,11 @@ class StockquoteDownloadJob < ApplicationJob
 	  		getrecommendations
 	  	when "metadata"
 	  		getstockprofiledata
+	  	when "refresh_options"
+	  		# Optionchain.delete_all
+	  		get_options
+	  	when "clear_oldoptions"
+	  		clear_old_optionchains
 	  	else
 	  		p "No method found"
   	end
@@ -147,5 +155,102 @@ class StockquoteDownloadJob < ApplicationJob
 		  	end
 	end
   end
+
+
+  def get_options
+  	
+  	p "@@@@@@@@@@@@@@@@@@@@@ Option chain download starting.... @@@@@@@@@@@@@@@@@@@@"  
+
+
+  	@universes.each do |security|
+  		#get expiry dates of a given stock
+  		getoptionexpiry_apicall(security: security) 
+	end
+	
+
+	p "@@@@@@@@@@@@@@@@@@@@@ Option chain download finished. @@@@@@@@@@@@@@@@@@@@"  
+
+  end
+
+
+  def getoptionexpiry_apicall(security:)
+  	@queue = Limiter::RateQueue.new(118, interval: 60) # rate limiter setup
+
+
+  	url_options_expiry_string = @baseurl_tradier + "options/expirations?symbol=" + security['displaysymbol'] + "&includeAllRoots=true&strikes=false"
+	response = HTTParty.get(url_options_expiry_string, {headers: {"Authorization" => 'Bearer ' + @tradier_api_key}})
+
+	expirydates_data = Array[]
+
+	if response.code == 200
+		if response.parsed_response['expirations']
+			expirydates_data = response.parsed_response['expirations']['date']
+		end
+	end
+
+	if !expirydates_data.empty?
+		expirydates_data.each do |item|
+			@queue.shift # rate limiter block
+			getoptionchains_apicall(symbol: security['displaysymbol'], expirydate: item, security: security)
+		end
+	end
+
+  end
+
+
+  def getoptionchains_apicall(symbol:, expirydate:, security:)
+ 		
+ 		begin 
+		  	url_options_chain_string = @baseurl_tradier + "options/chains?symbol=" + symbol + "&expiration=" + expirydate + "&greeks=true"
+			response = HTTParty.get(url_options_chain_string, {headers: {"Authorization" => 'Bearer ' + @tradier_api_key}})
+			if response.code == 200
+				
+				if response.parsed_response['options']['option']
+					optionchain_data = response.parsed_response['options']['option']
+					
+					#delete existing option chains with matching symbol and expiry date
+					p Optionchain.where(underlying: symbol).where(expiration_date: expirydate).delete_all
+					
+					if !optionchain_data.empty?
+						#then save to DB model
+							optionchain_data.each do |contract_item|
+								contract_item_greeks = contract_item['greeks']
+								if !contract_item.nil?
+									
+									@optionchain = security.optionchains.new(symbol: (contract_item['symbol']).to_s, description: (contract_item['description']).to_s, exch: (contract_item['exch']).to_s, option_type: (contract_item['option_type']).to_s, volume: (contract_item['volume']), bid: (contract_item['bid']), ask: (contract_item['ask']), underlying: (contract_item['underlying']).to_s, strike: (contract_item['strike']), change_percentage: (contract_item['change_percentage']), average_volume: (contract_item['average_volume']), last_volume: (contract_item['last_volume']), bidsize: (contract_item['bidsize']), asksize: (contract_item['asksize']), open_interest: (contract_item['open_interest']), expiration_date: (contract_item['expiration_date']).to_s, expiration_type: (contract_item['expiration_type']).to_s, root_symbol: (contract_item['root_symbol']).to_s, bid_iv: (contract_item_greeks['bid_iv']), mid_iv: (contract_item_greeks['mid_iv']), ask_iv: (contract_item_greeks['ask_iv']) )
+								else
+									@optionchain = security.optionchains.new(symbol: (contract_item['symbol']).to_s, description: (contract_item['description']).to_s, exch: (contract_item['exch']).to_s, option_type: (contract_item['option_type']).to_s, volume: (contract_item['volume']), bid: (contract_item['bid']), ask: (contract_item['ask']), underlying: (contract_item['underlying']).to_s, strike: (contract_item['strike']), change_percentage: (contract_item['change_percentage']), average_volume: (contract_item['average_volume']), last_volume: (contract_item['last_volume']), bidsize: (contract_item['bidsize']), asksize: (contract_item['asksize']), open_interest: (contract_item['open_interest']), expiration_date: (contract_item['expiration_date']).to_s, expiration_type: (contract_item['expiration_type']).to_s, root_symbol: (contract_item['root_symbol']).to_s )
+								end
+
+								if @optionchain.save
+									p "option chain " + (contract_item['symbol']).to_s  + " saved for " + symbol.to_s
+								else
+									p "option chain " + (contract_item['symbol']).to_s  + " not saved for " + symbol.to_s
+								end
+							end
+					end
+				end
+			end
+		rescue StandardError, NameError, NoMethodError, RuntimeError => e
+			p "Error for " + symbol + " exp date " + expirydate.to_s
+			p response
+			p "Rescued: #{e.inspect}"
+			p e.backtrace
+		else
+
+		ensure
+
+		end
+  end
+
+  def clear_old_optionchains
+  	#p Optionchain.column_names
+  	#arr.keep_if { |h| Time.parse(h['day']) > timestamp }
+  	#where('created_at < ?', Date.today )
+  	p Optionchain.where('expiration_date < ?', Date.today ).delete_all
+
+  end
+
+
 
 end

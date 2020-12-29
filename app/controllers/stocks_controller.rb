@@ -24,7 +24,9 @@ class StocksController < ApplicationController
 
     #StockquoteDownloadJob.set(wait: 1.minute).perform_later
     #StockquoteDownloadJob.perform_later
-    #StockquoteDownloadJob.perform_later("metadata")
+    #StockquoteDownloadJob.perform_later("refresh_options")
+    StockquoteDownloadJob.perform_later("clear_oldoptions")
+    
     
   end
 
@@ -55,7 +57,7 @@ class StocksController < ApplicationController
 
     respond_to do |format|
       if @stock.save
-        format.html { redirect_to @stock, notice: 'Stock was successfully created.' }
+        format.html { redirect_to @stock, notice: 'Stock was successfully added to watchlist.' }
         format.json { render :show, status: :created, location: @stock }
       else
         format.html { render :new }
@@ -83,7 +85,7 @@ class StocksController < ApplicationController
   def destroy
     @stock.destroy
     respond_to do |format|
-      format.html { redirect_to stocks_url, notice: 'Stock was successfully deleted.' }
+      format.html { redirect_to stocks_url, notice: 'Stock was successfully deleted from watchlist.' }
       format.json { head :no_content }
     end
   end

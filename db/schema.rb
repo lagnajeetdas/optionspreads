@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_28_105816) do
+ActiveRecord::Schema.define(version: 2020_12_29_115629) do
 
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer "priority", default: 0, null: false
@@ -25,6 +25,35 @@ ActiveRecord::Schema.define(version: 2020_12_28_105816) do
     t.datetime "created_at", precision: 6
     t.datetime "updated_at", precision: 6
     t.index ["priority", "run_at"], name: "delayed_jobs_priority"
+  end
+
+  create_table "optionchains", force: :cascade do |t|
+    t.integer "universe_id"
+    t.string "symbol"
+    t.text "description"
+    t.string "exch"
+    t.string "option_type"
+    t.float "volume"
+    t.float "bid"
+    t.float "ask"
+    t.string "underlying"
+    t.float "strike"
+    t.float "change_percentage"
+    t.float "average_volume"
+    t.float "last_volume"
+    t.float "bidsize"
+    t.float "asksize"
+    t.float "open_interest"
+    t.float "contract_size"
+    t.string "expiration_date"
+    t.string "expiration_type"
+    t.string "root_symbol"
+    t.float "bid_iv"
+    t.float "mid_iv"
+    t.float "ask_iv"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["universe_id"], name: "index_optionchains_on_universe_id"
   end
 
   create_table "recommendations", force: :cascade do |t|
@@ -83,4 +112,5 @@ ActiveRecord::Schema.define(version: 2020_12_28_105816) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "optionchains", "universes"
 end
