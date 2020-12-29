@@ -25,7 +25,13 @@ task :download_optionchains => :environment do
 end
 
 task :clear_oldoptions => :environment do
-  puts "Cleaning up the db..."
+  puts "Cleaning up old options from the db..."
   	StockquoteDownloadJob.perform_later("clear_oldoptions")
+  puts "done."
+end
+
+task :delete_alloptionchains => :environment do
+  puts "Cleaning up all options from the db..."
+  	StockquoteDownloadJob.perform_later("delete_all_options")
   puts "done."
 end

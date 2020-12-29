@@ -37,6 +37,8 @@ class StockquoteDownloadJob < ApplicationJob
 	  		get_options
 	  	when "clear_oldoptions"
 	  		clear_old_optionchains
+	  	when "clear_oldoptions"
+	  		Optionchain.delete_all
 	  	else
 	  		p "No method found"
   	end
