@@ -12,7 +12,7 @@ gem 'puma', '~> 5.0'
 # Use SCSS for stylesheets
 gem 'sass-rails', '>= 6'
 # Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
-gem 'webpacker', '~> 5.0'
+gem 'webpacker', '~> 5.2', '>= 5.2.1'
 # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
 gem 'turbolinks', '~> 5'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
@@ -30,6 +30,7 @@ gem 'bootstrap-table-rails', '~> 1.13', '>= 1.13.4'
 gem 'delayed_job', '~> 4.1', '>= 4.1.9'
 gem 'delayed_job_active_record'
 gem 'ruby-limiter', '~> 1.1'
+
 
 
 

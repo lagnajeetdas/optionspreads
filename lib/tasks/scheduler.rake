@@ -35,3 +35,12 @@ task :delete_alloptionchains => :environment do
   	StockquoteDownloadJob.perform_later("delete_all_options")
   puts "done."
 end
+
+task :delete_stockprofiles_conditional => :environment do
+  puts "Cleaning up selected stock profiles from the db..."
+  	StockquoteDownloadJob.perform_later("delete_stockprofiles")
+  puts "done."
+end
+
+
+

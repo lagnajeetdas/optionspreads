@@ -39,6 +39,8 @@ class StockquoteDownloadJob < ApplicationJob
 	  		clear_old_optionchains
 	  	when "delete_all_options"
 	  		p Optionchain.delete_all
+	  	when "delete_stockprofiles"
+	  		p Stockprofile.delete_all
 	  	else
 	  		p "No method found"
   	end
@@ -127,34 +129,46 @@ class StockquoteDownloadJob < ApplicationJob
   def getstockprofiledata_apicall(security:)
   	stockprofile_ary = Array[]
   	_marketcaptype = ""
-  	if @stockprofiles.select{ |s| s['symbol']==security['displaysymbol'] }.empty?
-	  	url_finnhub_stockprofile = @finnhub_baseurl_2 + "profile2?symbol=" + security['displaysymbol'] + "&token=" + @finnhub_api_key_prod
-		  	response = HTTParty.get(url_finnhub_stockprofile)
-		  	if response.code == 200
-		  		stockprofile_ary = response.parsed_response
-		  		if !stockprofile_ary.empty?
-	  				p security['displaysymbol'] 
-	  				p (stockprofile_ary['marketCapitalization'])
-	  				if (stockprofile_ary['marketCapitalization']) && (stockprofile_ary['marketCapitalization'])!=""
-		  				if (stockprofile_ary['marketCapitalization']).to_f < 3000.0
-		  					_marketcaptype = "Small Cap"
-		  				elsif (stockprofile_ary['marketCapitalization']).to_f > 10000.0
-		  					_marketcaptype = "Large Cap"
-		  				else
-							_marketcaptype = "Mid Cap"
-		  				end
-		  			end
-		  			p _marketcaptype
+  	
+  	begin 
+	  	if @stockprofiles.select{ |s| s['symbol']==security['displaysymbol'] }.empty?
+		  	url_finnhub_stockprofile = @finnhub_baseurl_2 + "profile2?symbol=" + security['displaysymbol'] + "&token=" + @finnhub_api_key_prod
+			  	response = HTTParty.get(url_finnhub_stockprofile)
+			  	if response.code == 200
+			  		stockprofile_ary = response.parsed_response
+			  		if !stockprofile_ary.empty?
+		  				p security['displaysymbol'] 
+		  				p (stockprofile_ary['marketCapitalization'])
+		  				if (stockprofile_ary['marketCapitalization']) && (stockprofile_ary['marketCapitalization'])!=""
+			  				if (stockprofile_ary['marketCapitalization']).to_f < 3000.0
+			  					_marketcaptype = "Small Cap"
+			  				elsif (stockprofile_ary['marketCapitalization']).to_f > 10000.0
+			  					_marketcaptype = "Large Cap"
+			  				else
+								_marketcaptype = "Mid Cap"
+			  				end
+			  			end
+			  			p _marketcaptype
 
-			    	@stockprofile = Stockprofile.new(symbol: stockprofile_ary['ticker'], industry: stockprofile_ary['finnhubIndustry'], marketcap: stockprofile_ary['marketCapitalization'], logo: stockprofile_ary['logo'], marketcap_type: _marketcaptype )
-			    	if @stockprofile.save
-				      p "Saved stock meta data to db " + security['displaysymbol'].to_s
-				    else
-				      p "Did not save stock meta data to db " + security['displaysymbol'].to_s
-				    end
-					
-		  		end
-		  	end
+				    	@stockprofile = Stockprofile.new(symbol: security['displaysymbol'], industry: stockprofile_ary['finnhubIndustry'], marketcap: stockprofile_ary['marketCapitalization'], logo: stockprofile_ary['logo'], marketcap_type: _marketcaptype )
+				    	if @stockprofile.save
+					      p "Saved stock meta data to db " + security['displaysymbol'].to_s
+					    else
+					      p "Did not save stock meta data to db " + security['displaysymbol'].to_s
+					    end
+						
+			  		end
+			  	end
+		end
+
+	rescue StandardError, NameError, NoMethodError, RuntimeError => e
+		p "Rescued: #{e.inspect}"
+		p e.backtrace
+
+	else
+
+	ensure
+
 	end
   end
 
