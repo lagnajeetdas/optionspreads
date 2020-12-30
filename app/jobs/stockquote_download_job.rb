@@ -282,7 +282,7 @@ class StockquoteDownloadJob < ApplicationJob
 		rescue StandardError, NameError, NoMethodError, RuntimeError => e
 			p "Error for " + symbol + " exp date " + expirydate.to_s
 			#p response
-			p "Rescued: #{e.inspect}"
+			#p "Rescued: #{e.inspect}"
 			#p e.backtrace
 		else
 
