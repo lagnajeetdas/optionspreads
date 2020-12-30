@@ -18,9 +18,9 @@ class StockquoteDownloadJob < ApplicationJob
 
   	#get models into instances
   	@universes = Universe.all
-  	@recommendations = Recommendation.all
-  	@stockprofiles = Stockprofile.all
-  	@optionchains = Optionchain.all
+  	
+  	
+  	
 
     #function calls
     #getstockuniverse
@@ -29,18 +29,26 @@ class StockquoteDownloadJob < ApplicationJob
 	  	when "universe"
 	  		getstockuniverse
 	  	when "recommendation"
+	  		@recommendations = Recommendation.all
 	  		getrecommendations
+	  	when "delete_recommendations"
+	  		p Recommendation.delete_all
 	  	when "metadata"
+	  		@stockprofiles = Stockprofile.all
 	  		getstockprofiledata
+	  	when "delete_stockprofiles"
+	  		@stockprofiles = Stockprofile.all
+	  		p Stockprofile.delete_all
 	  	when "refresh_options"
-	  		# Optionchain.delete_all
+	  		@optionchains = Optionchain.all
 	  		get_options
 	  	when "clear_oldoptions"
+	  		@optionchains = Optionchain.all
 	  		clear_old_optionchains
 	  	when "delete_all_options"
+	  		@optionchains = Optionchain.all
 	  		p Optionchain.delete_all
-	  	when "delete_stockprofiles"
-	  		p Stockprofile.delete_all
+	  	
 	  	else
 	  		p "No method found"
   	end
@@ -95,7 +103,7 @@ class StockquoteDownloadJob < ApplicationJob
 	  		if !recommendation_ary_stock.empty?
 	  			#recommendation_ary =  recommendation_ary.push(recommendation_ary_stock[0])
 	  			if @recommendations.select{ |r| r['symbol']==security['displaysymbol'] && r['period']==recommendation_ary_stock[0]['period'] }.empty?
-			    	@recommendation = Recommendation.new(buy: recommendation_ary_stock[0]['buy'], hold: recommendation_ary_stock[0]['hold'], period: recommendation_ary_stock[0]['period'], sell: recommendation_ary_stock[0]['sell'], strongbuy: recommendation_ary_stock[0]['strongBuy'], strongsell: recommendation_ary_stock[0]['strongSell'], symbol: recommendation_ary_stock[0]['symbol'] )
+			    	@recommendation = Recommendation.new(buy: recommendation_ary_stock[0]['buy'], hold: recommendation_ary_stock[0]['hold'], period: recommendation_ary_stock[0]['period'], sell: recommendation_ary_stock[0]['sell'], strongbuy: recommendation_ary_stock[0]['strongBuy'], strongsell: recommendation_ary_stock[0]['strongSell'], symbol: security['displaysymbol'] )
 			    	if @recommendation.save
 				      p "Saved recommendation to db " + security['displaysymbol'].to_s
 				    else
@@ -232,7 +240,7 @@ class StockquoteDownloadJob < ApplicationJob
  		
  		begin 
  			#check if option with same symbol, expiry date exists in db with creation date within 1 hour in past
- 			if (@optionchains.select{ |oc| oc['underlying'] == symbol && oc['expiration_date'] == expirydate && ((oc['created_at']- DateTime.now)/ 3600) <=3  }).empty?
+ 			#if (@optionchains.select{ |oc| oc['underlying'] == symbol && oc['expiration_date'] == expirydate && ((oc['created_at']- DateTime.now)/ 3600) <=3  }).empty?
 			  	
 			  	#api call to tradier to fetch option chains for a selected expiry date
 			  	url_options_chain_string = @baseurl_tradier + "options/chains?symbol=" + symbol + "&expiration=" + expirydate + "&greeks=true"
@@ -252,9 +260,9 @@ class StockquoteDownloadJob < ApplicationJob
 								optionchain_data.each do |contract_item|
 									contract_item_greeks = contract_item['greeks']
 									if !contract_item.nil?
-										@optionchain = security.optionchains.new(symbol: (contract_item['symbol']).to_s, description: (contract_item['description']).to_s, exch: (contract_item['exch']).to_s, option_type: (contract_item['option_type']).to_s, volume: (contract_item['volume']), bid: (contract_item['bid']), ask: (contract_item['ask']), underlying: (contract_item['underlying']).to_s, strike: (contract_item['strike']), change_percentage: (contract_item['change_percentage']), average_volume: (contract_item['average_volume']), last_volume: (contract_item['last_volume']), bidsize: (contract_item['bidsize']), asksize: (contract_item['asksize']), open_interest: (contract_item['open_interest']), expiration_date: (contract_item['expiration_date']).to_s, expiration_type: (contract_item['expiration_type']).to_s, root_symbol: (contract_item['root_symbol']).to_s, bid_iv: (contract_item_greeks['bid_iv']), mid_iv: (contract_item_greeks['mid_iv']), ask_iv: (contract_item_greeks['ask_iv']) )
+										@optionchain = Optionchain.new(symbol: (contract_item['symbol']).to_s, description: (contract_item['description']).to_s, exch: (contract_item['exch']).to_s, option_type: (contract_item['option_type']).to_s, volume: (contract_item['volume']), bid: (contract_item['bid']), ask: (contract_item['ask']), underlying: (contract_item['underlying']).to_s, strike: (contract_item['strike']), change_percentage: (contract_item['change_percentage']), average_volume: (contract_item['average_volume']), last_volume: (contract_item['last_volume']), bidsize: (contract_item['bidsize']), asksize: (contract_item['asksize']), open_interest: (contract_item['open_interest']), expiration_date: (contract_item['expiration_date']).to_s, expiration_type: (contract_item['expiration_type']).to_s, root_symbol: (contract_item['root_symbol']).to_s, bid_iv: (contract_item_greeks['bid_iv']), mid_iv: (contract_item_greeks['mid_iv']), ask_iv: (contract_item_greeks['ask_iv']) )
 									else
-										@optionchain = security.optionchains.new(symbol: (contract_item['symbol']).to_s, description: (contract_item['description']).to_s, exch: (contract_item['exch']).to_s, option_type: (contract_item['option_type']).to_s, volume: (contract_item['volume']), bid: (contract_item['bid']), ask: (contract_item['ask']), underlying: (contract_item['underlying']).to_s, strike: (contract_item['strike']), change_percentage: (contract_item['change_percentage']), average_volume: (contract_item['average_volume']), last_volume: (contract_item['last_volume']), bidsize: (contract_item['bidsize']), asksize: (contract_item['asksize']), open_interest: (contract_item['open_interest']), expiration_date: (contract_item['expiration_date']).to_s, expiration_type: (contract_item['expiration_type']).to_s, root_symbol: (contract_item['root_symbol']).to_s )
+										@optionchain = Optionchain.new(symbol: (contract_item['symbol']).to_s, description: (contract_item['description']).to_s, exch: (contract_item['exch']).to_s, option_type: (contract_item['option_type']).to_s, volume: (contract_item['volume']), bid: (contract_item['bid']), ask: (contract_item['ask']), underlying: (contract_item['underlying']).to_s, strike: (contract_item['strike']), change_percentage: (contract_item['change_percentage']), average_volume: (contract_item['average_volume']), last_volume: (contract_item['last_volume']), bidsize: (contract_item['bidsize']), asksize: (contract_item['asksize']), open_interest: (contract_item['open_interest']), expiration_date: (contract_item['expiration_date']).to_s, expiration_type: (contract_item['expiration_type']).to_s, root_symbol: (contract_item['root_symbol']).to_s )
 									end
 
 									if @optionchain.save
@@ -266,9 +274,9 @@ class StockquoteDownloadJob < ApplicationJob
 						end
 					end
 				end
-			else
+			#else
 				#p "recent record exists"
-			end
+			#end
 		rescue StandardError, NameError, NoMethodError, RuntimeError => e
 			p "Error for " + symbol + " exp date " + expirydate.to_s
 			p response

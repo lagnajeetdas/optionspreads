@@ -42,5 +42,11 @@ task :delete_stockprofiles_conditional => :environment do
   puts "done."
 end
 
+task :delete_all_recommendations => :environment do
+  puts "Cleaning recommendations the db..."
+  	StockquoteDownloadJob.perform_later("delete_recommendations")
+  puts "done."
+end
+
 
 

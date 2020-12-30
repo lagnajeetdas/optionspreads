@@ -28,6 +28,7 @@ class StocksController < ApplicationController
     #StockquoteDownloadJob.perform_later("clear_oldoptions")
     #StockquoteDownloadJob.perform_later("metadata")
     #StockquoteDownloadJob.perform_later("delete_stockprofiles")
+    #StockquoteDownloadJob.perform_later("delete_recommendations")
     
     
   end
