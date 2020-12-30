@@ -43,7 +43,7 @@ class StockquoteDownloadJob < ApplicationJob
 	  		@optionchains = Optionchain.all
 	  		get_options
 	  	when "clear_oldoptions"
-	  		@optionchains = Optionchain.all
+	  		
 	  		clear_old_optionchains
 	  	when "delete_all_options"
 	  		@optionchains = Optionchain.all
@@ -219,7 +219,7 @@ class StockquoteDownloadJob < ApplicationJob
 					getoptionchains_apicall(symbol: security['displaysymbol'], expirydate: item, security: security)
 				end
 			else
-					p "Non array expiry date response for " + (security['displaysymbol']).to_s + (expirydates_data).to_s
+					#p "Non array expiry date response for " + (security['displaysymbol']).to_s + (expirydates_data).to_s
 					getoptionchains_apicall(symbol: security['displaysymbol'], expirydate: expirydates_data.to_s, security: security)
 			end
 		end
@@ -252,7 +252,7 @@ class StockquoteDownloadJob < ApplicationJob
 						optionchain_data = response.parsed_response['options']['option']
 						
 						#delete existing option chains with matching symbol and expiry date
-						p Optionchain.where(underlying: symbol).where(expiration_date: expirydate).delete_all
+						#p Optionchain.where(underlying: symbol).where(expiration_date: expirydate).delete_all
 
 						
 						if !optionchain_data.empty?
@@ -260,9 +260,9 @@ class StockquoteDownloadJob < ApplicationJob
 								optionchain_data.each do |contract_item|
 									contract_item_greeks = contract_item['greeks']
 									if !contract_item.nil?
-										@optionchain = Optionchain.new(symbol: (contract_item['symbol']).to_s, description: (contract_item['description']).to_s, exch: (contract_item['exch']).to_s, option_type: (contract_item['option_type']).to_s, volume: (contract_item['volume']), bid: (contract_item['bid']), ask: (contract_item['ask']), underlying: (contract_item['underlying']).to_s, strike: (contract_item['strike']), change_percentage: (contract_item['change_percentage']), average_volume: (contract_item['average_volume']), last_volume: (contract_item['last_volume']), bidsize: (contract_item['bidsize']), asksize: (contract_item['asksize']), open_interest: (contract_item['open_interest']), expiration_date: (contract_item['expiration_date']).to_s, expiration_type: (contract_item['expiration_type']).to_s, root_symbol: (contract_item['root_symbol']).to_s, bid_iv: (contract_item_greeks['bid_iv']), mid_iv: (contract_item_greeks['mid_iv']), ask_iv: (contract_item_greeks['ask_iv']) )
+										@optionchain = security.optionchains.new(symbol: (contract_item['symbol']).to_s, description: (contract_item['description']).to_s, exch: (contract_item['exch']).to_s, option_type: (contract_item['option_type']).to_s, volume: (contract_item['volume']), bid: (contract_item['bid']), ask: (contract_item['ask']), underlying: (contract_item['underlying']).to_s, strike: (contract_item['strike']), change_percentage: (contract_item['change_percentage']), average_volume: (contract_item['average_volume']), last_volume: (contract_item['last_volume']), bidsize: (contract_item['bidsize']), asksize: (contract_item['asksize']), open_interest: (contract_item['open_interest']), expiration_date: (contract_item['expiration_date']).to_s, expiration_type: (contract_item['expiration_type']).to_s, root_symbol: (contract_item['root_symbol']).to_s, bid_iv: (contract_item_greeks['bid_iv']), mid_iv: (contract_item_greeks['mid_iv']), ask_iv: (contract_item_greeks['ask_iv']) )
 									else
-										@optionchain = Optionchain.new(symbol: (contract_item['symbol']).to_s, description: (contract_item['description']).to_s, exch: (contract_item['exch']).to_s, option_type: (contract_item['option_type']).to_s, volume: (contract_item['volume']), bid: (contract_item['bid']), ask: (contract_item['ask']), underlying: (contract_item['underlying']).to_s, strike: (contract_item['strike']), change_percentage: (contract_item['change_percentage']), average_volume: (contract_item['average_volume']), last_volume: (contract_item['last_volume']), bidsize: (contract_item['bidsize']), asksize: (contract_item['asksize']), open_interest: (contract_item['open_interest']), expiration_date: (contract_item['expiration_date']).to_s, expiration_type: (contract_item['expiration_type']).to_s, root_symbol: (contract_item['root_symbol']).to_s )
+										@optionchain = security.optionchains.new(symbol: (contract_item['symbol']).to_s, description: (contract_item['description']).to_s, exch: (contract_item['exch']).to_s, option_type: (contract_item['option_type']).to_s, volume: (contract_item['volume']), bid: (contract_item['bid']), ask: (contract_item['ask']), underlying: (contract_item['underlying']).to_s, strike: (contract_item['strike']), change_percentage: (contract_item['change_percentage']), average_volume: (contract_item['average_volume']), last_volume: (contract_item['last_volume']), bidsize: (contract_item['bidsize']), asksize: (contract_item['asksize']), open_interest: (contract_item['open_interest']), expiration_date: (contract_item['expiration_date']).to_s, expiration_type: (contract_item['expiration_type']).to_s, root_symbol: (contract_item['root_symbol']).to_s )
 									end
 
 									if @optionchain.save
@@ -279,9 +279,9 @@ class StockquoteDownloadJob < ApplicationJob
 			#end
 		rescue StandardError, NameError, NoMethodError, RuntimeError => e
 			p "Error for " + symbol + " exp date " + expirydate.to_s
-			p response
+			#p response
 			p "Rescued: #{e.inspect}"
-			p e.backtrace
+			#p e.backtrace
 		else
 
 		ensure
@@ -293,8 +293,14 @@ class StockquoteDownloadJob < ApplicationJob
   	#p Optionchain.column_names
   	#arr.keep_if { |h| Time.parse(h['day']) > timestamp }
   	#where('created_at < ?', Date.today )
-  	p Optionchain.where('expiration_date < ?', Date.today ).delete_all
+  	#p Optionchain.where('expiration_date < ?', Date.today ).delete_all
 
+  	#Logic
+  	#Assuming option chains are downloaded only 1 time/day
+  	#Check if option chains have been successfully downloaded today
+  	
+  	p Optionchain.where('created_at < ?', Date.today ).delete_all
+  	
   end
 
 
