@@ -216,11 +216,11 @@ class StockquoteDownloadJob < ApplicationJob
 			if expirydates_data.kind_of?(Array) 
 				expirydates_data.each do |item|
 					#@queue.shift # rate limiter block
-					getoptionchains_apicall(symbol: security['displaysymbol'], expirydate: item, security: security)
+					getoptionchains_apicall(symbol: security['displaysymbol'], expirydate: item, universeid: security['id'])
 				end
 			else
 					#p "Non array expiry date response for " + (security['displaysymbol']).to_s + (expirydates_data).to_s
-					getoptionchains_apicall(symbol: security['displaysymbol'], expirydate: expirydates_data.to_s, security: security)
+					getoptionchains_apicall(symbol: security['displaysymbol'], expirydate: expirydates_data.to_s, universeid: security['id'] )
 			end
 		end
 	rescue StandardError, NameError, NoMethodError, RuntimeError => e
@@ -236,7 +236,7 @@ class StockquoteDownloadJob < ApplicationJob
   end
 
 
-  def getoptionchains_apicall(symbol:, expirydate:, security:)
+  def getoptionchains_apicall(symbol:, expirydate:, universeid:)
  		
  		begin 
  			#check if option with same symbol, expiry date exists in db with creation date within 1 hour in past
@@ -260,10 +260,12 @@ class StockquoteDownloadJob < ApplicationJob
 								optionchain_data.each do |contract_item|
 									contract_item_greeks = contract_item['greeks']
 									if !contract_item.nil?
-										@optionchain = security.optionchains.new(symbol: (contract_item['symbol']).to_s, description: (contract_item['description']).to_s, exch: (contract_item['exch']).to_s, option_type: (contract_item['option_type']).to_s, volume: (contract_item['volume']), bid: (contract_item['bid']), ask: (contract_item['ask']), underlying: (contract_item['underlying']).to_s, strike: (contract_item['strike']), change_percentage: (contract_item['change_percentage']), average_volume: (contract_item['average_volume']), last_volume: (contract_item['last_volume']), bidsize: (contract_item['bidsize']), asksize: (contract_item['asksize']), open_interest: (contract_item['open_interest']), expiration_date: (contract_item['expiration_date']).to_s, expiration_type: (contract_item['expiration_type']).to_s, root_symbol: (contract_item['root_symbol']).to_s, bid_iv: (contract_item_greeks['bid_iv']), mid_iv: (contract_item_greeks['mid_iv']), ask_iv: (contract_item_greeks['ask_iv']) )
+										@optionchain = Optionchain.new(universe_id: universeid, symbol: (contract_item['symbol']).to_s, description: (contract_item['description']).to_s, exch: (contract_item['exch']).to_s, option_type: (contract_item['option_type']).to_s, volume: (contract_item['volume']), bid: (contract_item['bid']), ask: (contract_item['ask']), underlying: (contract_item['underlying']).to_s, strike: (contract_item['strike']), change_percentage: (contract_item['change_percentage']), average_volume: (contract_item['average_volume']), last_volume: (contract_item['last_volume']), bidsize: (contract_item['bidsize']), asksize: (contract_item['asksize']), open_interest: (contract_item['open_interest']), expiration_date: (contract_item['expiration_date']).to_s, expiration_type: (contract_item['expiration_type']).to_s, root_symbol: (contract_item['root_symbol']).to_s, bid_iv: (contract_item_greeks['bid_iv']), mid_iv: (contract_item_greeks['mid_iv']), ask_iv: (contract_item_greeks['ask_iv']) )
 									else
-										@optionchain = security.optionchains.new(symbol: (contract_item['symbol']).to_s, description: (contract_item['description']).to_s, exch: (contract_item['exch']).to_s, option_type: (contract_item['option_type']).to_s, volume: (contract_item['volume']), bid: (contract_item['bid']), ask: (contract_item['ask']), underlying: (contract_item['underlying']).to_s, strike: (contract_item['strike']), change_percentage: (contract_item['change_percentage']), average_volume: (contract_item['average_volume']), last_volume: (contract_item['last_volume']), bidsize: (contract_item['bidsize']), asksize: (contract_item['asksize']), open_interest: (contract_item['open_interest']), expiration_date: (contract_item['expiration_date']).to_s, expiration_type: (contract_item['expiration_type']).to_s, root_symbol: (contract_item['root_symbol']).to_s )
+										@optionchain = Optionchain.new(universe_id: universeid, symbol: (contract_item['symbol']).to_s, description: (contract_item['description']).to_s, exch: (contract_item['exch']).to_s, option_type: (contract_item['option_type']).to_s, volume: (contract_item['volume']), bid: (contract_item['bid']), ask: (contract_item['ask']), underlying: (contract_item['underlying']).to_s, strike: (contract_item['strike']), change_percentage: (contract_item['change_percentage']), average_volume: (contract_item['average_volume']), last_volume: (contract_item['last_volume']), bidsize: (contract_item['bidsize']), asksize: (contract_item['asksize']), open_interest: (contract_item['open_interest']), expiration_date: (contract_item['expiration_date']).to_s, expiration_type: (contract_item['expiration_type']).to_s, root_symbol: (contract_item['root_symbol']).to_s )
 									end
+
+									
 
 									if @optionchain.save
 										#p "option chain " + (contract_item['symbol']).to_s  + " saved for " + symbol.to_s
