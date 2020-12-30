@@ -189,7 +189,7 @@ class StockquoteDownloadJob < ApplicationJob
 				expirydates_data = response.parsed_response['expirations']['date']
 			end
 		end
-		p expirydates_data
+		
 		if !expirydates_data.empty?
 			if expirydates_data.kind_of?(Array) 
 				expirydates_data.each do |item|
@@ -253,7 +253,7 @@ class StockquoteDownloadJob < ApplicationJob
 					end
 				end
 			else
-				p "recent record exists"
+				#p "recent record exists"
 			end
 		rescue StandardError, NameError, NoMethodError, RuntimeError => e
 			p "Error for " + symbol + " exp date " + expirydate.to_s

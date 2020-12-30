@@ -37,7 +37,7 @@ class StocksController < ApplicationController
     require 'net/http'
     @tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
     @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
-
+    @recommendations = Recommendation.all
   end
 
   # GET /stocks/new
