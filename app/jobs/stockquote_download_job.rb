@@ -232,7 +232,7 @@ class StockquoteDownloadJob < ApplicationJob
  		
  		begin 
  			#check if option with same symbol, expiry date exists in db with creation date within 1 hour in past
- 			if (@optionchains.select{ |oc| oc['underlying'] == symbol && oc['expiration_date'] == expirydate && ((oc['created_at']- DateTime.now)/ 3600) <=1  }).empty?
+ 			if (@optionchains.select{ |oc| oc['underlying'] == symbol && oc['expiration_date'] == expirydate && ((oc['created_at']- DateTime.now)/ 3600) <=3  }).empty?
 			  	
 			  	#api call to tradier to fetch option chains for a selected expiry date
 			  	url_options_chain_string = @baseurl_tradier + "options/chains?symbol=" + symbol + "&expiration=" + expirydate + "&greeks=true"
