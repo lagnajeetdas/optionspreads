@@ -1,54 +1,71 @@
-<h1>Winning Spreads</h1>
-<p>Find low risk high reward option spreads </p>
+<div class="container">
+	<div class="row">
+		<div class="col-md-10 offset-md-1">
+			<div class="jumbotron">
+				<div class="container">
+					<h1><strong>Discover Winning Options Strategies</strong></h1>
+					<p>Find low risk high reward spreads like a pro   </p>
+					<div class="form-group">
+						<%= form_tag root_path, :method => 'POST' do %>
+							<div class="input-group mb-3">
+								
+									<%= text_field_tag 'ticker', nil, placeholder: "Enter Ticker Symbol", size: 50, class: "form-control" %>
+								
+								<div class="input-group-append">
+									<%= submit_tag 'Lookup', class: "btn btn-outline-success" %>
+								</div>
+							</div>
+						<% end %>
+					</div>
 
-<%= form_tag root_path, :method => 'POST' do %>
-	<%= text_field_tag 'ticker', nil, placeholder: "Enter Ticker Symbol", size: 50 %>
-	<%= submit_tag 'Lookup' %>
-<% end %>
+					<br/>
 
-<br/>
+					<% if @stock %>
+						<%= @stock.company_name %>
+						$<%= @stock.latest_price %>
+						<br/><br/>
+						<strong>Option Spreads</strong>
+						<br/><br/>
+						
 
-<% if @stock %>
-	<%= @stock.company_name %>
-	$<%= @stock.latest_price %>
-	<br/><br/>
-	<strong>Option Spreads</strong>
-	<br/><br/>
-	
+						<table class="table table-bordered table-hover"   data-toggle="table" data-pagination="true"  data-filter-control="true">
+						  <thead class="thead-dark">
+						    <tr>
+						      <th data-sortable="true" data-field="expiry_date" data-filter-control="select">Expiry</th>
+						      <th>Buy Strike</th>
+						      <th>Sell Strike</th>
+						      <th data-sortable="true" data-field="risk">Risk</th>
+						      <th data-sortable="true" data-field="reward">Reward</th>
+						      <th data-sortable="true" data-field="perc_change">Upside % Reqd</th>
+						      <th data-sortable="true" data-field="rr">R/R</th>							      
+						      
+						    </tr>
+						  </thead>
 
-	<table class="table table-bordered table-hover"   data-toggle="table" data-pagination="true"  data-filter-control="true">
-	  <thead class="thead-dark">
-	    <tr>
-	      <th data-sortable="true" data-field="expiry_date" data-filter-control="select">Expiry</th>
-	      <th>Buy Strike</th>
-	      <th>Sell Strike</th>
-	      <th data-sortable="true" data-field="risk">Risk</th>
-	      <th data-sortable="true" data-field="reward">Reward</th>
-	      <th data-sortable="true" data-field="perc_change">Upside % Reqd</th>
-	      <th data-sortable="true" data-field="rr">R/R</th>							      
-	      
-	    </tr>
-	  </thead>
-
-		<tbody>
-			<tr>
-				<td><%=  %></td>
-				<td><%=  %></td>
-				<td><%=  %></td>
-				<td><%=  %></td>
-				<td><%=  %></td>
-				<td><%=  %></td>
-				<td><%=  %></td>
-			</tr>
-		</tbody>
-	</table>
-<% elsif @nothing %>
-	<%= @nothing %>
-<% end %>
+							<tbody>
+								<tr>
+									<td><%=  %></td>
+									<td><%=  %></td>
+									<td><%=  %></td>
+									<td><%=  %></td>
+									<td><%=  %></td>
+									<td><%=  %></td>
+									<td><%=  %></td>
+								</tr>
+							</tbody>
+						</table>
+					<% elsif @nothing %>
+						<%= @nothing %>
+					<% end %>
 
 
-<% if @error %>
-	<%= @error %>
-<% end %>
+					<% if @error %>
+						<%= @error %>
+					<% end %>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 
 

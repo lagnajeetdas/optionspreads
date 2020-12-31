@@ -1,12 +1,12 @@
 Rails.application.routes.draw do
 
-
+  get 'home/about'
   resources :stocks
   resources :home
   devise_for :users
   get 'home/index'
   root 'home#index'
-  get 'home/about'
+
   #get 'home/show'
 
   post "/" => 'home#index'
