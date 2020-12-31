@@ -16,5 +16,9 @@
   "version": "0.1.0",
   "devDependencies": {
     "webpack-dev-server": "^3.11.1"
-  }
+  },
+  "main": "index.js",
+  "repository": "https://github.com/lagnajeetdas/optionspreads.git",
+  "author": "Lagnajeet Das <lagnajeetdas@gmail.com>",
+  "license": "MIT"
 }
