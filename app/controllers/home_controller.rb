@@ -6,23 +6,27 @@ class HomeController < ApplicationController
   	@api = StockQuote::Stock.new(api_key: 'pk_34bbabe4cf054befa331a42b695e75b2')
     @tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
     @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
-
+    @universes = Universe.select("displaysymbol")
     
   	
   	if params[:ticker] == ""
   		@nothing = "Hey, You forgot to enter a symbol"
   	elsif params[:ticker]
-
+      _symbol = params[:ticker]
     	begin
-  		    @stock = StockQuote::Stock.quote(params[:ticker])
-          if @stock
+  		    #@stock = StockQuote::Stock.quote(params[:ticker]) # to validate if stock symbol is valid
+          #if @stock
+
+          if !(@universes.select{ |u| u['displaysymbol'] == _symbol }).empty?
+            redirect_to home_path(_symbol)
             #OptionsStragizerJob.perform_later(@stock.symbol)
             #get_option_expirydates(ticker: @stock.symbol)
           else
             p "Stock array is empty"
+            @error =  "Hey, we had a problem finding data for that stock. Please try another stock."
           end
   		rescue StandardError, NameError, NoMethodError, RuntimeError => e
-  		    @error =  "Hey, we had a problem finding data for that stock. Please try again"
+  		    @error =  "Hey, we had a problem finding data for that stock. Please try again."
           p "Rescued: #{e.inspect}"
           p e.backtrace
   		else
@@ -32,6 +36,16 @@ class HomeController < ApplicationController
   		end
 
   	end
+  end
+
+  def show
+    require 'uri'
+    require 'net/http'
+    p params
+    @stock = params[:id] 
+    @tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
+    @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
+    @recommendations = Recommendation.all
   end
 
   def about

@@ -2,10 +2,12 @@ Rails.application.routes.draw do
 
 
   resources :stocks
+  resources :home
   devise_for :users
   get 'home/index'
   root 'home#index'
   get 'home/about'
+  #get 'home/show'
 
   post "/" => 'home#index'
   post "targetprice", to: "stocks#gettarget"

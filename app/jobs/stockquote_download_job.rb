@@ -201,7 +201,7 @@ class StockquoteDownloadJob < ApplicationJob
   	#@queue = Limiter::RateQueue.new(118, interval: 60) # rate limiter setup
 
   	begin 
-	  	url_options_expiry_string = @baseurl_tradier + "options/expirations?symbol=" + security['displaysymbol'] + "&includeAllRoots=true&strikes=false"
+	  	url_options_expiry_string = @baseurl_tradier + "options/expirations?symbol=" + security['displaysymbol'] + "&includeAllRoots=false&strikes=false"
 		response = HTTParty.get(url_options_expiry_string, {headers: {"Authorization" => 'Bearer ' + @tradier_api_key}})
 
 		expirydates_data = Array[]
@@ -301,7 +301,7 @@ class StockquoteDownloadJob < ApplicationJob
   	#Assuming option chains are downloaded only 1 time/day
   	#Check if option chains have been successfully downloaded today
   	
-  	p Optionchain.where('created_at < ?', Date.today ).delete_all
+  	#p Optionchain.where('created_at < ?', Date.today ).delete_all
   	
   end
 
