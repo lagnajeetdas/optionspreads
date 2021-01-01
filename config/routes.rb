@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   devise_for :users
   get 'home/index'
   root 'home#index'
+  #get :autocomplete_universe_displaysymbol, :on => :collection
 
   #get 'home/show'
 

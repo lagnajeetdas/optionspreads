@@ -1,8 +1,11 @@
-<%= link_to 'New Stock', new_stock_path %>
+
+<%= button_to "Add New Stock to Watchlist", new_stock_path, class: "btn btn-outline-success"  %>
+
+
 <br/>
 
 <table class="table table-bordered table-hover" data-toggle="table" data-search="true" >
-  <thead class="thead-dark">
+  <thead class="thead-dark" data-pagination="true">
     <tr>
       <th data-sortable="true" data-field="company">Company</th>
       <th data-sortable="true" data-field="symbol">Ticker</th>
@@ -86,4 +89,6 @@
 
 <br>
 
-<%= link_to 'New Stock', new_stock_path %>
+<% if @stocks.length() > 10 %>
+  <%= button_to "Add New Stock to Watchlist", new_stock_path, class: "btn btn-outline-success"  %>
+<% end %>

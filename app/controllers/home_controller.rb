@@ -1,4 +1,6 @@
 class HomeController < ApplicationController
+
+
   require 'httparty'
   require 'json'
   require 'bootstrap-table-rails'
@@ -46,6 +48,10 @@ class HomeController < ApplicationController
     @tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
     @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
     @recommendations = Recommendation.all
+    if current_user
+      @currentUser = current_user.id
+    end
+  
   end
 
   def about

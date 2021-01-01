@@ -7,6 +7,8 @@
 //= require popper
 //= require bootstrap-sprockets
 //= require bootstrap-table/bootstrap-table
+//= require jquery_ujs
+
 
 import Rails from "@rails/ujs"
 import Turbolinks from "turbolinks"

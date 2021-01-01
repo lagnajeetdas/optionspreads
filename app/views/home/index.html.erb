@@ -4,18 +4,19 @@
 			<div class="jumbotron">
 				<div class="container">
 					<h1><strong>Discover Winning Options Strategies</strong></h1>
-					<p>Find low risk high reward spreads like a pro   </p>
+					<p>Find low risk high reward spreads like a pro</p>
 					<div class="form-group">
-						<%= form_tag root_path, :method => 'POST' do %>
+						<%= form_tag root_path, :method => 'POST', id: "search-form" do %>
 							<div class="input-group mb-3">
 								
-									<%= text_field_tag 'ticker', nil, placeholder: "Enter Ticker Symbol", size: 50, class: "form-control" %>
+									<%= text_field_tag 'ticker', nil, placeholder: "Enter Ticker Symbol", size: 50,  class: "form-control" %>
 								
 								<div class="input-group-append">
 									<%= submit_tag 'Lookup', class: "btn btn-outline-success" %>
 								</div>
 							</div>
 						<% end %>
+						
 					</div>
 
 					<br/>

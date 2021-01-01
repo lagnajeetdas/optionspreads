@@ -42,8 +42,8 @@
 									<%= link_to 'Delete', @stock, method: :delete, data: { confirm: 'Are you sure?' } %> | 
 									<%= link_to 'Back', stocks_path %>
 								<% else %>
-									<%= link_to 'Add to watchlist', new_stock_path %> | 
-									<%= link_to 'Back', home_index_path %>
+									 <%= link_to 'Add to Watchlist', stocks_path("stock"=>{"ticker"=>@ticker.symbol, "user_id"=>@currentUser}), method: :post %> |
+									<%= link_to 'Back to Search', home_index_path %>
 								<% end %>
 							</div>
 							<br/><br/>
@@ -266,8 +266,8 @@
 						<%= link_to 'Delete', @stock, method: :delete, data: { confirm: 'Are you sure?' } %> | 
 						<%= link_to 'Back', stocks_path %>
 					<% else %>
-						<%= link_to 'Add to watchlist', new_stock_path %> | 
-						<%= link_to 'Back', home_index_path %>
+						
+						<%= link_to 'Back to Search', home_index_path %>
 					<% end %>
 
 
