@@ -18,9 +18,6 @@ class StockquoteDownloadJob < ApplicationJob
 
   	#get models into instances
   	@universes = Universe.all
-  	
-  	
-  	
 
     #function calls
     #getstockuniverse
@@ -43,12 +40,12 @@ class StockquoteDownloadJob < ApplicationJob
 	  		@optionchains = Optionchain.all
 	  		get_options
 	  	when "clear_oldoptions"
-	  		
 	  		clear_old_optionchains
 	  	when "delete_all_options"
 	  		@optionchains = Optionchain.all
 	  		p Optionchain.delete_all
-	  	
+	  	when "download_stock_quotes"
+	  		get_stock_quotes_snapshot
 	  	else
 	  		p "No method found"
   	end
@@ -303,6 +300,54 @@ class StockquoteDownloadJob < ApplicationJob
   	
   	#p Optionchain.where('created_at < ?', Date.today ).delete_all
   	
+  end
+
+
+  def get_stock_quotes_snapshot
+  	begin
+		#paginate universe for 20 symbols at a time and execute API
+		if 1==1
+	  		(1..136).each do |p|  # needs to bbe made dynamic
+
+	  			symbols_arr = Kaminari.paginate_array(Universe.pluck(:displaysymbol))
+	  			symbols = symbols_arr.page(p).per(25)  #tested till 25.. can it be increased?
+	  			symbols_string = symbols.join(",")
+	  			p symbols_string
+	  			url_stock_quote_string = @baseurl_tradier + "quotes?symbols=" + symbols_string
+				response = HTTParty.get(url_stock_quote_string, {headers: {"Authorization" => 'Bearer ' + @tradier_api_key}})
+				if response.code == 200 
+					if response.parsed_response['quotes']['quote']
+						symbols_quotes = response.parsed_response['quotes']['quote']
+						symbols_quotes.each do |q|
+							stockprices = Stockprice.new(symbol: q['symbol'], last: q['last'])
+							if stockprices.save
+								p "saved to db " + q['symbol']
+							else
+								p "did not save to db " + q['symbol']
+							end
+						end
+					else
+						p "did not find quotes - quote for " + symbols_string.to_s
+					end
+				else
+					p "API did not respond sucessfully for  " + symbols_string.to_s
+
+				end
+	  		end
+	  	end
+
+	rescue StandardError, NameError, NoMethodError, RuntimeError => e
+		p "Error downloading stock prices .."
+		p response
+		#p "Rescued: #{e.inspect}"
+		#p e.backtrace
+
+	else
+
+	ensure
+
+	end
+
   end
 
 

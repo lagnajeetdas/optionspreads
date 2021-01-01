@@ -15,6 +15,8 @@ class HomeController < ApplicationController
   		@nothing = "Hey, You forgot to enter a symbol"
   	elsif params[:ticker]
       _symbol = params[:ticker]
+      _symbol = _symbol.upcase
+      _symbol = _symbol.strip
     	begin
   		    #@stock = StockQuote::Stock.quote(params[:ticker]) # to validate if stock symbol is valid
           #if @stock

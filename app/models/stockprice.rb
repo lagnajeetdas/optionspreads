@@ -1,0 +1,2 @@
+class Stockprice < ApplicationRecord
+end

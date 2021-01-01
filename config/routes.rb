@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   resources :stocks
   resources :home
   devise_for :users
+  resources :options
   get 'home/index'
   root 'home#index'
   #get :autocomplete_universe_displaysymbol, :on => :collection

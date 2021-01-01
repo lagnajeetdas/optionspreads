@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_29_115629) do
+ActiveRecord::Schema.define(version: 2021_01_01_145829) do
 
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer "priority", default: 0, null: false
@@ -64,6 +64,13 @@ ActiveRecord::Schema.define(version: 2020_12_29_115629) do
     t.float "strongbuy"
     t.float "strongsell"
     t.string "symbol"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "stockprices", force: :cascade do |t|
+    t.string "symbol"
+    t.float "last"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

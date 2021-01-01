@@ -47,7 +47,7 @@ class StocksController < ApplicationController
 
   # GET /stocks/new
   def new
-    
+
     @stock = Stock.new
   end
 
@@ -58,7 +58,7 @@ class StocksController < ApplicationController
   # POST /stocks
   # POST /stocks.json
   def create
-    p stock_params
+
     @stock = Stock.new(stock_params)
 
     respond_to do |format|
