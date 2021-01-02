@@ -32,19 +32,19 @@ end
 
 task :calculate_options_spreads => :environment do
   puts "Compute option spreads using saved data from db..."
-    OptionsStragizerJob.perform_later(calc_op_spreads)
+    OptionsStragizerJob.perform_later("calc_op_spreads")
   puts "done."
 end
 
 task :calculate_high_open_interest_options => :environment do
   puts "Select top 500 open interest options and save to db to serve to client fast..."
-    OptionsStragizerJob.perform_later(calc_high_open_interests)
+    OptionsStragizerJob.perform_later("calc_high_open_interests")
   puts "done."
 end
 
 task :calculate_top_option_spreads => :environment do
   puts "Select top 500 top option spreads and save to db to serve to client fast..."
-    OptionsStragizerJob.perform_later(calc_top_option_spreads)
+    OptionsStragizerJob.perform_later("calc_top_option_spreads")
   puts "done."
 end
 
