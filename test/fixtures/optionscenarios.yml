@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  underlying: MyString
+  expiry_date: MyString
+  buy_strike: 1.5
+  sell_strike: 1.5
+  risk: 1.5
+  reward: 1.5
+  rr_ratio: 1.5
+  perc_change: 1.5
+  buy_contract_symbol: MyString
+  sell_contract_symbol: MyString
+  buy_contract_iv: 1.5
+  sell_contract_iv: 1.5
+
+two:
+  underlying: MyString
+  expiry_date: MyString
+  buy_strike: 1.5
+  sell_strike: 1.5
+  risk: 1.5
+  reward: 1.5
+  rr_ratio: 1.5
+  perc_change: 1.5
+  buy_contract_symbol: MyString
+  sell_contract_symbol: MyString
+  buy_contract_iv: 1.5
+  sell_contract_iv: 1.5

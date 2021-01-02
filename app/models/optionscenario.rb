@@ -1,0 +1,2 @@
+class Optionscenario < ApplicationRecord
+end

@@ -307,10 +307,10 @@ class StockquoteDownloadJob < ApplicationJob
   	begin
 		#paginate universe for 20 symbols at a time and execute API
 		if 1==1
-	  		(1..136).each do |p|  # needs to bbe made dynamic
+	  		(1..70).each do |p|  # needs to bbe made dynamic
 
 	  			symbols_arr = Kaminari.paginate_array(Universe.pluck(:displaysymbol))
-	  			symbols = symbols_arr.page(p).per(25)  #tested till 25.. can it be increased?
+	  			symbols = symbols_arr.page(p).per(50)  #tested till 25.. can it be increased?
 	  			symbols_string = symbols.join(",")
 	  			p symbols_string
 	  			url_stock_quote_string = @baseurl_tradier + "quotes?symbols=" + symbols_string
@@ -319,6 +319,7 @@ class StockquoteDownloadJob < ApplicationJob
 					if response.parsed_response['quotes']['quote']
 						symbols_quotes = response.parsed_response['quotes']['quote']
 						symbols_quotes.each do |q|
+							p Stockprice.where(symbol: q['symbol']).delete_all
 							stockprices = Stockprice.new(symbol: q['symbol'], last: q['last'])
 							if stockprices.save
 								p "saved to db " + q['symbol']

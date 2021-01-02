@@ -11,7 +11,7 @@ class OptionsController < ApplicationController
     	@baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
 
   		@universes = Universe.pluck(:displaysymbol)
-  		OptionsStragizerJob.perform_later
+  		#OptionsStragizerJob.perform_later
 
   	end
 
