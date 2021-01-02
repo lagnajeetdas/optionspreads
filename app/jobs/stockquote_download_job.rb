@@ -292,7 +292,7 @@ class StockquoteDownloadJob < ApplicationJob
   	#p Optionchain.column_names
   	#arr.keep_if { |h| Time.parse(h['day']) > timestamp }
   	#where('created_at < ?', Date.today )
-  	#p Optionchain.where('expiration_date < ?', Date.today ).delete_all
+  	p Optionchain.where('expiration_date < ?', Date.today ).delete_all
 
   	#Logic
   	#Assuming option chains are downloaded only 1 time/day
