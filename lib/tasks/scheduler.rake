@@ -32,7 +32,7 @@ end
 
 task :calculate_options_spreads => :environment do
   puts "Compute option spreads using saved data from db..."
-    OptionsStragizerJob.perform_later()
+    OptionsStragizerJob.perform_later
   puts "done."
 end
 
