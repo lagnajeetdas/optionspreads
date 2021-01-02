@@ -42,6 +42,12 @@ task :calculate_high_open_interest_options => :environment do
   puts "done."
 end
 
+task :calculate_top_option_spreads => :environment do
+  puts "Select top 500 top option spreads and save to db to serve to client fast..."
+    OptionsStragizerJob.perform_later(calc_top_option_spreads)
+  puts "done."
+end
+
 
 
 #delete tasks

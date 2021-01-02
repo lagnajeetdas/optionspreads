@@ -20,6 +20,8 @@ class OptionsStragizerJob < ApplicationJob
 			end
 	  	when "calc_high_open_interests"
 	  		top_high_open_interest
+	  	when "calc_top_option_spreads"
+	  		top_option_spreads
 	  	else
 	  		p "no job found"
 	 end
@@ -285,7 +287,51 @@ class OptionsStragizerJob < ApplicationJob
 	p "@@@@@@@@@@@@@@@@@@@@ Finished high open interest options calc @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
   end
 
+  def top_option_spreads
 
+  	 
+  	p "@@@@@@@@@@@@@@@@@@@@ Starting updating top option spreads @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+
+  	stock_latest_price = -1
+  	stock_description = ""
+  	begin
+  		p Topoptionscenario.delete_all
+	  	@best_rr_options = Optionscenario.select{ |o| o['perc_change']<35 }.group_by { |r| r["rr_ratio"] }.sort_by  { |k, v| -k }.first(500).map(&:last).flatten
+
+	  	@best_rr_options.each do |hoi|
+	  		if ((Stockprice.where(symbol: hoi.underlying)).last)
+				stock_latest_price = ((Stockprice.where(symbol: hoi.underlying)).last)['last']
+			end
+			
+			if ((Universe.where(displaysymbol: hoi.underlying)).last)
+				stock_description = ((Universe.where(displaysymbol: hoi.underlying)).last)['description']
+			end
+	  		
+
+			@topoptionscenario =  Topoptionscenario.new(underlying: hoi.underlying, expiry_date: hoi.expiry_date, buy_strike: hoi.buy_strike, sell_strike: hoi.sell_strike, risk: hoi.risk, reward: hoi.reward, rr_ratio: hoi.rr_ratio, perc_change: hoi.perc_change, buy_contract_symbol: hoi.buy_contract_symbol, sell_contract_symbol: hoi.sell_contract_symbol, stock_quote: stock_latest_price, stock_description: stock_description, buy_contract_iv: hoi.buy_contract_iv, sell_contract_iv: hoi.sell_contract_iv )
+			if @topoptionscenario.save
+				
+			else
+				p "could not save top option scenario to db"
+			end
+
+	  		
+	  	end
+	rescue StandardError, NameError, NoMethodError, RuntimeError => e
+		p "Rescued: #{e.inspect}"
+		
+	else
+
+	ensure
+
+	end
+
+	p "@@@@@@@@@@@@@@@@@@@@ Finished updating top option spreads @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+
+
+
+
+  end
 
   def calculate_call_debit_spreads
     #Bullish

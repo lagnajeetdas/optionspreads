@@ -1,0 +1,2 @@
+class Topoptionscenario < ApplicationRecord
+end
