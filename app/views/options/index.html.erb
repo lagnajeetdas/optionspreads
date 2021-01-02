@@ -1,0 +1,105 @@
+<div class="container">
+  <!-- Nav tabs -->
+  <ul class="nav nav-pills" id="myTab" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="high_open_interest_options-tab" data-toggle="tab" href="#high_open_interest_options" role="tab" aria-controls="high_open_interest_options" aria-selected="true">High Open Interest</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="call_debit_spreads-tab" data-toggle="tab" href="#call_debit_spreads" role="tab" aria-controls="call_debit_spreads" aria-selected="false">Bullish Spreads</a>
+    </li>
+    
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div class="tab-pane active" id="high_open_interest_options" role="tabpanel" aria-labelledby="home-tab">
+      <br/>
+      <h5>Top option contracts with highest open interest </h5>
+      <p>Analyzed <%= @optionchain_count %> option chains </p>
+      <br/>
+            
+              <table class="table table-bordered table-hover"   data-toggle="table" data-pagination="true"  data-filter-control="true">
+                <thead class="thead-dark">
+                  <tr>
+                    <th data-sortable="true" data-field="underlying" data-filter-control="select">Underlying</th>
+                    <th data-sortable="true" data-field="stock_description" data-filter-control="select">Company</th>
+                  
+                    <th data-field="option_type" data-filter-control="select">Option Type</th>
+                    <th data-field="expiry" data-filter-control="select">Expiry</th>
+                    <th data-sortable="true" data-field="quote">Stock Price</th>
+                    <th data-sortable="true" data-field="strike">Strike</th>
+                    <th data-sortable="true" data-field="bid">Bid</th>
+                    <th data-sortable="true" data-field="ask">Ask</th>
+                    <th data-sortable="true" data-field="volume">Volume</th>    
+                    <th data-sortable="true" data-field="open_interest">Open Interest</th> 
+                 
+                    
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <% @high_open_interest.each do |hoi| %>
+
+                    <tr>
+                      <td><%= hoi.underlying %></td>
+                      <td><%= hoi.description %></td>
+                      <td><%= hoi.option_type  %></td>
+                      <td><%= hoi.expiration_date %></td>
+                      <td><%= hoi.quote  %></td>
+                      <td><%= hoi.strike  %></td>
+                      <td><%= hoi.bid %></td>
+                      <td><%= hoi.ask %></td>
+                      <td><%= hoi.last_volume %></td>
+                      <td><%= hoi.open_interest %></td>
+
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+    </div>
+
+
+    <div class="tab-pane" id="call_debit_spreads" role="tabpanel" aria-labelledby="call_debit_spreads-tab">
+      <br/>
+      <h5>Top call debit spreads scenarios </h5>
+      <p>Analyzed <%= @optionchain_count %> option chains and <%= @Optionscenario_count %> scenarios </p>
+      <br/>
+
+              <table class="table table-bordered table-hover"   data-toggle="table" data-pagination="true"  data-filter-control="true">
+                <thead class="thead-dark">
+                  <tr>
+                    <th data-sortable="true" data-field="underlying_scenario_call_debit" data-filter-control="select">Underlying</th>
+                    <th data-field="expiry_scenario_call_debit" data-filter-control="select">Expiry</th>
+                    <th data-sortable="true" data-field="buy_strike">Buy Strike</th>
+                    <th data-sortable="true" data-field="sell_strike">Sell Strike</th>
+                    <th data-sortable="true" data-field="risk">Risk</th>
+                    <th data-sortable="true" data-field="reward">Reward</th>    
+                    <th data-sortable="true" data-field="rr_ratio">R/R</th> 
+                    <th data-sortable="true" data-field="perc_change">Upside Reqd %</th> 
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <% @best_rr_options.each do |best_rr| %>
+
+                    <tr>
+                      <td><%= best_rr.underlying %></td>
+                      <td><%= best_rr.expiry_date %></td>
+                      <td><%= best_rr.buy_strike.round(1)  %></td>
+                      <td><%= best_rr.sell_strike.round(1) %></td>
+                      <td><%= best_rr.risk.round(1) %></td>
+                      <td><%= best_rr.reward.round(1) %></td>
+                      <td><%= best_rr.rr_ratio.round(1) %></td>
+                      <td><%= best_rr.perc_change.round(1) %></td>
+
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+
+
+
+    </div>
+    
+  </div>
+</div>

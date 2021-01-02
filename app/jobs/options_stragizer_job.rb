@@ -1,22 +1,32 @@
 class OptionsStragizerJob < ApplicationJob
    
 	
-   def perform
+  def perform(service_name)
     # Do something later
     @tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
     @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
 
     #get_option_expirydates(ticker: symbol)
 	universes = Universe.pluck(:displaysymbol)
-	p "@@@@@@@@@@@@@@@@@@@@ Starting option scenario calcs@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-	@option_spreads_scenarios = Array[]
-	universes.each do |security|
-		#p security
-		calc_op_spreads(security: security)
-	end
+	
 
-	p Optionscenario.count
-	p "@@@@@@@@@@@@@@@@@@@@ Finished option scenario calcs@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+	@option_spreads_scenarios = Array[]
+
+	case service_name
+	  	when "calc_op_spreads"
+			universes.each do |security|
+				#p security
+				calc_op_spreads(security: security)
+			end
+	  	when "calc_high_open_interests"
+	  		top_high_open_interest
+	  	else
+	  		p "no job found"
+	 end
+
+
+
+	
 
 
   end
@@ -90,7 +100,9 @@ class OptionsStragizerJob < ApplicationJob
   end
 
   def calc_op_spreads(security:)
-
+  	
+  	p "@@@@@@@@@@@@@@@@@@@@ Starting option scenario calcs@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+  	
   	begin 
 	  	stock_latest_price = -1 
 	  	if ((Stockprice.where(symbol: security)).last)
@@ -110,7 +122,7 @@ class OptionsStragizerJob < ApplicationJob
 			
 				option_strikes_array = Array[]
 				optionchains = optionchains.uniq{ |s| s['symbol'] } #get unique option chains by option symbol
-				#p optionchains
+				 optionchains
 
 				#Loop through all contracts in option chain of an expiry date 
 				optionchains.each do |contract_item|
@@ -218,7 +230,7 @@ class OptionsStragizerJob < ApplicationJob
 	rescue StandardError, NameError, NoMethodError, RuntimeError => e
 		p "Error calculating spreads " + security.to_s
 		p "Rescued: #{e.inspect}"
-		#p e.backtrace
+		p e.backtrace
 		#p response
 
 	else
@@ -226,9 +238,52 @@ class OptionsStragizerJob < ApplicationJob
 	ensure
 
 	end
+	p "@@@@@@@@@@@@@@@@@@@@ Finished option scenario calcs@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 
   end
 
+
+
+
+  def top_high_open_interest
+
+  	p "@@@@@@@@@@@@@@@@@@@@ Starting high open interest options calc @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+
+  	stock_latest_price = -1
+  	stock_description = ""
+  	begin
+  		p Optionhighopeninterest.delete_all
+	  	@high_open_interest = Optionchain.select{ |o| o['open_interest']>1 }.group_by { |r| r["open_interest"] }.sort_by  { |k, v| -k }.first(500).map(&:last).flatten
+	  	@high_open_interest.each do |hoi|
+	  		if ((Stockprice.where(symbol: hoi.underlying)).last)
+				stock_latest_price = ((Stockprice.where(symbol: hoi.underlying)).last)['last']
+			end
+			
+			if ((Universe.where(displaysymbol: hoi.underlying)).last)
+				stock_description = ((Universe.where(displaysymbol: hoi.underlying)).last)['description']
+			end
+	  		
+
+			@optionhighopeninterest =  Optionhighopeninterest.new(underlying: hoi.underlying, expiration_date: hoi.expiration_date, strike: hoi.strike, bid: hoi.bid, ask: hoi.ask, last_volume: hoi.last_volume, open_interest: hoi.open_interest, symbol: hoi.symbol, quote: stock_latest_price, description: stock_description, option_type: hoi.option_type )
+			if @optionhighopeninterest.save
+				
+			else
+				p "could not save high open interest to db"
+			end
+
+	  		
+	  	end
+	rescue StandardError, NameError, NoMethodError, RuntimeError => e
+		p "Rescued: #{e.inspect}"
+		
+	else
+
+	ensure
+
+	end
+
+	p "@@@@@@@@@@@@@@@@@@@@ Finished high open interest options calc @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+  end
 
 
 

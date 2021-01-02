@@ -191,6 +191,8 @@ class StockquoteDownloadJob < ApplicationJob
 
 	p "@@@@@@@@@@@@@@@@@@@@@ Option chain download finished. @@@@@@@@@@@@@@@@@@@@"  
 
+	OptionsStragizerJob.perform_later("calc_high_open_interests")
+
   end
 
 
@@ -249,7 +251,7 @@ class StockquoteDownloadJob < ApplicationJob
 						optionchain_data = response.parsed_response['options']['option']
 						
 						#delete existing option chains with matching symbol and expiry date
-						#p Optionchain.where(underlying: symbol).where(expiration_date: expirydate).delete_all
+						p Optionchain.where(underlying: symbol).where(expiration_date: expirydate).delete_all
 
 						
 						if !optionchain_data.empty?

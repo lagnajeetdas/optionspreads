@@ -1,0 +1,25 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  underlying: MyString
+  expiration_date: MyString
+  strike: 1.5
+  bid: 
+  ask: 1.5
+  last_volume: 1.5
+  open_interest: 1.5
+  symbol: MyString
+  quote: 1.5
+  description: MyString
+
+two:
+  underlying: MyString
+  expiration_date: MyString
+  strike: 1.5
+  bid: 
+  ask: 1.5
+  last_volume: 1.5
+  open_interest: 1.5
+  symbol: MyString
+  quote: 1.5
+  description: MyString

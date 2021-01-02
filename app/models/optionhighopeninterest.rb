@@ -1,0 +1,2 @@
+class Optionhighopeninterest < ApplicationRecord
+end
