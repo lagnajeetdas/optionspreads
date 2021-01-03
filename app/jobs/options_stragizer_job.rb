@@ -255,7 +255,9 @@ class OptionsStragizerJob < ApplicationJob
   	stock_description = ""
   	begin
   		p Optionhighopeninterest.delete_all
-  		@high_open_interest = Optionchain.order(:open_interest).limit(100)
+  		@high_open_interest = Optionchain.order('open_interest DESC').limit(500)
+  		p Optionchain.count
+	  	p @high_open_interest.count
 	  	#@high_open_interest = Optionchain.select{ |o| o['open_interest']>1 }.group_by { |r| r["open_interest"] }.sort_by  { |k, v| -k }.first(500).map(&:last).flatten
 	  	@high_open_interest.each do |hoi|
 	  		if ((Stockprice.where(symbol: hoi.underlying)).last)
@@ -298,7 +300,7 @@ class OptionsStragizerJob < ApplicationJob
   	begin
   		p Topoptionscenario.delete_all
 
-  		@best_rr_options = Optionscenario.order(:rr_ratio).limit(100)
+  		@best_rr_options = Optionscenario.order('rr_ratio DESC').limit(500)
 
 	  	#@best_rr_options = Optionscenario.all.group_by { |r| r["rr_ratio"] }.sort_by  { |k, v| -k }.first(5).map(&:last).flatten
 	  	p Optionscenario.count

@@ -253,6 +253,8 @@ class StockquoteDownloadJob < ApplicationJob
 						optionchain_data = response.parsed_response['options']['option']
 						
 						#delete existing option chains with matching symbol and expiry date
+						p Optionchain.count
+						p Optionchain.where(underlying: symbol).count
 						p Optionchain.where(underlying: symbol).where(expiration_date: expirydate).delete_all
 
 						
@@ -264,9 +266,7 @@ class StockquoteDownloadJob < ApplicationJob
 										@optionchain = Optionchain.new(universe_id: universeid, symbol: (contract_item['symbol']).to_s, description: (contract_item['description']).to_s, exch: (contract_item['exch']).to_s, option_type: (contract_item['option_type']).to_s, volume: (contract_item['volume']), bid: (contract_item['bid']), ask: (contract_item['ask']), underlying: (contract_item['underlying']).to_s, strike: (contract_item['strike']), change_percentage: (contract_item['change_percentage']), average_volume: (contract_item['average_volume']), last_volume: (contract_item['last_volume']), bidsize: (contract_item['bidsize']), asksize: (contract_item['asksize']), open_interest: (contract_item['open_interest']), expiration_date: (contract_item['expiration_date']).to_s, expiration_type: (contract_item['expiration_type']).to_s, root_symbol: (contract_item['root_symbol']).to_s, bid_iv: (contract_item_greeks['bid_iv']), mid_iv: (contract_item_greeks['mid_iv']), ask_iv: (contract_item_greeks['ask_iv']) )
 									else
 										@optionchain = Optionchain.new(universe_id: universeid, symbol: (contract_item['symbol']).to_s, description: (contract_item['description']).to_s, exch: (contract_item['exch']).to_s, option_type: (contract_item['option_type']).to_s, volume: (contract_item['volume']), bid: (contract_item['bid']), ask: (contract_item['ask']), underlying: (contract_item['underlying']).to_s, strike: (contract_item['strike']), change_percentage: (contract_item['change_percentage']), average_volume: (contract_item['average_volume']), last_volume: (contract_item['last_volume']), bidsize: (contract_item['bidsize']), asksize: (contract_item['asksize']), open_interest: (contract_item['open_interest']), expiration_date: (contract_item['expiration_date']).to_s, expiration_type: (contract_item['expiration_type']).to_s, root_symbol: (contract_item['root_symbol']).to_s )
-									end
-
-									
+									end								
 
 									if @optionchain.save
 										#p "option chain " + (contract_item['symbol']).to_s  + " saved for " + symbol.to_s
