@@ -14,7 +14,7 @@ class OptionsController < ApplicationController
       #@optionchain_count = Optionchain.pluck(:symbol).count
       @Optionscenario_count = Optionscenario.pluck(:id).count
 
-  		OptionsStragizerJob.perform_later("calc_top_option_spreads")
+  		#OptionsStragizerJob.perform_later("calc_top_option_spreads")
       #StockquoteDownloadJob.perform_later("refresh_options")
 
       #p @optionchains
