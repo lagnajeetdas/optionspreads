@@ -37,6 +37,7 @@ class StockquoteDownloadJob < ApplicationJob
 	  		@stockprofiles = Stockprofile.all
 	  		p Stockprofile.delete_all
 	  	when "refresh_options"
+	  		@optionchain_import = Array[]
 	  		@optionchains = Optionchain.all
 	  		get_options
 	  	when "clear_oldoptions"
@@ -201,7 +202,7 @@ class StockquoteDownloadJob < ApplicationJob
 
   def getoptionexpiry_apicall(security:)
   	#@queue = Limiter::RateQueue.new(118, interval: 60) # rate limiter setup
-
+  	@optionchain_import = Array[]
   	begin 
 	  	url_options_expiry_string = @baseurl_tradier + "options/expirations?symbol=" + security['displaysymbol'] + "&includeAllRoots=false&strikes=false"
 		response = HTTParty.get(url_options_expiry_string, {headers: {"Authorization" => 'Bearer ' + @tradier_api_key}})
@@ -224,6 +225,11 @@ class StockquoteDownloadJob < ApplicationJob
 					#p "Non array expiry date response for " + (security['displaysymbol']).to_s + (expirydates_data).to_s
 					getoptionchains_apicall(symbol: security['displaysymbol'], expirydate: expirydates_data.to_s, universeid: security['id'] )
 			end
+			if !@optionchain_import.empty?
+				Optionchain.import @optionchain_import
+			else
+				p "error bulk importing data to optionchain db"
+			end
 		end
 	rescue StandardError, NameError, NoMethodError, RuntimeError => e
 		p "Rescued: #{e.inspect}"
@@ -239,7 +245,7 @@ class StockquoteDownloadJob < ApplicationJob
 
 
   def getoptionchains_apicall(symbol:, expirydate:, universeid:)
- 		optionchain_import = Array[]
+ 		
  		begin 
  			#check if option with same symbol, expiry date exists in db with creation date within 1 hour in past
  			#if (@optionchains.select{ |oc| oc['underlying'] == symbol && oc['expiration_date'] == expirydate && ((oc['created_at']- DateTime.now)/ 3600) <=3  }).empty?
@@ -264,10 +270,10 @@ class StockquoteDownloadJob < ApplicationJob
 								optionchain_data.each do |contract_item|
 									contract_item_greeks = contract_item['greeks']
 									if !contract_item.nil?
-										optionchain_import.push(Optionchain.new(universe_id: universeid, symbol: (contract_item['symbol']).to_s, description: (contract_item['description']).to_s, exch: (contract_item['exch']).to_s, option_type: (contract_item['option_type']).to_s, volume: (contract_item['volume']), bid: (contract_item['bid']), ask: (contract_item['ask']), underlying: (contract_item['underlying']).to_s, strike: (contract_item['strike']), change_percentage: (contract_item['change_percentage']), average_volume: (contract_item['average_volume']), last_volume: (contract_item['last_volume']), bidsize: (contract_item['bidsize']), asksize: (contract_item['asksize']), open_interest: (contract_item['open_interest']), expiration_date: (contract_item['expiration_date']).to_s, expiration_type: (contract_item['expiration_type']).to_s, root_symbol: (contract_item['root_symbol']).to_s, bid_iv: (contract_item_greeks['bid_iv']), mid_iv: (contract_item_greeks['mid_iv']), ask_iv: (contract_item_greeks['ask_iv']) ))
+										@optionchain_import.push(Optionchain.new(universe_id: universeid, symbol: (contract_item['symbol']).to_s, description: (contract_item['description']).to_s, exch: (contract_item['exch']).to_s, option_type: (contract_item['option_type']).to_s, volume: (contract_item['volume']), bid: (contract_item['bid']), ask: (contract_item['ask']), underlying: (contract_item['underlying']).to_s, strike: (contract_item['strike']), change_percentage: (contract_item['change_percentage']), average_volume: (contract_item['average_volume']), last_volume: (contract_item['last_volume']), bidsize: (contract_item['bidsize']), asksize: (contract_item['asksize']), open_interest: (contract_item['open_interest']), expiration_date: (contract_item['expiration_date']).to_s, expiration_type: (contract_item['expiration_type']).to_s, root_symbol: (contract_item['root_symbol']).to_s, bid_iv: (contract_item_greeks['bid_iv']), mid_iv: (contract_item_greeks['mid_iv']), ask_iv: (contract_item_greeks['ask_iv']) ))
 									end								
 								end
-							Optionchain.import optionchain_import
+							
 						end
 					end
 				end
