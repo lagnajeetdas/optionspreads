@@ -13,7 +13,8 @@ class StocksController < ApplicationController
   # GET /stocks.json
   def index
     
-    @stocks = Stock.all
+    @stocks = Stock.select{ |s| s['user_id']==current_user.id}
+    @tickers = Array[]
     @recommendations = Recommendation.all
 
     @api = StockQuote::Stock.new(api_key: 'pk_34bbabe4cf054befa331a42b695e75b2')
@@ -21,6 +22,13 @@ class StocksController < ApplicationController
     
     @iexcloud_api_key = "pk_34bbabe4cf054befa331a42b695e75b2"
     @baseurl_iexcloud = "https://cloud.iexapis.com/stable/stock/"
+
+    @tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
+    @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
+
+    get_watchlist_stocks_live_quotes
+
+
 
     #StockquoteDownloadJob.set(wait: 1.minute).perform_later
     #StockquoteDownloadJob.perform_later
@@ -30,9 +38,6 @@ class StocksController < ApplicationController
     #StockquoteDownloadJob.perform_later("metadata")
     #StockquoteDownloadJob.perform_later("delete_stockprofiles")
     #StockquoteDownloadJob.perform_later("delete_recommendations")
-    
-    
-    
   end
 
   # GET /stocks/1
@@ -155,6 +160,35 @@ class StocksController < ApplicationController
     end
 
 
+  end
+
+  def get_watchlist_stocks_live_quotes
+
+
+      last_page = ((@stocks.count)/25)+1
+      (1..last_page).each do |p|  
+        symbols_arr = Kaminari.paginate_array(@stocks.pluck(:ticker))
+        symbols = symbols_arr.page(p).per(25)  #tested till 25.. can it be increased?
+        symbols = symbols.map!(&:upcase)
+        symbols_string = symbols.join(",")
+        
+        url_stock_quote_string = @baseurl_tradier + "quotes?symbols=" + symbols_string
+        response = HTTParty.get(url_stock_quote_string, {headers: {"Authorization" => 'Bearer ' + @tradier_api_key}})
+        if response.code == 200 
+          if response.parsed_response['quotes']['quote']
+            symbols_quotes = response.parsed_response['quotes']['quote']
+            symbols_quotes.each do |q|
+              #p q['description']
+              #p q['last']
+              @tickers.push("company_name" => q["description"], "latest_price" => q['last'], "symbol" => q['symbol'])
+            end
+          else
+            p "did not find quotes - quote for " + symbols_string.to_s
+          end
+        else
+          p "API did not respond sucessfully for  " + symbols_string.to_s
+        end
+      end
   end
 
 

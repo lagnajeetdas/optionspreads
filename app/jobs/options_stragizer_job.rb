@@ -296,27 +296,31 @@ class OptionsStragizerJob < ApplicationJob
   	stock_description = ""
   	begin
   		p Topoptionscenario.delete_all
-	  	@best_rr_options = Optionscenario.select{ |o| o['perc_change']<35 }.group_by { |r| r["rr_ratio"] }.sort_by  { |k, v| -k }.first(500).map(&:last).flatten
 
-	  	@best_rr_options.each do |hoi|
-	  		if ((Stockprice.where(symbol: hoi.underlying)).last)
-				stock_latest_price = ((Stockprice.where(symbol: hoi.underlying)).last)['last']
-			end
-			
-			if ((Universe.where(displaysymbol: hoi.underlying)).last)
-				stock_description = ((Universe.where(displaysymbol: hoi.underlying)).last)['description']
-			end
-	  		
-
-			@topoptionscenario =  Topoptionscenario.new(underlying: hoi.underlying, expiry_date: hoi.expiry_date, buy_strike: hoi.buy_strike, sell_strike: hoi.sell_strike, risk: hoi.risk, reward: hoi.reward, rr_ratio: hoi.rr_ratio, perc_change: hoi.perc_change, buy_contract_symbol: hoi.buy_contract_symbol, sell_contract_symbol: hoi.sell_contract_symbol, stock_quote: stock_latest_price, stock_description: stock_description, buy_contract_iv: hoi.buy_contract_iv, sell_contract_iv: hoi.sell_contract_iv )
-			if @topoptionscenario.save
+	  	@best_rr_options = Optionscenario.all.group_by { |r| r["rr_ratio"] }.sort_by  { |k, v| -k }.first(5).map(&:last).flatten
+	  	p Optionscenario.count
+	  	p @best_rr_options
+	  	if 1==3
+		  	@best_rr_options.each do |hoi|
+		  		if ((Stockprice.where(symbol: hoi.underlying)).last)
+					stock_latest_price = ((Stockprice.where(symbol: hoi.underlying)).last)['last']
+				end
 				
-			else
-				p "could not save top option scenario to db"
-			end
+				if ((Universe.where(displaysymbol: hoi.underlying)).last)
+					stock_description = ((Universe.where(displaysymbol: hoi.underlying)).last)['description']
+				end
+		  		
 
-	  		
-	  	end
+				@topoptionscenario =  Topoptionscenario.new(underlying: hoi.underlying, expiry_date: hoi.expiry_date, buy_strike: hoi.buy_strike, sell_strike: hoi.sell_strike, risk: hoi.risk, reward: hoi.reward, rr_ratio: hoi.rr_ratio, perc_change: hoi.perc_change, buy_contract_symbol: hoi.buy_contract_symbol, sell_contract_symbol: hoi.sell_contract_symbol, stock_quote: stock_latest_price, stock_description: stock_description, buy_contract_iv: hoi.buy_contract_iv, sell_contract_iv: hoi.sell_contract_iv )
+				if @topoptionscenario.save
+					
+				else
+					p "could not save top option scenario to db"
+				end
+
+		  		
+		  	end
+		end
 	rescue StandardError, NameError, NoMethodError, RuntimeError => e
 		p "Rescued: #{e.inspect}"
 		

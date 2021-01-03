@@ -23,20 +23,20 @@
       <% if current_user.id==stock.user_id %>
 
         <% begin %>
-          <% @ticker = StockQuote::Stock.quote(stock.ticker) %>
-          
-          
+          <% @ticker = @tickers.select{|t| t['symbol']==(stock.ticker).upcase} %>
+
+
           <tr>
-                <td><%= link_to @ticker.company_name, stock %></td>
-                <td><%= @ticker.symbol %></td>
-                <td><%= number_with_precision(@ticker.latest_price, :precision => 2) %></td>
+                <td><%= link_to @ticker[0]['company_name'], stock %></td>
+                <td><%= @ticker[0]['symbol'] %></td>
+                <td><%= number_with_precision(@ticker[0]['latest_price'], :precision => 2) %></td>
                 <td><%= stock.target_price_auto %></td>
-                <td><%= number_with_precision(100 * ((stock.target_price_auto.to_f - @ticker.latest_price.to_f)/@ticker.latest_price.to_f),  :precision => 2) %></td>
+                <td><%= number_with_precision(100 * ((stock.target_price_auto.to_f - @ticker[0]['latest_price'].to_f)/@ticker[0]['latest_price'].to_f),  :precision => 2) %></td>
 
 
                 <% reco = Array[] %>
                 <% buy_rating = 0 %>
-                <% reco = @recommendations.select{ |r| r['symbol']==@ticker.symbol } %>
+                <% reco = @recommendations.select{ |r| r['symbol']==@ticker[0]['symbol'] } %>
                 
                 <% if !reco.empty? %>
                   <td><%=(100 * ( ((reco[0]["buy"]) +  (reco[0]["strongbuy"])) / ( (reco[0]["buy"]) +  (reco[0]["strongbuy"]) +   (reco[0]["sell"]) +  (reco[0]["strongsell"]) +  (reco[0]["hold"]) ) )).round(1) %></td>

@@ -121,8 +121,10 @@ class StockquoteDownloadJob < ApplicationJob
   	@queue = Limiter::RateQueue.new(56, interval: 60)
 
   	@universes.each do |security|
-  		@queue.shift
-  		getstockprofiledata_apicall(security: security) 
+  		if !Stockprofile.where(symbol: security['displaysymbol']).present?
+	  		@queue.shift
+	  		getstockprofiledata_apicall(security: security) 
+	  	end
 	end
 	
 
@@ -142,8 +144,8 @@ class StockquoteDownloadJob < ApplicationJob
 			  	if response.code == 200
 			  		stockprofile_ary = response.parsed_response
 			  		if !stockprofile_ary.empty?
-		  				p security['displaysymbol'] 
-		  				p (stockprofile_ary['marketCapitalization'])
+		  				#p security['displaysymbol'] 
+		  				#p (stockprofile_ary['marketCapitalization'])
 		  				if (stockprofile_ary['marketCapitalization']) && (stockprofile_ary['marketCapitalization'])!=""
 			  				if (stockprofile_ary['marketCapitalization']).to_f < 3000.0
 			  					_marketcaptype = "Small Cap"
@@ -153,7 +155,7 @@ class StockquoteDownloadJob < ApplicationJob
 								_marketcaptype = "Mid Cap"
 			  				end
 			  			end
-			  			p _marketcaptype
+			  			#p _marketcaptype
 
 				    	@stockprofile = Stockprofile.new(symbol: security['displaysymbol'], industry: stockprofile_ary['finnhubIndustry'], marketcap: stockprofile_ary['marketCapitalization'], logo: stockprofile_ary['logo'], marketcap_type: _marketcaptype )
 				    	if @stockprofile.save
