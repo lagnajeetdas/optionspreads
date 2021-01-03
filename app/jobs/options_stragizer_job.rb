@@ -255,7 +255,7 @@ class OptionsStragizerJob < ApplicationJob
   	stock_description = ""
   	begin
   		p Optionhighopeninterest.delete_all
-  		@high_open_interest = Optionchain.order('open_interest DESC').limit(500)
+  		@high_open_interest = Optionchain.order('open_interest DESC').limit(100)
   		p Optionchain.count
 	  	p @high_open_interest.count
 	  	#@high_open_interest = Optionchain.select{ |o| o['open_interest']>1 }.group_by { |r| r["open_interest"] }.sort_by  { |k, v| -k }.first(500).map(&:last).flatten
