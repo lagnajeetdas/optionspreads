@@ -7,13 +7,23 @@
 					<% begin %>
 
 						<% if type=="show_from_watchlist" %>
-							<% @ticker = StockQuote::Stock.quote(@stock.ticker) %>
-							<% @ticker_logo = StockQuote::Stock.logo(@stock.ticker) %>
-							<% @ticker_company = StockQuote::Stock.company(@stock.ticker) %>
-						<% else %>
-							<% @ticker = StockQuote::Stock.quote(@stock) %>
-							<% @ticker_logo = StockQuote::Stock.logo(@stock) %>
-							<% @ticker_company = StockQuote::Stock.company(@stock) %>
+							<% @ticker = Livequotetradier.new(@stock.ticker) %>
+							<% @ticker_logo  = (StockQuote::Stock.logo(@stock.ticker)).url %>
+				        <% else %>
+				        	<% @ticker = Livequotetradier.new(@stock) %>
+				        	<% @ticker_logo  = (StockQuote::Stock.logo(@stock)).url %>
+				        	
+				        <% end %>
+				        
+				        <% if !@ticker %>
+				        	<% p "ticker could not be fetched using tradier api" %>
+							<% if type=="show_from_watchlist" %>
+								<% @ticker = StockQuote::Stock.quote(@stock.ticker) %>
+								
+							<% else %>
+								<% @ticker = StockQuote::Stock.quote(@stock) %>
+								
+							<% end %>
 						<% end %>
 
 						
@@ -48,7 +58,10 @@
 							</div>
 							<br/><br/>
 
-			              	<img src="<%= @ticker_logo.url %>" class="img-thumbnail rounded float-right" >
+
+
+			              	<img src="<%= @ticker_logo %>" class="img-thumbnail rounded float-right" >
+
 			              	
 			                <strong><%=  @ticker.company_name %></strong><br/>
 			                
@@ -79,13 +92,14 @@
 			                <br/><br/>	
 			                
 
-			                Percent Change: <%= number_with_precision(@ticker.change_percent*100, :precision => 2, :delimiter => ',') %>%<br/>
-			                PE Ratio: <%= @ticker.pe_ratio %><br/>
-			                YtD Change: <%= number_with_precision(@ticker.ytd_change*100, :precision => 2, :delimiter => ',') %>%<br/>
+			                Percent Change: <%= number_with_precision((@ticker.change_percent)*100, :precision => 2, :delimiter => ',') %>%<br/>
+			                52 Week High: <%= @ticker.week52_high %> <br/>
+			                52 Week Low: <%= @ticker.week52_low %> <br/>
 
+			                
 			                <br/>
 
-			                <strong>Option Spreads Scenarios</strong><br/><br/>
+			                <strong>Option Spreads Scenarios</strong><br/>
 
 			                <% if !expirydates_data.empty? %>
 				                <table class="table table-bordered table-hover"   data-toggle="table" data-pagination="true"  data-show-export="true" data-filter-control="true">

@@ -5,6 +5,7 @@ class StocksController < ApplicationController
   require 'httparty'
   require 'json'
   require 'bootstrap-table-rails'
+  require 'livequotetradier'
 
 
 
@@ -16,6 +17,7 @@ class StocksController < ApplicationController
     @stocks = Stock.select{ |s| s['user_id']==current_user.id}
     @tickers = Array[]
     @recommendations = Recommendation.all
+
 
     @api = StockQuote::Stock.new(api_key: 'pk_34bbabe4cf054befa331a42b695e75b2')
     @finnhub_api_key = "sandbox_bv1u7mf48v6o5ed6gpdg"

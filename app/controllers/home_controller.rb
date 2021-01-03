@@ -4,12 +4,16 @@ class HomeController < ApplicationController
   require 'httparty'
   require 'json'
   require 'bootstrap-table-rails'
+  require 'livequotetradier'
+
   def index
   	@api = StockQuote::Stock.new(api_key: 'pk_34bbabe4cf054befa331a42b695e75b2')
     @tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
     @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
     @universes = Universe.select("displaysymbol")
     
+
+
   	
   	if params[:ticker] == ""
   		@nothing = "Hey, You forgot to enter a symbol"
@@ -148,9 +152,6 @@ class HomeController < ApplicationController
 
   end
 
-
-
-
-  
+ 
 
 end

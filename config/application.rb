@@ -21,6 +21,7 @@ module Stocking
     config.active_job.queue_adapter = :delayed_job
     # config.active_job.queue_adapter = Rails.env.production? ? :sidekiq : :sync
     #config.serve_static_assets = true
+    config.autoload_paths << "#{Rails.root}/lib"
   end
 end
 
