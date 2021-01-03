@@ -92,7 +92,7 @@
 			                <br/><br/>	
 			                
 
-			                Percent Change: <%= number_with_precision((@ticker.change_percent)*100, :precision => 2, :delimiter => ',') %>%<br/>
+			                Percent Change: <%= number_with_precision((@ticker.change_percent), :precision => 2, :delimiter => ',') %>%<br/>
 			                52 Week High: <%= @ticker.week52_high %> <br/>
 			                52 Week Low: <%= @ticker.week52_low %> <br/>
 

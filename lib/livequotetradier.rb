@@ -59,6 +59,7 @@ class Livequotetradier
       (@q['week_52_low']).to_f
     end
 
+
     #def logo
     #  (@stockprofiles.select{|s| s['symbol']==@symbol })[0]['logo']
     #end
