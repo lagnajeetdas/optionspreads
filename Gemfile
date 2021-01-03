@@ -31,6 +31,7 @@ gem 'delayed_job', '~> 4.1', '>= 4.1.9'
 gem 'delayed_job_active_record'
 gem 'ruby-limiter', '~> 1.1'
 gem 'kaminari'
+gem 'activerecord-import', '~> 1.0', '>= 1.0.7'
 
 
 

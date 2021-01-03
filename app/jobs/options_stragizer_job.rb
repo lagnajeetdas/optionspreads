@@ -14,10 +14,12 @@ class OptionsStragizerJob < ApplicationJob
 
 	case service_name
 	  	when "calc_op_spreads"
+	  		p "@@@@@@@@@@@@@@@@@@@@ Starting option scenario calcs@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 			universes.each do |security|
 				#p security
 				calc_op_spreads(security: security)
 			end
+			p "@@@@@@@@@@@@@@@@@@@@ Finished option scenario calcs@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 	  	when "calc_high_open_interests"
 	  		top_high_open_interest
 	  	when "calc_top_option_spreads"
@@ -103,12 +105,12 @@ class OptionsStragizerJob < ApplicationJob
 
   def calc_op_spreads(security:)
   	
-  	p "@@@@@@@@@@@@@@@@@@@@ Starting option scenario calcs@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+  	
   	
   	begin 
 	  	stock_latest_price = -1 
 	  	if ((Stockprice.where(symbol: security)).last)
-			p stock_latest_price = ((Stockprice.where(symbol: security)).last)['last']
+			stock_latest_price = ((Stockprice.where(symbol: security)).last)['last']
 		end
 		
 		if stock_latest_price != -1 && !stock_latest_price.nil?
@@ -125,6 +127,8 @@ class OptionsStragizerJob < ApplicationJob
 				option_strikes_array = Array[]
 				optionchains = optionchains.uniq{ |s| s['symbol'] } #get unique option chains by option symbol
 				 optionchains
+
+				optionscenario_import = Array[] 
 
 				#Loop through all contracts in option chain of an expiry date 
 				optionchains.each do |contract_item|
@@ -206,17 +210,17 @@ class OptionsStragizerJob < ApplicationJob
 
 									perc_change = 100*((sell_call_strike.to_f - stock_latest_price)/stock_latest_price)
 								
-									Optionscenario.where(expiry_date: e_date).where(buy_contract_symbol: buy_contract_symbol).where(sell_contract_symbol: sell_contract_symbol).delete_all
+									p Optionscenario.where(expiry_date: e_date).where(buy_contract_symbol: buy_contract_symbol).where(sell_contract_symbol: sell_contract_symbol).delete_all
 									
 									#@option_spreads_scenarios.push({ "underlying" => security, "expiry_date" => e_date, "buy_strike" => buy_call_strike, "sell_strike" => sell_call_strike, "risk" => risk, "reward" => reward, "rr_ratio" => rr_ratio, "perc_change" => perc_change, "buy_contract_symbol" => buy_contract_symbol , "sell_contract_symbol" => sell_contract_symbol, "buy_contract_iv" => buy_contract_iv , "sell_contract_iv" => sell_contract_iv    })
 									
-
-									@optionscenario = Optionscenario.new(underlying: security, expiry_date: e_date, buy_strike: buy_call_strike, sell_strike: sell_call_strike, risk: risk, reward: reward, rr_ratio: rr_ratio, perc_change: perc_change, buy_contract_symbol: buy_contract_symbol, sell_contract_symbol: sell_contract_symbol, buy_contract_iv: buy_contract_iv , sell_contract_iv: sell_contract_iv )
-									if @optionscenario.save
-										#p "saved to option scenario db"
-									else
-										p "could not save to option scenario db  - " + security.to_s + " -  " + e_date.to_s + " - " +  buy_contract_symbol.to_s + " - " +  sell_contract_symbol.to_s
-									end
+									optionscenario_import.push(Optionscenario.new(underlying: security, expiry_date: e_date, buy_strike: buy_call_strike, sell_strike: sell_call_strike, risk: risk, reward: reward, rr_ratio: rr_ratio, perc_change: perc_change, buy_contract_symbol: buy_contract_symbol, sell_contract_symbol: sell_contract_symbol, buy_contract_iv: buy_contract_iv , sell_contract_iv: sell_contract_iv ))
+									#@optionscenario = Optionscenario.new(underlying: security, expiry_date: e_date, buy_strike: buy_call_strike, sell_strike: sell_call_strike, risk: risk, reward: reward, rr_ratio: rr_ratio, perc_change: perc_change, buy_contract_symbol: buy_contract_symbol, sell_contract_symbol: sell_contract_symbol, buy_contract_iv: buy_contract_iv , sell_contract_iv: sell_contract_iv )
+									#if @optionscenario.save
+									#	#p "saved to option scenario db"
+									#else
+									#	p "could not save to option scenario db  - " + security.to_s + " -  " + e_date.to_s + " - " +  buy_contract_symbol.to_s + " - " +  sell_contract_symbol.to_s
+									#end
 
 								end
 							end
@@ -225,8 +229,18 @@ class OptionsStragizerJob < ApplicationJob
 				else
 					p "option strike array is empty for " + security.to_s
 				end
+				if !optionscenario_import.empty?
+					Optionscenario.import optionscenario_import
+					#p "Saved to db with import"
+
+				else
+					p "could not save to db optionscenario_import"
+				end
 			end
 
+
+		else
+			p "did not find latest stock price " + security.to_s
 		end
 
 	rescue StandardError, NameError, NoMethodError, RuntimeError => e
@@ -240,7 +254,7 @@ class OptionsStragizerJob < ApplicationJob
 	ensure
 
 	end
-	p "@@@@@@@@@@@@@@@@@@@@ Finished option scenario calcs@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+	
 
   end
 
