@@ -296,10 +296,13 @@ class OptionsStragizerJob < ApplicationJob
 
 	  	stock_latest_price = -1
 	  	stock_description = ""
+	  	stock_industry = ""
+
 	  	begin
 	  		p Topoptionscenario.delete_all
 
 	  		@best_rr_options = Optionscenario.order('rr_ratio DESC').limit(500)
+
 
 		  	#@best_rr_options = Optionscenario.all.group_by { |r| r["rr_ratio"] }.sort_by  { |k, v| -k }.first(5).map(&:last).flatten
 		  	p Optionscenario.count
@@ -313,9 +316,13 @@ class OptionsStragizerJob < ApplicationJob
 					if ((Universe.where(displaysymbol: hoi.underlying)).last)
 						stock_description = ((Universe.where(displaysymbol: hoi.underlying)).last)['description']
 					end
+
+					if ((Stockprofile.where(symbol: hoi.underlying)).last)
+						stock_industry = ((Stockprofile.where(symbol: hoi.underlying)).last)['industry']
+					end
 			  		
 
-					@topoptionscenario =  Topoptionscenario.new(underlying: hoi.underlying, expiry_date: hoi.expiry_date, buy_strike: hoi.buy_strike, sell_strike: hoi.sell_strike, risk: hoi.risk, reward: hoi.reward, rr_ratio: hoi.rr_ratio, perc_change: hoi.perc_change, buy_contract_symbol: hoi.buy_contract_symbol, sell_contract_symbol: hoi.sell_contract_symbol, stock_quote: stock_latest_price, stock_description: stock_description, buy_contract_iv: hoi.buy_contract_iv, sell_contract_iv: hoi.sell_contract_iv )
+					@topoptionscenario =  Topoptionscenario.new(underlying: hoi.underlying, expiry_date: hoi.expiry_date, buy_strike: hoi.buy_strike, sell_strike: hoi.sell_strike, risk: hoi.risk, reward: hoi.reward, rr_ratio: hoi.rr_ratio, perc_change: hoi.perc_change, buy_contract_symbol: hoi.buy_contract_symbol, sell_contract_symbol: hoi.sell_contract_symbol, stock_quote: stock_latest_price, stock_description: stock_description, buy_contract_iv: hoi.buy_contract_iv, sell_contract_iv: hoi.sell_contract_iv, industry: stock_industry )
 					if @topoptionscenario.save
 						
 					else

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_02_175050) do
+ActiveRecord::Schema.define(version: 2021_01_04_093617) do
 
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer "priority", default: 0, null: false
@@ -146,6 +146,7 @@ ActiveRecord::Schema.define(version: 2021_01_02_175050) do
     t.string "stock_description"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "industry"
   end
 
   create_table "universes", force: :cascade do |t|
