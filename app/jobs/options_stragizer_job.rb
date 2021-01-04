@@ -15,22 +15,23 @@ class OptionsStragizerJob < ApplicationJob
 		case service_name
 		  	when "calc_op_spreads"
 		  		
-		  		page_size = 100
+		  		page_size = 50
 		  		num_pages_universe = ((Universe.count)/page_size)+1
 
-		  		(1..num_pages_universe).each do |p|  
+		  		(1..num_pages_universe).each do |pg|  
 
 		  			symbols_arr = Kaminari.paginate_array(universes)
-		  			symbols = symbols_arr.page(p).per(page_size)  
+		  			symbols = symbols_arr.page(pg).per(page_size)  
 
 		  			if 1==1
-
+		  				p "Start page " pg.to_s
 				  		p "@@@@@@@@@@@@@@@@@@@@ Starting option scenario calcs@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 						symbols.each do |security|
 							#p security
 							calc_op_spreads(security: security)					
 						end
 						p "@@@@@@@@@@@@@@@@@@@@ Finished option scenario calcs@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+						p "End page " pg.to_s
 						OptionsStragizerJob.perform_later("calc_top_option_spreads")
 					end
 				end
@@ -387,7 +388,7 @@ class OptionsStragizerJob < ApplicationJob
   end
 
   def delete_old_option_spreads
-  	Optionscenario.where('created_at < ?', Date.today ).delete_all
+  	Optionscenario.where('created_at <= ?', Date.today ).delete_all
   end
 
   
