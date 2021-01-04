@@ -185,7 +185,9 @@ class StockquoteDownloadJob < ApplicationJob
 
 	  	@universes.each do |security|
 	  		#get expiry dates of a given stock
-	  		getoptionexpiry_apicall(security: security) 
+	  		
+	  			getoptionexpiry_apicall(security: security) 
+
 		end
 		
 
@@ -211,7 +213,9 @@ class StockquoteDownloadJob < ApplicationJob
 			end
 			
 			if !expirydates_data.empty?
-				if expirydates_data.kind_of?(Array) 
+				if expirydates_data.kind_of?(Array)
+					#delete all existing option chains for that symbol before downloading more data
+					Optionchain.where(underlying: security['displaysymbol']).delete_all 
 					expirydates_data.each do |item|
 						#@queue.shift # rate limiter block
 						getoptionchains_apicall(symbol: security['displaysymbol'], expirydate: item, universeid: security['id'])
@@ -222,16 +226,24 @@ class StockquoteDownloadJob < ApplicationJob
 				end
 				if !@optionchain_import.empty?
 					Optionchain.import @optionchain_import
+					@optionchain_import = Array[]
+					#p "Saved import data to db"
 				else
-					p "error bulk importing data to optionchain db"
+					p "option chain import array is empty"
 				end
 			end
 		rescue StandardError, NameError, NoMethodError, RuntimeError => e
 			p "Rescued: #{e.inspect}"
 			p e.backtrace
-
+			if !@optionchain_import.empty?
+				Optionchain.import @optionchain_import
+				@optionchain_import = Array[]
+				p "error but successfully saved data to optionchain db"
+			else
+				p "option chain import array is empty"
+			end
 		else
-
+			
 		ensure
 
 		end
@@ -263,8 +275,10 @@ class StockquoteDownloadJob < ApplicationJob
 							#then save to DB model
 								optionchain_data.each do |contract_item|
 									contract_item_greeks = contract_item['greeks']
-									if !contract_item.nil?
+									if !contract_item_greeks.nil?
 										@optionchain_import.push(Optionchain.new(universe_id: universeid, symbol: (contract_item['symbol']).to_s, description: (contract_item['description']).to_s, exch: (contract_item['exch']).to_s, option_type: (contract_item['option_type']).to_s, volume: (contract_item['volume']), bid: (contract_item['bid']), ask: (contract_item['ask']), underlying: (contract_item['underlying']).to_s, strike: (contract_item['strike']), change_percentage: (contract_item['change_percentage']), average_volume: (contract_item['average_volume']), last_volume: (contract_item['last_volume']), bidsize: (contract_item['bidsize']), asksize: (contract_item['asksize']), open_interest: (contract_item['open_interest']), expiration_date: (contract_item['expiration_date']).to_s, expiration_type: (contract_item['expiration_type']).to_s, root_symbol: (contract_item['root_symbol']).to_s, bid_iv: (contract_item_greeks['bid_iv']), mid_iv: (contract_item_greeks['mid_iv']), ask_iv: (contract_item_greeks['ask_iv']) ))
+									else
+										@optionchain_import.push(Optionchain.new(universe_id: universeid, symbol: (contract_item['symbol']).to_s, description: (contract_item['description']).to_s, exch: (contract_item['exch']).to_s, option_type: (contract_item['option_type']).to_s, volume: (contract_item['volume']), bid: (contract_item['bid']), ask: (contract_item['ask']), underlying: (contract_item['underlying']).to_s, strike: (contract_item['strike']), change_percentage: (contract_item['change_percentage']), average_volume: (contract_item['average_volume']), last_volume: (contract_item['last_volume']), bidsize: (contract_item['bidsize']), asksize: (contract_item['asksize']), open_interest: (contract_item['open_interest']), expiration_date: (contract_item['expiration_date']).to_s, expiration_type: (contract_item['expiration_type']).to_s, root_symbol: (contract_item['root_symbol']).to_s ))
 									end								
 								end
 							
@@ -276,8 +290,8 @@ class StockquoteDownloadJob < ApplicationJob
 			#end
 		rescue StandardError, NameError, NoMethodError, RuntimeError => e
 			p "Error for " + symbol + " exp date " + expirydate.to_s
-			#p e.backtrace
-			#p response
+			p e.backtrace
+			p response
 			#p "Rescued: #{e.inspect}"
 			#p e.backtrace
 		else
