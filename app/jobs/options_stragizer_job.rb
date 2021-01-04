@@ -387,7 +387,8 @@ class OptionsStragizerJob < ApplicationJob
   end
 
   def delete_old_option_spreads
-  	Optionscenario.where('created_at <= ?', Date.today ).delete_all
+  	#Optionscenario.where('created_at < ?', Date.today ).delete_all
+  	Optionscenario.delete_all
   end
 
   
