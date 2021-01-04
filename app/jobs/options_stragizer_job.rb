@@ -15,7 +15,7 @@ class OptionsStragizerJob < ApplicationJob
 		case service_name
 		  	when "calc_op_spreads"
 		  		
-		  		page_size = 50
+		  		page_size = 75
 		  		num_pages_universe = ((Universe.count)/page_size)+1
 		  		(1..num_pages_universe).each do |pg|  
 
@@ -31,7 +31,7 @@ class OptionsStragizerJob < ApplicationJob
 						end
 						p "@@@@@@@@@@@@@@@@@@@@ Finished option scenario calcs@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 						p "End page " + pg.to_s
-						OptionsStragizerJob.perform_later("calc_top_option_spreads")
+						top_option_spreads
 					end
 				end
 		  	when "calc_high_open_interests"
@@ -270,7 +270,7 @@ class OptionsStragizerJob < ApplicationJob
 		rescue StandardError, NameError, NoMethodError, RuntimeError => e
 			p "Error calculating spreads " + security.to_s
 			p "Rescued: #{e.inspect}"
-			p e.backtrace
+			#p e.backtrace
 			#p response
 			if !optionscenario_import.empty?
 				Optionscenario.import optionscenario_import
