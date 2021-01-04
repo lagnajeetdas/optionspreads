@@ -20,7 +20,7 @@ class OptionsStragizerJob < ApplicationJob
 					calc_op_spreads(security: security)					
 				end
 				p "@@@@@@@@@@@@@@@@@@@@ Finished option scenario calcs@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-				#OptionsStragizerJob.perform_later("calc_top_option_spreads")
+				OptionsStragizerJob.perform_later("calc_top_option_spreads")
 		  	when "calc_high_open_interests"
 		  		top_high_open_interest
 		  	when "calc_top_option_spreads"
