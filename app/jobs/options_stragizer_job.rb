@@ -17,21 +17,20 @@ class OptionsStragizerJob < ApplicationJob
 		  		
 		  		page_size = 50
 		  		num_pages_universe = ((Universe.count)/page_size)+1
-
 		  		(1..num_pages_universe).each do |pg|  
 
 		  			symbols_arr = Kaminari.paginate_array(universes)
 		  			symbols = symbols_arr.page(pg).per(page_size)  
 
 		  			if 1==1
-		  				p "Start page " pg.to_s
+		  				p "Start page " + pg.to_s
 				  		p "@@@@@@@@@@@@@@@@@@@@ Starting option scenario calcs@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
 						symbols.each do |security|
 							#p security
 							calc_op_spreads(security: security)					
 						end
 						p "@@@@@@@@@@@@@@@@@@@@ Finished option scenario calcs@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-						p "End page " pg.to_s
+						p "End page " + pg.to_s
 						OptionsStragizerJob.perform_later("calc_top_option_spreads")
 					end
 				end
@@ -261,7 +260,7 @@ class OptionsStragizerJob < ApplicationJob
 						p "could not save to db optionscenario_import" + security.to_s
 					end
 				else
-					p "expiry dates array is empty " + symbol.to_s
+					p "expiry dates array is empty " + security.to_s
 				end
 
 			else
@@ -271,7 +270,7 @@ class OptionsStragizerJob < ApplicationJob
 		rescue StandardError, NameError, NoMethodError, RuntimeError => e
 			p "Error calculating spreads " + security.to_s
 			p "Rescued: #{e.inspect}"
-			#p e.backtrace
+			p e.backtrace
 			#p response
 			if !optionscenario_import.empty?
 				Optionscenario.import optionscenario_import
