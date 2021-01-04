@@ -75,3 +75,9 @@ task :delete_all_recommendations => :environment do
     StockquoteDownloadJob.perform_later("delete_recommendations")
   puts "done."
 end
+
+task :delete_old_option_spreads => :environment do
+  puts "Cleaning up old option spreads..."
+    OptionsStragizerJob.perform_later("delete_old_option_spreads")
+  puts "done."
+end

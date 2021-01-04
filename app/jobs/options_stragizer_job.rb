@@ -14,17 +14,32 @@ class OptionsStragizerJob < ApplicationJob
 
 		case service_name
 		  	when "calc_op_spreads"
-		  		p "@@@@@@@@@@@@@@@@@@@@ Starting option scenario calcs@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-				universes.each do |security|
-					#p security
-					calc_op_spreads(security: security)					
+		  		
+		  		page_size = 100
+		  		num_pages_universe = ((Universe.count)/page_size)+1
+
+		  		(1..num_pages_universe).each do |p|  
+
+		  			symbols_arr = Kaminari.paginate_array(universes)
+		  			symbols = symbols_arr.page(p).per(page_size)  
+
+		  			if 1==1
+
+				  		p "@@@@@@@@@@@@@@@@@@@@ Starting option scenario calcs@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+						symbols.each do |security|
+							#p security
+							calc_op_spreads(security: security)					
+						end
+						p "@@@@@@@@@@@@@@@@@@@@ Finished option scenario calcs@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+						OptionsStragizerJob.perform_later("calc_top_option_spreads")
+					end
 				end
-				p "@@@@@@@@@@@@@@@@@@@@ Finished option scenario calcs@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-				OptionsStragizerJob.perform_later("calc_top_option_spreads")
 		  	when "calc_high_open_interests"
 		  		top_high_open_interest
 		  	when "calc_top_option_spreads"
 		  		top_option_spreads
+		  	when "delete_old_option_spreads"
+		  		delete_old_option_spreads
 		  	else
 		  		p "no job found"
 		 end
@@ -113,134 +128,140 @@ class OptionsStragizerJob < ApplicationJob
 				expiry_dates_unique_array =  Optionchain.where(underlying: security).distinct.pluck(:expiration_date)
 
 				optionscenario_import = Array[] 
-				expiry_dates_unique_array.each do |e_date|
-						optionchains = Optionchain.where(underlying: security).where(option_type: 'call').where(expiration_date: e_date)
-						#p e_date
+				if !expiry_dates_unique_array.empty?
+					expiry_dates_unique_array.each do |e_date|
+							optionchains = Optionchain.where(underlying: security).where(option_type: 'call').where(expiration_date: e_date)
+							#p e_date
 
-					
-						option_strikes_array = Array[]
-						optionchains = optionchains.uniq{ |s| s['symbol'] } #get unique option chains by option symbol
-						#p optionchains
+							if !optionchains.empty?
+								option_strikes_array = Array[]
+								optionchains = optionchains.uniq{ |s| s['symbol'] } #get unique option chains by option symbol
+								#p optionchains
 
-						
-
-						#Loop through all contracts in option chain of an expiry date 
-						optionchains.each do |contract_item|
-							if contract_item['expiration_date'] == e_date  && contract_item['root_symbol'] == security								
 								
-								#create an array of option strikes
-								option_strikes_array.push((contract_item['strike'])) 
-							end
-						end
 
-						option_strikes_array = option_strikes_array.uniq
-						
-						#p option_strikes_array
-						#Check if option strikes array is not empty 
-						if 1==1 && !option_strikes_array.empty?
-							#find strike price closest to stock quote to set anchor
-							h = option_strikes_array.map(&:to_f).sort.group_by{|e| e <=> stock_latest_price.to_f}
-							#p h
-							if 1==1
-								anchor_strike = (h[-1].last || h[1].first)
-								strike_gap = h[-1].last - h[-1][-2]
-								
-								#Create a strike_gap set array
-								strike_gap_set = Array[]
-								anchor_set = Array[]
-								strike_gap_set.push(strike_gap)
-								strike_gap_set.push(strike_gap * 2)
-								strike_gap_set.push(strike_gap * 3)
-								strike_gap_set
-								
-								strike_gap_set.each do |sg|
-									#Create an anchor set array
-									anchor_set =  (anchor_strike..anchor_strike*1.3).step(sg).to_a 
-									
-									threshold = [5, anchor_set.length()].min
-
-									#Loop through each anchor price in anchor_set
-									anchor_set
-									anchor_set.take(threshold).each do |anc_price|
-										buy_contract_ask_price = -1
-										sell_contract_bid_price = -1
+								#Loop through all contracts in option chain of an expiry date 
+								optionchains.each do |contract_item|
+									if contract_item['expiration_date'] == e_date  && contract_item['root_symbol'] == security								
 										
-
-										risk = -1
-										reward = -1 
-										rr_ratio = -1 
-										perc_change = -1
-
-										#p "buy strike"
-										buy_call_strike = anc_price 
-										#p "sell strike"
-										sell_call_strike = anc_price + sg
-
-										
-										
-										#Get ask price of buy option contract with strike price = buy_call_strike 
-										t_contract_buy = optionchains.detect {|contract_item| contract_item['strike'] == buy_call_strike && contract_item['expiration_date']==e_date  }
-
-										unless t_contract_buy.nil?
-												#p "buy contract ask"
-												buy_contract_ask_price =  t_contract_buy['ask']
-												buy_contract_symbol = t_contract_buy['symbol']
-												buy_contract_iv = t_contract_buy['mid_iv']
-										end
-
-										#Get bid price of sell option contract with strike price = sell_call_strike -->
-										t_contract_sell = optionchains.detect {|contract_item| contract_item['strike'] == sell_call_strike && contract_item['expiration_date']==e_date   }
-
-										unless t_contract_sell.nil?
-												#p "sell contract bid"
-												sell_contract_bid_price =  t_contract_sell['bid']
-												sell_contract_symbol = t_contract_sell['symbol']
-												sell_contract_iv = t_contract_sell['mid_iv']
-										end
-
-
-										#if both bid and ask of the 2 contracts are valid, calc risk and reward
-										if buy_contract_ask_price != -1 && sell_contract_bid_price != -1 
-											#p "risk"
-											risk = 100 * (buy_contract_ask_price.to_f - sell_contract_bid_price.to_f)
-											
-											#p "reward"
-											reward = (100.0 * sg.to_f) - risk.to_f
-											
-											if risk != 0
-												rr_ratio = reward.to_f / risk.to_f
-											end
-
-											perc_change = 100*((sell_call_strike.to_f - stock_latest_price)/stock_latest_price)
-										
-											
-											#@option_spreads_scenarios.push({ "underlying" => security, "expiry_date" => e_date, "buy_strike" => buy_call_strike, "sell_strike" => sell_call_strike, "risk" => risk, "reward" => reward, "rr_ratio" => rr_ratio, "perc_change" => perc_change, "buy_contract_symbol" => buy_contract_symbol , "sell_contract_symbol" => sell_contract_symbol, "buy_contract_iv" => buy_contract_iv , "sell_contract_iv" => sell_contract_iv    })
-											
-											optionscenario_import.push(Optionscenario.new(underlying: security, expiry_date: e_date, buy_strike: buy_call_strike, sell_strike: sell_call_strike, risk: risk, reward: reward, rr_ratio: rr_ratio, perc_change: perc_change, buy_contract_symbol: buy_contract_symbol, sell_contract_symbol: sell_contract_symbol, buy_contract_iv: buy_contract_iv , sell_contract_iv: sell_contract_iv ))
-											#@optionscenario = Optionscenario.new(underlying: security, expiry_date: e_date, buy_strike: buy_call_strike, sell_strike: sell_call_strike, risk: risk, reward: reward, rr_ratio: rr_ratio, perc_change: perc_change, buy_contract_symbol: buy_contract_symbol, sell_contract_symbol: sell_contract_symbol, buy_contract_iv: buy_contract_iv , sell_contract_iv: sell_contract_iv )
-											#if @optionscenario.save
-											#	#p "saved to option scenario db"
-											#else
-											#	p "could not save to option scenario db  - " + security.to_s + " -  " + e_date.to_s + " - " +  buy_contract_symbol.to_s + " - " +  sell_contract_symbol.to_s
-											#end
-
-										end
+										#create an array of option strikes
+										option_strikes_array.push((contract_item['strike'])) 
 									end
 								end
+
+								option_strikes_array = option_strikes_array.uniq
+								
+								#p option_strikes_array
+								#Check if option strikes array is not empty 
+								if 1==1 && !option_strikes_array.empty?
+									#find strike price closest to stock quote to set anchor
+									h = option_strikes_array.map(&:to_f).sort.group_by{|e| e <=> stock_latest_price.to_f}
+									#p h
+									if 1==1 && !h.empty?
+										anchor_strike = (h[-1].last || h[1].first)
+										strike_gap = h[-1].last - h[-1][-2]
+										
+										#Create a strike_gap set array
+										strike_gap_set = Array[]
+										anchor_set = Array[]
+										strike_gap_set.push(strike_gap)
+										strike_gap_set.push(strike_gap * 2)
+										strike_gap_set.push(strike_gap * 3)
+										strike_gap_set
+										
+										strike_gap_set.each do |sg|
+											#Create an anchor set array
+											anchor_set =  (anchor_strike..anchor_strike*1.3).step(sg).to_a 
+											
+											threshold = [5, anchor_set.length()].min
+
+											#Loop through each anchor price in anchor_set
+											anchor_set
+											anchor_set.take(threshold).each do |anc_price|
+												buy_contract_ask_price = -1
+												sell_contract_bid_price = -1
+												
+
+												risk = -1
+												reward = -1 
+												rr_ratio = -1 
+												perc_change = -1
+
+												#p "buy strike"
+												buy_call_strike = anc_price 
+												#p "sell strike"
+												sell_call_strike = anc_price + sg
+
+												
+												
+												#Get ask price of buy option contract with strike price = buy_call_strike 
+												t_contract_buy = optionchains.detect {|contract_item| contract_item['strike'] == buy_call_strike && contract_item['expiration_date']==e_date  }
+
+												unless t_contract_buy.nil?
+														#p "buy contract ask"
+														buy_contract_ask_price =  t_contract_buy['ask']
+														buy_contract_symbol = t_contract_buy['symbol']
+														buy_contract_iv = t_contract_buy['mid_iv']
+												end
+
+												#Get bid price of sell option contract with strike price = sell_call_strike -->
+												t_contract_sell = optionchains.detect {|contract_item| contract_item['strike'] == sell_call_strike && contract_item['expiration_date']==e_date   }
+
+												unless t_contract_sell.nil?
+														#p "sell contract bid"
+														sell_contract_bid_price =  t_contract_sell['bid']
+														sell_contract_symbol = t_contract_sell['symbol']
+														sell_contract_iv = t_contract_sell['mid_iv']
+												end
+
+
+												#if both bid and ask of the 2 contracts are valid, calc risk and reward
+												if buy_contract_ask_price != -1 && sell_contract_bid_price != -1 
+													#p "risk"
+													risk = 100 * (buy_contract_ask_price.to_f - sell_contract_bid_price.to_f)
+													
+													#p "reward"
+													reward = (100.0 * sg.to_f) - risk.to_f
+													
+													if risk != 0
+														rr_ratio = reward.to_f / risk.to_f
+													end
+
+													perc_change = 100*((sell_call_strike.to_f - stock_latest_price)/stock_latest_price)
+												
+													
+													#@option_spreads_scenarios.push({ "underlying" => security, "expiry_date" => e_date, "buy_strike" => buy_call_strike, "sell_strike" => sell_call_strike, "risk" => risk, "reward" => reward, "rr_ratio" => rr_ratio, "perc_change" => perc_change, "buy_contract_symbol" => buy_contract_symbol , "sell_contract_symbol" => sell_contract_symbol, "buy_contract_iv" => buy_contract_iv , "sell_contract_iv" => sell_contract_iv    })
+													
+													optionscenario_import.push(Optionscenario.new(underlying: security, expiry_date: e_date, buy_strike: buy_call_strike, sell_strike: sell_call_strike, risk: risk, reward: reward, rr_ratio: rr_ratio, perc_change: perc_change, buy_contract_symbol: buy_contract_symbol, sell_contract_symbol: sell_contract_symbol, buy_contract_iv: buy_contract_iv , sell_contract_iv: sell_contract_iv ))
+													#@optionscenario = Optionscenario.new(underlying: security, expiry_date: e_date, buy_strike: buy_call_strike, sell_strike: sell_call_strike, risk: risk, reward: reward, rr_ratio: rr_ratio, perc_change: perc_change, buy_contract_symbol: buy_contract_symbol, sell_contract_symbol: sell_contract_symbol, buy_contract_iv: buy_contract_iv , sell_contract_iv: sell_contract_iv )
+													#if @optionscenario.save
+													#	#p "saved to option scenario db"
+													#else
+													#	p "could not save to option scenario db  - " + security.to_s + " -  " + e_date.to_s + " - " +  buy_contract_symbol.to_s + " - " +  sell_contract_symbol.to_s
+													#end
+
+												end
+											end
+										end
+									end
+								else
+									p "option strike array is empty for " + security.to_s
+								end
+							else
+								p "Option chain not found for " + security.to_s
 							end
-						else
-							p "option strike array is empty for " + security.to_s
-						end
-				end
+					end
 
-				if !optionscenario_import.empty?
-					Optionscenario.import optionscenario_import
-					optionscenario_import = Array[] 
-					#p "saved import to db"
+					if !optionscenario_import.empty?
+						Optionscenario.import optionscenario_import
+						optionscenario_import = Array[] 
+						#p "saved import to db"
+					else
+						p "could not save to db optionscenario_import" + security.to_s
+					end
 				else
-					p "could not save to db optionscenario_import"
+					p "expiry dates array is empty " + symbol.to_s
 				end
-
 
 			else
 				p "did not find latest stock price " + security.to_s
@@ -249,14 +270,14 @@ class OptionsStragizerJob < ApplicationJob
 		rescue StandardError, NameError, NoMethodError, RuntimeError => e
 			p "Error calculating spreads " + security.to_s
 			p "Rescued: #{e.inspect}"
-			p e.backtrace
+			#p e.backtrace
 			#p response
 			if !optionscenario_import.empty?
 				Optionscenario.import optionscenario_import
 				optionscenario_import = Array[] 
 				p "Error but saved import to db"
 			else
-				p "could not save to db optionscenario_import"
+				p "Exception: could not save to db optionscenario_import " + security.to_s
 			end
 
 
@@ -363,6 +384,10 @@ class OptionsStragizerJob < ApplicationJob
 		end
 
 		p "@@@@@@@@@@@@@@@@@@@@ Finished updating top option spreads @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+  end
+
+  def delete_old_option_spreads
+  	Optionscenario.where('created_at < ?', Date.today ).delete_all
   end
 
   
