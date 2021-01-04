@@ -70,6 +70,8 @@
                   <tr>
                     <th data-sortable="true" data-field="underlying_scenario_call_debit" data-filter-control="select">Underlying</th>
                     <th data-field="expiry_scenario_call_debit" data-filter-control="select">Expiry</th>
+                    <th data-field="industry_scenario_call_debit" data-filter-control="select">Industry</th>
+                    <th data-sortable="true" data-field="quote_scenario_call_debit">Stock Price</th>
                     <th data-sortable="true" data-field="buy_strike">Buy Strike</th>
                     <th data-sortable="true" data-field="sell_strike">Sell Strike</th>
                     <th data-sortable="true" data-field="risk">Risk</th>
@@ -85,6 +87,8 @@
                     <tr>
                       <td><%= best_rr.underlying %></td>
                       <td><%= best_rr.expiry_date %></td>
+                      <td><%= best_rr.industry %></td>
+                      <td><%= best_rr.stock_quote %></td>
                       <td><%= best_rr.buy_strike.round(1)  %></td>
                       <td><%= best_rr.sell_strike.round(1) %></td>
                       <td><%= best_rr.risk.round(1) %></td>
