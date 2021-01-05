@@ -33,7 +33,7 @@ class Earningsdate
 		  	@earningsdate_ary = response.parsed_response["earningsCalendar"]
 
 		  	@earningsdate_ary.each do |e|
-		  				  		
+		  			  		
 		  	end
 		end
 

@@ -377,8 +377,7 @@ class StockquoteDownloadJob < ApplicationJob
 	  	begin 
 		  	@queue = Limiter::RateQueue.new(5, interval: 60) #API throttling setup 5 calls / minute
 		  	Stockprofile.select{|s| s['marketcap_type']==marketcap_type}.each do |sf|
-		  		
-		  		if sf['updated_at'] >= 24.hours.ago
+		  		if sf['updated_at'] < 24.hours.ago
 			  		target = Acquiretarget.new(sf['symbol']) # initialize Acquiretarget as target
 			  		
 			  		@queue.shift #API throttling block starts here
@@ -406,9 +405,9 @@ class StockquoteDownloadJob < ApplicationJob
   end
 
   def get_earningscalendar
-  	ed = Earningsdate.new(2021,1)
-  	p ed.earnings
-
+  	#ed = Earningsdate.new(2021,1)
+  	p 24.hours.ago
+  	
   end
 
 
