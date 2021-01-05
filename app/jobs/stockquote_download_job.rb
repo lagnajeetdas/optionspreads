@@ -378,7 +378,7 @@ class StockquoteDownloadJob < ApplicationJob
 		  	@queue = Limiter::RateQueue.new(5, interval: 60) #API throttling setup 5 calls / minute
 		  	Stockprofile.select{|s| s['marketcap_type']==marketcap_type}.each do |sf|
 		  		
-		  		if ((DateTime.now() - sf['updated_at'])/3600)>24
+		  		if sf['updated_at'] >= 24.hours.ago
 			  		target = Acquiretarget.new(sf['symbol']) # initialize Acquiretarget as target
 			  		
 			  		@queue.shift #API throttling block starts here
@@ -388,6 +388,8 @@ class StockquoteDownloadJob < ApplicationJob
 			  		else
 			  			p target.get_target_error + " " + (sf['symbol']).to_s
 			  		end
+			  	else
+			  		p "record was updated less than 24 hours ago. " + (sf['symbol']).to_s
 			  	end
 		  	
 		  	end
