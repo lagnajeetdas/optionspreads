@@ -66,6 +66,11 @@ task :get_targets_smallcap => :environment do
   puts "done."
 end
 
+task :get_earnings => :environment do
+  puts "Downloading earnings calendar at one go from finnhub."
+    StockquoteDownloadJob.perform_later("earningscalendar")
+  puts "done."
+end
 
 
 
