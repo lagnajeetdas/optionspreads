@@ -1,6 +1,7 @@
 class StockquoteDownloadJob < ApplicationJob
   queue_as :default
   extend Limiter::Mixin
+  require 'acquiretarget'
   
   def perform(service_name)
 	    # Do something later
@@ -45,6 +46,12 @@ class StockquoteDownloadJob < ApplicationJob
 		  		p Optionchain.delete_all
 		  	when "download_stock_quotes"
 		  		get_stock_quotes_snapshot
+		  	when "get_targets_largecap"
+		  		get_targets("Large Cap")
+	  		when "get_targets_midcap"
+		  		get_targets("Mid Cap")
+	  		when "get_targets_smallcap"
+		  		get_targets("Small Cap")
 		  	else
 		  		p "No method found"
   end
@@ -362,6 +369,34 @@ class StockquoteDownloadJob < ApplicationJob
 
 		end
   end
+
+  def get_targets(marketcap_type)
+  	begin 
+	  	@queue = Limiter::RateQueue.new(5, interval: 60) #API throttling setup 5 calls / minute
+	  	Stockprofile.select{|s| s['marketcap_type']==marketcap_type}.each do |sf|
+	  		
+	  		target = Acquiretarget.new(sf['symbol']) # initialize Acquiretarget as target
+	  		
+	  		@queue.shift #API throttling block starts here
+	  		if target.get_target
+	  			Stockprofile.find_by(symbol: sf['symbol']).update_column(:target_price, target.get_target)
+	  			p "target saved " + (sf['symbol']).to_s
+	  		else
+	  			p target.get_target_error + " " + (sf['symbol']).to_s
+	  		end
+	  	end
+	rescue StandardError, NameError, NoMethodError, RuntimeError => e
+		p "Error target prices .."
+		p "Rescued: #{e.inspect}"
+		p e.backtrace
+
+	else
+
+	ensure
+
+	end
+  end
+
 
 
 

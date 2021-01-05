@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_04_093617) do
+ActiveRecord::Schema.define(version: 2021_01_05_185327) do
 
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer "priority", default: 0, null: false
@@ -117,6 +117,7 @@ ActiveRecord::Schema.define(version: 2021_01_04_093617) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "marketcap_type"
     t.string "belongsto_index"
+    t.float "target_price"
   end
 
   create_table "stocks", force: :cascade do |t|

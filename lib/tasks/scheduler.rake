@@ -48,6 +48,25 @@ task :calculate_top_option_spreads => :environment do
   puts "done."
 end
 
+task :get_targets_largecap => :environment do
+  puts "Download targets from alphavantage..."
+    StockquoteDownloadJob.perform_later("get_targets_largecap")
+  puts "done."
+end
+
+task :get_targets_midcap => :environment do
+  puts "Download targets from alphavantage..."
+    StockquoteDownloadJob.perform_later("get_targets_midcap")
+  puts "done."
+end
+
+task :get_targets_smallcap => :environment do
+  puts "Download targets from alphavantage..."
+    StockquoteDownloadJob.perform_later("get_targets_smallcap")
+  puts "done."
+end
+
+
 
 
 #delete tasks

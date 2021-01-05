@@ -17,6 +17,7 @@ class OptionsController < ApplicationController
   		#OptionsStragizerJob.perform_later("calc_top_option_spreads")
       #StockquoteDownloadJob.perform_later("refresh_options")
       #OptionsStragizerJob.perform_later("calc_op_spreads")
+      #StockquoteDownloadJob.perform_later("get_targets_largecap")
 
       #p @optionchains
 
