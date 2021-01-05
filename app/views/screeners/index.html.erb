@@ -31,26 +31,67 @@
 
                     <th data-sortable="true" data-field="buyrating" >Buy %</th>
 
+                    <th data-sortable="true" data-field="earningsdate" >Earnings Date</th>
+
                     
                   </tr>
                 </thead>
 
                 <tbody>
-                 
+                  <% @sp1.select{|s| s['marketcap_type']=="Large Cap"}.take(150).each do |sf| %>
 
-                    <tr>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      
-                      
+                    
+                      <% begin %>
+                        <tr>
+                          <td><%= sf['symbol'] %></td>
+                          
+                          <% if @universes_pluck.include? sf['symbol'] %>
+                            <td><%= @universes.select{|u| u['displaysymbol']==sf['symbol']}[0]['description'] %></td>
+                          <% else %>
+                            <td>N/A</td>
+                          <% end %>
+                          
+                          <td><%= sf['industry'] %></td>
+                          
+                          
+                          <td><%= current = @stockprices.select{|sp| sp['symbol']==sf['symbol']}[0]['last'] %></td>
 
-                    </tr>
 
+                          <% if sf['target_price'] %>
+                            <td><%= target =  sf['target_price'] %></td>
+                          <% else %>
+                            <td>-1</td>
+                          <% end %>
+
+                        
+                          <% if sf['target_price']  %>
+                            <td><%= (((target-current)/current) * 100).round(1) %></td>
+                          <% else %>
+                            <td>-1</td>
+                          <% end %>
+
+                          <td>N/A</td>
+
+                          <td><%= sf['next_earnings_date'] %></td>
+
+                        </tr>
+                      <% rescue StandardError, NameError, NoMethodError, RuntimeError => e %>
+                        <% p e.inspect %>
+                        <tr> 
+                          <td><%= sf['symbol'] %></td>
+                          <td>N/A</td>
+                          <td><%= sf['industry'] %></td>
+                          <td>N/A</td>
+
+                          <td>N/A</td>
+                          <td>N/A</td>
+                          <td>N/A</td>
+                          <td>N/A</td>
+                        </tr>
+                      <% end %>
+                    
+
+                  <% end %>
                 </tbody>
               </table>
     </div>

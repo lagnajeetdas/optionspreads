@@ -405,8 +405,7 @@ class StockquoteDownloadJob < ApplicationJob
   end
 
   def get_earningscalendar
-  	#ed = Earningsdate.new(2021,1)
-  	p 24.hours.ago
+  	ed = Earningsdate.new(2021,1)
   	
   end
 

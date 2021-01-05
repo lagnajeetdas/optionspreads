@@ -30,11 +30,24 @@ class Earningsdate
 		response = HTTParty.get(url_finnhub_earningdates)
 
 		if response.code == 200
-		  	@earningsdate_ary = response.parsed_response["earningsCalendar"]
+			if response.parsed_response["earningsCalendar"]
+			  	@earningsdate_ary = response.parsed_response["earningsCalendar"]
 
-		  	@earningsdate_ary.each do |e|
-		  			  		
-		  	end
+			  	if !@earningsdate_ary.empty?
+				  	@earningsdate_ary.each do |ed|
+				  		begin 
+					  		Stockprofile.find_by(symbol: ed['symbol']).update_column(:next_earnings_date, ed['date'])
+						  	p "earnings date saved " + (ed['symbol']).to_s	
+						rescue StandardError, NameError, NoMethodError, RuntimeError => e
+							
+							p "Error saving earnings date.."
+							p "Rescued: #{e.inspect}"
+						end  		
+				  	end
+				end
+			end
+		else
+			p "Response code 400"
 		end
 
 	end
