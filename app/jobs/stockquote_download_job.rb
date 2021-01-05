@@ -2,6 +2,7 @@ class StockquoteDownloadJob < ApplicationJob
   queue_as :default
   extend Limiter::Mixin
   require 'acquiretarget'
+  require 'earningsdate'
   
   def perform(service_name)
 	    # Do something later
@@ -52,6 +53,8 @@ class StockquoteDownloadJob < ApplicationJob
 		  		get_targets("Mid Cap")
 	  		when "get_targets_smallcap"
 		  		get_targets("Small Cap")
+		  	when "earningscalendar"
+		  		get_earningscalendar
 		  	else
 		  		p "No method found"
   end
@@ -371,30 +374,39 @@ class StockquoteDownloadJob < ApplicationJob
   end
 
   def get_targets(marketcap_type)
-  	begin 
-	  	@queue = Limiter::RateQueue.new(5, interval: 60) #API throttling setup 5 calls / minute
-	  	Stockprofile.select{|s| s['marketcap_type']==marketcap_type}.each do |sf|
-	  		
-	  		target = Acquiretarget.new(sf['symbol']) # initialize Acquiretarget as target
-	  		
-	  		@queue.shift #API throttling block starts here
-	  		if target.get_target
-	  			Stockprofile.find_by(symbol: sf['symbol']).update_column(:target_price, target.get_target)
-	  			p "target saved " + (sf['symbol']).to_s
-	  		else
-	  			p target.get_target_error + " " + (sf['symbol']).to_s
-	  		end
-	  	end
-	rescue StandardError, NameError, NoMethodError, RuntimeError => e
-		p "Error target prices .."
-		p "Rescued: #{e.inspect}"
-		p e.backtrace
+	  	begin 
+		  	@queue = Limiter::RateQueue.new(5, interval: 60) #API throttling setup 5 calls / minute
+		  	Stockprofile.select{|s| s['marketcap_type']==marketcap_type}.each do |sf|
+		  		
+		  		if ((DateTime.now() - sf['updated_at'])/3600)>24
+			  		target = Acquiretarget.new(sf['symbol']) # initialize Acquiretarget as target
+			  		
+			  		@queue.shift #API throttling block starts here
+			  		if target.get_target
+			  			Stockprofile.find_by(symbol: sf['symbol']).update_column(:target_price, target.get_target)
+			  			p "target saved " + (sf['symbol']).to_s
+			  		else
+			  			p target.get_target_error + " " + (sf['symbol']).to_s
+			  		end
+			  	end
+		  	
+		  	end
+		rescue StandardError, NameError, NoMethodError, RuntimeError => e
+			p "Error target prices .."
+			p "Rescued: #{e.inspect}"
+			p e.backtrace
 
-	else
+		else
 
-	ensure
+		ensure
 
-	end
+		end
+  end
+
+  def get_earningscalendar
+  	ed = Earningsdate.new(2021,1)
+  	p ed.earnings
+
   end
 
 
