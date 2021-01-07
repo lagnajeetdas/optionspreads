@@ -174,21 +174,27 @@ class StocksController < ApplicationController
         symbols = symbols.map!(&:upcase)
         symbols_string = symbols.join(",")
         
-        url_stock_quote_string = @baseurl_tradier + "quotes?symbols=" + symbols_string
-        response = HTTParty.get(url_stock_quote_string, {headers: {"Authorization" => 'Bearer ' + @tradier_api_key}})
-        if response.code == 200 
-          if response.parsed_response['quotes']['quote']
-            symbols_quotes = response.parsed_response['quotes']['quote']
-            symbols_quotes.each do |q|
-              #p q['description']
-              #p q['last']
-              @tickers.push("company_name" => q["description"], "latest_price" => q['last'], "symbol" => q['symbol'])
+        begin
+          url_stock_quote_string = @baseurl_tradier + "quotes?symbols=" + symbols_string
+          response = HTTParty.get(url_stock_quote_string, {headers: {"Authorization" => 'Bearer ' + @tradier_api_key}})
+            if response.code == 200 
+              if response.parsed_response['quotes']['quote']
+                symbols_quotes = response.parsed_response['quotes']['quote']
+                symbols_quotes.each do |q|
+                  #p q['description']
+                  #p q['last']
+                  @tickers.push("company_name" => q["description"], "latest_price" => q['last'], "symbol" => q['symbol'])
+                end
+              else
+                p "did not find quotes - quote for " + symbols_string.to_s
+              end
+            else
+              p "API did not respond sucessfully for  " + symbols_string.to_s
             end
-          else
-            p "did not find quotes - quote for " + symbols_string.to_s
-          end
-        else
-          p "API did not respond sucessfully for  " + symbols_string.to_s
+        rescue StandardError, NameError, NoMethodError, RuntimeError => e
+          p "Error getting quotes .."
+          p "Rescued: #{e.inspect}"
+
         end
       end
   end
