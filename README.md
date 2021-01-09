@@ -1,5 +1,5 @@
 # Winning Spreads
 
-This is an app that screens top winning option spreads.
+Easily find winning options spreads!
 
-Check it out at http://winningspreads.com
+Check it out at https://winningspreads.com

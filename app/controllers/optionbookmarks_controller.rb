@@ -6,7 +6,7 @@ class OptionbookmarksController < ApplicationController
   # GET /optionbookmarks
   # GET /optionbookmarks.json
   def index
-    @optionbookmarks = Optionbookmark.all
+    @optionbookmarks = Optionbookmark.select{ |s| s['user_id']==current_user.id}
   end
 
   # GET /optionbookmarks/1
