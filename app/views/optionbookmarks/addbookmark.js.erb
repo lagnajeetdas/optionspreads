@@ -1,0 +1,9 @@
+if ("<%= escape_javascript( @bookmark_flag ) %>"==1)
+{
+	
+	$("#<%= escape_javascript(@longleg + @shortleg) %>").html("<%= escape_javascript( fa_icon 'bookmark' ) %>"); 
+}
+else
+{
+	$("#<%= escape_javascript(@longleg + @shortleg) %>").html("<%= escape_javascript( fa_icon 'bookmark-o' ) %>"); 
+}

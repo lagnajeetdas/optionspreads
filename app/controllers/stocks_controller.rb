@@ -19,6 +19,7 @@ class StocksController < ApplicationController
     @recommendations = Recommendation.all
 
 
+
     @api = StockQuote::Stock.new(api_key: 'pk_34bbabe4cf054befa331a42b695e75b2')
     @finnhub_api_key = "sandbox_bv1u7mf48v6o5ed6gpdg"
     
@@ -50,6 +51,7 @@ class StocksController < ApplicationController
     @tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
     @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
     @recommendations = Recommendation.all
+    @bookmarks = Optionbookmark.select{ |o| o['user_id']==current_user.id}
   end
 
   # GET /stocks/new

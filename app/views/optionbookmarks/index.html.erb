@@ -1,0 +1,31 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Optionbookmarks</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Longleg</th>
+      <th>Shortleg</th>
+      <th>User</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @optionbookmarks.each do |optionbookmark| %>
+      <tr>
+        <td><%= optionbookmark.longleg %></td>
+        <td><%= optionbookmark.shortleg %></td>
+        <td><%= optionbookmark.user_id %></td>
+        <td><%= link_to 'Show', optionbookmark %></td>
+        <td><%= link_to 'Edit', edit_optionbookmark_path(optionbookmark) %></td>
+        <td><%= link_to 'Destroy', optionbookmark, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Optionbookmark', new_optionbookmark_path %>

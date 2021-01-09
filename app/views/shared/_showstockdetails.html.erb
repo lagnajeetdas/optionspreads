@@ -111,7 +111,10 @@
 								      <th data-sortable="true" data-field="risk">Risk</th>
 								      <th data-sortable="true" data-field="reward">Reward</th>
 								      <th data-sortable="true" data-field="perc_change">Upside % Reqd</th>
-								      <th data-sortable="true" data-field="rr">R/R</th>							      
+								      <th data-sortable="true" data-field="rr">R/R</th>
+								      <% if type=="show_from_watchlist" %>
+								      	<th data-field="bookmark">Bookmark</th>
+								      <% end %>							      
 								      
 								    </tr>
 								  </thead>
@@ -180,15 +183,18 @@
 															<!--Get ask price of buy option contract with strike price = buy_call_strike -->
 															<% t_contract_buy = optionchain_data.detect {|contract_item| contract_item['strike'].to_s == buy_call_strike.to_s && contract_item['option_type']=="call" && contract_item['root_symbol'] == @ticker.symbol } %>
 
+															<% longleg_symbol = "" %>
 															<% unless t_contract_buy.nil? %>
 					  											<% buy_contract_ask_price =  t_contract_buy['ask'] %>
+					  											<% longleg_symbol = t_contract_buy['symbol'] %>
 															<% end %>
 
 															<!--Get bid price of sell option contract with strike price = sell_call_strike -->
 															<% t_contract_sell = optionchain_data.detect {|contract_item| contract_item['strike'].to_s == sell_call_strike.to_s && contract_item['option_type']=="call" && contract_item['root_symbol'] == @ticker.symbol } %>
-
+															<% shortleg_symbol = "" %>
 															<% unless t_contract_sell.nil? %>
 					  											<% sell_contract_bid_price =  t_contract_sell['bid'] %>
+					  											<% shortleg_symbol = t_contract_sell['symbol'] %>
 															<% end %>
 
 
@@ -220,6 +226,20 @@
 																		<td><%= reward.round(1) %></td>
 																		<td><%= perc_change.round(1) %></td>
 																		<td><%= rr_ratio.round(1) %></td>
+																		<% if type=="show_from_watchlist" %>
+
+																			<% if @bookmarks.detect{ |b| b['shortleg']== shortleg_symbol &&  b['longleg']==longleg_symbol} %>
+
+																				<% bookmark_icon = "bookmark" %>
+																			<% else %>
+																				<% bookmark_icon = "bookmark-o" %>
+																			<% end %>
+
+																				<td><%= link_to (fa_icon bookmark_icon), addoptionbookmark_path(:longleg => longleg_symbol, :shortleg => shortleg_symbol, :underlying => @ticker.symbol, :e_date => item.to_s), method: :post, :remote => true, id: longleg_symbol + shortleg_symbol %></td>
+
+
+
+																		<% end %>
 																	</tr>
 
 															<% end %>

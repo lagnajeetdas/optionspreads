@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
 
+  resources :optionbookmarks
   get 'home/about'
   resources :stocks
   resources :home
@@ -14,6 +15,7 @@ Rails.application.routes.draw do
 
   post "/" => 'home#index'
   post "targetprice", to: "stocks#gettarget"
+  post "addoptionbookmark", to: "optionbookmarks#addbookmark"
   #get "/targetprice" => 'stocks#gettarget', as: 'targetprice'
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 end

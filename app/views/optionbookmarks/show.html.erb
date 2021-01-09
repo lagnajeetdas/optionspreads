@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Longleg:</strong>
+  <%= @optionbookmark.longleg %>
+</p>
+
+<p>
+  <strong>Shortleg:</strong>
+  <%= @optionbookmark.shortleg %>
+</p>
+
+<p>
+  <strong>User:</strong>
+  <%= @optionbookmark.user_id %>
+</p>
+
+<%= link_to 'Edit', edit_optionbookmark_path(@optionbookmark) %> |
+<%= link_to 'Back', optionbookmarks_path %>
