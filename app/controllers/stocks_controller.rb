@@ -69,6 +69,7 @@ class StocksController < ApplicationController
   def create
 
     @stock = Stock.new(stock_params)
+    @stock.ticker = params[:stock][:ticker].upcase
 
     respond_to do |format|
       if @stock.save

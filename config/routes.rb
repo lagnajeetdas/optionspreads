@@ -16,6 +16,9 @@ Rails.application.routes.draw do
   post "/" => 'home#index'
   post "targetprice", to: "stocks#gettarget"
   post "addoptionbookmark", to: "optionbookmarks#addbookmark"
+  resources :home do
+    get :autocomplete_universe_displaysymbol, :on => :collection
+  end
   #get "/targetprice" => 'stocks#gettarget', as: 'targetprice'
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 end

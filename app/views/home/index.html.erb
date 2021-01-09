@@ -1,3 +1,5 @@
+
+
 <div class="container">
 	<div class="row">
 		<div class="col-md-10 offset-md-1">
@@ -7,20 +9,26 @@
 					<p>Find low risk high reward spreads like a pro</p>
 					<div class="form-group">
 						<%= form_tag root_path, :method => 'POST', id: "search-form" do %>
-							<div class="input-group mb-3">
+							<div class="input-group mb-3" id= "search-data" class="form-search search-data">
 								
-									<%= text_field_tag 'ticker', nil, placeholder: "Enter Ticker Symbol", size: 50,  class: "form-control" %>
+									<%= text_field_tag 'ticker', nil, placeholder: "Enter Ticker Symbol", size: 50,  class: "form-control search-input" %>
+
+
 								
 								<div class="input-group-append">
 									<%= submit_tag 'Lookup', class: "btn btn-outline-success" %>
 								</div>
 							</div>
+
+
 						<% end %>
 
 												
 					</div>
 					
-					
+					<div id='mydiv' style='display:none'>
+					   TEST
+					 </div>
 
 					<br/>
 
@@ -72,4 +80,43 @@
 	</div>
 </div>
 
+<script type='text/javascript'>
+
+
+	window.onload = function () {
+	  	$('#mydiv').hide();
+
+		  
+		   var demo = new autoComplete({
+		    selector: 'input[name="ticker"]',
+		    minChars: 2,
+		    source: function(term, response){
+		        $.getJSON('https://financialmodelingprep.com/api/v3/search?&limit=10&apikey=69b8bf512c3f3962412228ee02211987', { query: term }, function(data)
+		        	{ 
+		        		
+	        		
+		        		
+		        		var res = []; 
+              			
+              			
+			            for(var i = 0; i < data.length; i++)
+			            { 
+			                if(data[i].currency == "USD")
+			                {
+			                	res.push(data[i].symbol); 
+			                }
+			            }
+			            console.log(res);
+			            response(res); 
+              
+
+		        	});
+		    }
+		});
+
+
+   
+	};
+   
+ </script>
 

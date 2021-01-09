@@ -11,10 +11,8 @@ class HomeController < ApplicationController
     @tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
     @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
     @universes = Universe.select("displaysymbol")
+    @symbolsplucked  = Universe.pluck(:displaysymbol)
     
-
-
-  	
   	if params[:ticker] == ""
   		@nothing = "Hey, You forgot to enter a symbol"
   	elsif params[:ticker]
