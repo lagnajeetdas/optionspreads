@@ -27,9 +27,12 @@ function colorcell(num){
 		{
 			return "prof" + String(Math.max(roundedValue,-100));
 		}
+}
 
-		
-
+function get_td(resultObject){
+	color_class = colorcell(resultObject.results.profit_perc)
+	//Create TD elements with values, tooltips, color classes etc.
+	return "<td title='" + resultObject.results.profit_perc  + "% Buy Price: " + resultObject.results.buy_p + " Sell Price:" + resultObject.results.sell_p   +  "' class='tooltip-test " + color_class + "' >" + resultObject.results.profit + "</td>"
 }
 
 
@@ -58,10 +61,23 @@ th_html_days = ""
 $(html).appendTo('#roiviz_tablehead') ;
 
 
+
+var days_step = 1
+if (days.length > 20)
+{
+	days_step = Math.ceil(days.length / 20)
+}
+
+
 //Iterate over days
-for(i=(days.length-1); i>=0; i--)
+for(i=(days.length-1); i>=0; i = i - days_step)
 {
 	th_html_days += "<th>" + i + "</th>"
+}
+
+if (i!==0)
+{
+	th_html_days += "<th>Exp</th>"
 }
 
 //Add days as headers to table
@@ -79,23 +95,21 @@ for(i=0; i<strikes.length; i++)
 
 	var td_html_profit = ""
 	var color_class = ""
-	for(k=(days.length-1); k>=0; k--)
+
+	//Iterate over days with days_step
+	for(k=(days.length-1); k>=0; k= k - days_step)
 	{
-		//console.log(pg[0])
-		var resultObject = search(k, strikes[i], pg);
-		
-		//console.log(resultObject)
-		
-
-
-		color_class = colorcell(resultObject.results.profit_perc)
-		td_html_profit += "<td class='" + color_class + "' >" + resultObject.results.profit + "</td>"
-		//console.log(td_html_profit)
-		
-		
+		//Create TD elements with values, tooltips, color classes etc.
+		td_html_profit += get_td(search(k, strikes[i], pg));
+	}
+	if(k!==0)
+	{
+		td_html_profit += get_td(search(0, strikes[i], pg));
 	}
 
-	tr_html_strikes = "<tr id='" + strikes[i] + "'><td>" + strikes[i] + "</td>" + td_html_profit + "</tr>"
+
+
+	tr_html_strikes = "<tr id='" + strikes[i] + "'><th>" + strikes[i] + "</th>" + td_html_profit + "</tr>"
 	$(tr_html_strikes).appendTo('#roiviz_tablebody') ;
 
 
@@ -103,5 +117,8 @@ for(i=0; i<strikes.length; i++)
 	//$(td_html_profit).appendTo('#' + String(strikes[i])) ;
 
 }
+
+$("#roiviz_table td").addClass("small_text");
+$("#roiviz_table th").addClass("small_text");
 
 //$("td:contains('-')").addClass('deepredBg');

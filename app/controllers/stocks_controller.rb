@@ -208,14 +208,15 @@ class StocksController < ApplicationController
     symbol = params[:symbol]
     quote = params[:quote]
     e_date = params[:e_date]
-    iv = params[:iv]
+    long_iv = params[:long_iv]
+    short_iv = params[:short_iv]
     dividend = params[:dividend]
     long_strike = params[:long_strike]
     short_strike = params[:short_strike]
     strategy = params[:strategy]
     entry_cost = params[:entry_cost]
 
-    bs = Blackscholesprocessor.new(symbol, quote, e_date, iv, dividend, long_strike, short_strike, strategy, entry_cost)
+    bs = Blackscholesprocessor.new(symbol, quote, e_date, long_iv, short_iv, dividend, long_strike, short_strike, strategy, entry_cost)
     @_price_grid =(bs.price_grid)
     @price_grid = (@_price_grid)
     @strikes = (bs.strikes_array)

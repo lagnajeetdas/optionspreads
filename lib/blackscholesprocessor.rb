@@ -3,11 +3,13 @@ class Blackscholesprocessor
 	require 'options_library'
 
 
-	def initialize(symbol, quote, e_date, iv, dividend, long_strike, short_strike, strategy, entry_cost)
+	def initialize(symbol, quote, e_date, long_iv, short_iv, dividend, long_strike, short_strike, strategy, entry_cost)
 		@symbol = symbol
 		@quote = quote.to_f
 		@e_date = e_date
-		@iv = iv.to_f
+		@long_iv = long_iv.to_f
+		@short_iv = short_iv.to_f
+		@iv = (@long_iv + @short_iv)/2
 		@interest = 0.01
 		@dividend = dividend.to_f
 		@long_strike = long_strike.to_f
@@ -37,19 +39,21 @@ class Blackscholesprocessor
 		r = num_days_till_e_date..0
 		(r.first).downto(r.last).each do |d| 
 		#(0..num_days_till_e_date).each do |d|
-			d_years = (d/365)
+
+			d_years = (d.to_f)/365
 			@days.push(d)
 			#iterate over strike range to calculate option pricing
 			(floor_price..ceiling_price).step(step_price) do |s|
 				s = s.round(2)
 				#option library gem calculator
 				@strikes.push(s)
-				buy_p = Option::Calculator.price_call( s, @long_strike, d, @interest, @iv, @dividend ) 
-				sell_p = Option::Calculator.price_call( s, @short_strike, d, @interest, @iv, @dividend ) 
+				buy_p = Option::Calculator.price_call( s, @long_strike, d_years, @interest, @iv, @dividend ) 
+				sell_p = Option::Calculator.price_call( s, @short_strike, d_years, @interest, @iv, @dividend ) 
 				closing_p = (buy_p - sell_p) * 100
 				profit = (closing_p - @entry_cost).round(0)
 				profit_perc = ((profit/@entry_cost) * 100).round(2)
-
+				buy_p = buy_p.round(2)
+				sell_p = sell_p.round(2)
 				#price_hash = {:days => d, :results => { :strike => s, :closing => closing_p, :buy_p => buy_p, :sell_p => sell_p, :profit => profit }}
 				price_hash = {"days" => d, "strike" => s,  "results" => { "closing" => closing_p, "buy_p" => buy_p, "sell_p" => sell_p, "profit" => profit, "profit_perc" => profit_perc }}
 
