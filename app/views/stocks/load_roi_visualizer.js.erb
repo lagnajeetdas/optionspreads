@@ -4,6 +4,35 @@ function onlyUnique(value, index, self) {
   return self.indexOf(value) === index;
 }
 
+
+function search(dayKey, strikeKey, myArray){
+    for (var i=0; i < myArray.length; i++) {
+        if (myArray[i].days === dayKey && myArray[i].strike === strikeKey ) {
+            return myArray[i];
+        }
+    }
+}
+
+function colorcell(num){
+		
+		
+		var roundedValue = Math.round(num / 5) * 5;
+		
+		
+		if (num>0)
+		{
+			return "prof" + String(Math.min(roundedValue,200));
+		}
+		else
+		{
+			return "prof" + String(Math.max(roundedValue,-100));
+		}
+
+		
+
+}
+
+
 $('#exampleModal').modal('show');
 
 
@@ -40,20 +69,39 @@ $(th_html_days).appendTo('#roiviz_tablehead') ;
 
 
 var tr_html_strikes = ""
-var td_html_profit = ""
+
 
 
 //Iterate over strikes
 for(i=0; i<strikes.length; i++)
 {
-	tr_html_strikes = "<tr id='" + strikes[i] + "''><td>" + strikes[i] + "</td></tr>"
+	
+
+	var td_html_profit = ""
+	var color_class = ""
+	for(k=(days.length-1); k>=0; k--)
+	{
+		//console.log(pg[0])
+		var resultObject = search(k, strikes[i], pg);
+		
+		//console.log(resultObject)
+		
+
+
+		color_class = colorcell(resultObject.results.profit_perc)
+		td_html_profit += "<td class='" + color_class + "' >" + resultObject.results.profit + "</td>"
+		//console.log(td_html_profit)
+		
+		
+	}
+
+	tr_html_strikes = "<tr id='" + strikes[i] + "'><td>" + strikes[i] + "</td>" + td_html_profit + "</tr>"
 	$(tr_html_strikes).appendTo('#roiviz_tablebody') ;
+
+
+	//console.log(td_html_profit)
+	//$(td_html_profit).appendTo('#' + String(strikes[i])) ;
+
 }
 
-
-
-for(i=(days.length-1); i>=0; i--)
-{
-	//console.log(pg[0])
-	td_html_profit += "<td>" + '' + "</td>"
-}
+//$("td:contains('-')").addClass('deepredBg');

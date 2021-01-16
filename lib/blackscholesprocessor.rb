@@ -26,7 +26,7 @@ class Blackscholesprocessor
 		#initialize days and price ranges
 		num_days_till_e_date = (Date.parse(@e_date) - Date.today).to_i
 		ceiling_price = ([@long_strike, @short_strike].max) * 1.2
-		floor_price = ([@long_strike, @short_strike].min) * 0.8
+		floor_price = ([@long_strike, @short_strike, @quote].min) * 0.8
 		step_price = 0.05 * (@quote).to_f
 		p = 0.0
 		@grid = Array []
@@ -46,12 +46,12 @@ class Blackscholesprocessor
 				@strikes.push(s)
 				buy_p = Option::Calculator.price_call( s, @long_strike, d, @interest, @iv, @dividend ) 
 				sell_p = Option::Calculator.price_call( s, @short_strike, d, @interest, @iv, @dividend ) 
-				closing_p = (sell_p - buy_p) * 100
-				profit = closing_p - @entry_cost
-
+				closing_p = (buy_p - sell_p) * 100
+				profit = (closing_p - @entry_cost).round(0)
+				profit_perc = ((profit/@entry_cost) * 100).round(2)
 
 				#price_hash = {:days => d, :results => { :strike => s, :closing => closing_p, :buy_p => buy_p, :sell_p => sell_p, :profit => profit }}
-				price_hash = {"days" => d, "results" => { "strike" => s, "closing" => closing_p, "buy_p" => buy_p, "sell_p" => sell_p, "profit" => profit }}
+				price_hash = {"days" => d, "strike" => s,  "results" => { "closing" => closing_p, "buy_p" => buy_p, "sell_p" => sell_p, "profit" => profit, "profit_perc" => profit_perc }}
 
 				@grid.push(price_hash)
 			end
