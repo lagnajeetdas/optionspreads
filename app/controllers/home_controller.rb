@@ -10,7 +10,7 @@ class HomeController < ApplicationController
   	@api = StockQuote::Stock.new(api_key: 'pk_34bbabe4cf054befa331a42b695e75b2')
     @tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
     @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
-    @universes = Universe.select("displaysymbol")
+    @universes = Universe.all
     @symbolsplucked  = Universe.pluck(:displaysymbol)
     
   	if params[:ticker] == ""
@@ -20,10 +20,12 @@ class HomeController < ApplicationController
       _symbol = _symbol.upcase
       _symbol = _symbol.strip
     	begin
-  		    #@stock = StockQuote::Stock.quote(params[:ticker]) # to validate if stock symbol is valid
-          #if @stock
+  		    #_stock = StockQuote::Stock.quote(_symbol) # to validate if stock symbol is valid
+          #if _stock
 
-          if !(@universes.select{ |u| u['displaysymbol'] == _symbol }).empty?
+          #if !(@universes.select{ |u| u['displaysymbol'] == _symbol }).empty?
+          _stock = StockQuote::Stock.quote(_symbol)
+          if _stock
             redirect_to home_path(_symbol)
             #OptionsStragizerJob.perform_later(@stock.symbol)
             #get_option_expirydates(ticker: @stock.symbol)

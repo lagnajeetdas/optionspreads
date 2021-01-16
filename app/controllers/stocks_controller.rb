@@ -6,9 +6,7 @@ class StocksController < ApplicationController
   require 'json'
   require 'bootstrap-table-rails'
   require 'livequotetradier'
-
-
-
+  require 'blackscholesprocessor'
 
   # GET /stocks
   # GET /stocks.json
@@ -167,6 +165,8 @@ class StocksController < ApplicationController
 
   end
 
+
+
   def get_watchlist_stocks_live_quotes
 
 
@@ -202,7 +202,40 @@ class StocksController < ApplicationController
       end
   end
 
+  def load_roi_visualizer
 
+
+    symbol = params[:symbol]
+    quote = params[:quote]
+    e_date = params[:e_date]
+    iv = params[:iv]
+    dividend = params[:dividend]
+    long_strike = params[:long_strike]
+    short_strike = params[:short_strike]
+    strategy = params[:strategy]
+    entry_cost = params[:entry_cost]
+
+    bs = Blackscholesprocessor.new(symbol, quote, e_date, iv, dividend, long_strike, short_strike, strategy, entry_cost)
+    @_price_grid =(bs.price_grid)
+    @price_grid = (@_price_grid)
+    @strikes = (bs.strikes_array)
+    @days = (bs.days_array)
+    @current_quote = quote
+
+    
+
+    respond_to do |format|
+        format.js 
+    end
+    
+    #get_roi_json(@_price_grid.to_json)
+
+  end
+
+  def get_roi_json(pg)
+    p pg
+    #render json: {status: 'SUCCESS', message: 'Loaded all posts', data: pg}, status: :ok
+  end
 
   private
     # Use callbacks to share common setup or constraints between actions.

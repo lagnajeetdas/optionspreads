@@ -105,6 +105,7 @@
 				                <table class="table table-bordered table-hover"   data-toggle="table" data-pagination="true"  data-show-export="true" data-filter-control="true" data-show-columns="true">
 								  <thead class="thead-dark">
 								    <tr>
+								      <th></th>
 								      <th data-sortable="true" data-field="expiry_date" data-filter-control="select">Expiry</th>
 								      <th>Buy Strike</th>
 								      <th>Sell Strike</th>
@@ -219,6 +220,7 @@
 																		<% end %>
 
 																	<tr class="<%= under_target ? 'undertargetprice' : 'normalprice' %>">
+																		<td><%= link_to (fa_icon "eye"), roi_visualizer_path( :symbol => @ticker.symbol,:quote => @ticker.latest_price, :e_date => item.to_s, :iv => 0.30, :dividend => 0.0, :long_strike => buy_call_strike, :short_strike => sell_call_strike, :strategy => 'Call Debit Spread', :entry_cost => risk.round(1) ), method: :post, :remote => true %></td>
 																		<td><%= item.to_s %></td>
 																		<td><%= buy_call_strike %></td>
 																		<td><%= sell_call_strike %></td>
@@ -235,7 +237,7 @@
 																				<% bookmark_icon = "bookmark-o" %>
 																			<% end %>
 
-																				<td><%= link_to (fa_icon bookmark_icon), addoptionbookmark_path(:longleg => longleg_symbol, :shortleg => shortleg_symbol, :underlying => @ticker.symbol, :e_date => item.to_s), method: :post, :remote => true, id: longleg_symbol + shortleg_symbol %></td>
+																				<td><%= link_to (fa_icon bookmark_icon), addoptionbookmark_path(:longleg => longleg_symbol, :shortleg => shortleg_symbol, :underlying => @ticker.symbol, :e_date => item.to_s), method: :post, :remote => true, id: longleg_symbol + shortleg_symbol, size: 50 %></td>
 
 
 
@@ -313,6 +315,26 @@
 		<div class="col-md-10 offset-md-1">
 			<p>Option Chains Powered by <a href=https://tradier.com title=”Powered by Tradier”>Tradier</a></p>
 		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+	  	<div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="exampleModalLabel">ROI Visualizer</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	        <%= render 'roivisualizer' %>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	        
+	      </div>
+	    </div>
 	</div>
 </div>
 

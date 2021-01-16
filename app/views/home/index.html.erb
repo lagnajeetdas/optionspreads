@@ -32,45 +32,6 @@
 
 					<br/>
 
-					<% if @stock %>
-						<%= @stock.company_name %>
-						$<%= @stock.latest_price %>
-						<br/><br/>
-						<strong>Option Spreads</strong>
-						<br/><br/>
-						
-
-						<table class="table table-bordered table-hover"   data-toggle="table" data-pagination="true"  data-filter-control="true">
-						  <thead class="thead-dark">
-						    <tr>
-						      <th data-sortable="true" data-field="expiry_date" data-filter-control="select">Expiry</th>
-						      <th>Buy Strike</th>
-						      <th>Sell Strike</th>
-						      <th data-sortable="true" data-field="risk">Risk</th>
-						      <th data-sortable="true" data-field="reward">Reward</th>
-						      <th data-sortable="true" data-field="perc_change">Upside % Reqd</th>
-						      <th data-sortable="true" data-field="rr">R/R</th>							      
-						      
-						    </tr>
-						  </thead>
-
-							<tbody>
-								<tr>
-									<td><%=  %></td>
-									<td><%=  %></td>
-									<td><%=  %></td>
-									<td><%=  %></td>
-									<td><%=  %></td>
-									<td><%=  %></td>
-									<td><%=  %></td>
-								</tr>
-							</tbody>
-						</table>
-					<% elsif @nothing %>
-						<%= @nothing %>
-					<% end %>
-
-
 					<% if @error %>
 						<%= @error %>
 					<% end %>
