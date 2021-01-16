@@ -93,3 +93,26 @@
 .large_text{
 	font-size: 1.1em;
 }
+
+td.four_digit{
+  font-size: 0.75em;
+}
+
+td.pct, th.pct {
+    white-space: nowrap;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    text-align: right;
+    font-weight: bold;
+}
+
+table.roi tr.curPriceAbove td, table.roi tr.curPriceAbove th{
+  border-top:1px solid #444;
+}
+table.roi tr.curPriceRow td, table.roi tr.curPriceRow th{
+  border-top:1px solid #444;
+  border-bottom:1px solid #444;
+}
+table.roi tr.curPriceRow th{
+  background-color:#ddd;
+}

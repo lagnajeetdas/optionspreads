@@ -4,6 +4,9 @@ function onlyUnique(value, index, self) {
   return self.indexOf(value) === index;
 }
 
+function getlength(number) {
+    return number.toString().length;
+}
 
 function search(dayKey, strikeKey, myArray){
     for (var i=0; i < myArray.length; i++) {
@@ -30,10 +33,18 @@ function colorcell(num){
 }
 
 function get_td(resultObject){
-	color_class = colorcell(resultObject.results.profit_perc)
+	var color_class = colorcell(resultObject.results.profit_perc)
+	var f_class = ""
+	if (getlength(resultObject.results.profit)===4){
+		f_class = "four_digit"
+	}
 	//Create TD elements with values, tooltips, color classes etc.
-	return "<td title='" + resultObject.results.profit_perc  + "% Buy Price: " + resultObject.results.buy_p + " Sell Price:" + resultObject.results.sell_p   +  "' class='tooltip-test " + color_class + "' >" + resultObject.results.profit + "</td>"
+	return "<td title='" + resultObject.results.profit_perc  + "% Buy Price: " + resultObject.results.buy_p + " Sell Price:" + resultObject.results.sell_p   +  "' class='tooltip-test " + f_class + " " +  color_class + "' >" + resultObject.results.profit + "</td>"
 }
+
+
+
+
 
 
 $('#exampleModal').modal('show');
@@ -53,8 +64,17 @@ var pg = <%= raw json_escape(@price_grid.to_json) %>;
 $("#ph").html(pg)
 var days = <%= escape_javascript( @days ) %>
 var strikes = <%= escape_javascript( @strikes ) %>
+var q = <%= escape_javascript( @current_quote ) %>
 strikes = strikes.reverse()
 strikes = strikes.filter(onlyUnique);
+
+//get closet element to current price in strikes array 
+	var counts = strikes;
+	var goal = q;
+
+	var closest = counts.reduce(function(prev, curr) {
+	  return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
+	});
 
 html = "<th></th>"
 th_html_days = ""
@@ -63,9 +83,20 @@ $(html).appendTo('#roiviz_tablehead') ;
 
 
 var days_step = 1
-if (days.length > 20)
+var column_threshold = 15
+
+if ($( document ).width() <= 380 )
 {
-	days_step = Math.ceil(days.length / 20)
+	column_threshold = 5
+}
+if ($( document ).width() > 370 && $( document ).width() < 990 )
+{
+	column_threshold = 8
+}
+
+if (days.length > column_threshold)
+{
+	days_step = Math.ceil(days.length / column_threshold)
 }
 
 
@@ -79,6 +110,7 @@ if (i!==0)
 {
 	th_html_days += "<th>Exp</th>"
 }
+th_html_days += "<th>+/-%</th>"
 
 //Add days as headers to table
 $(th_html_days).appendTo('#roiviz_tablehead') ;
@@ -106,10 +138,12 @@ for(i=0; i<strikes.length; i++)
 	{
 		td_html_profit += get_td(search(0, strikes[i], pg));
 	}
+	var s = search(0, strikes[i], pg)
+	td_html_profit += "<td class='pct'>" + s.results.upside_perc + "%</td>"
 
-
-
-	tr_html_strikes = "<tr id='" + strikes[i] + "'><th>" + strikes[i] + "</th>" + td_html_profit + "</tr>"
+	var curr_price_class = ""
+	if (String(closest)===String(strikes[i])){ curr_price_class="curPriceAbove" };
+	tr_html_strikes = "<tr id='" + strikes[i] + "' class='" + curr_price_class  + "'><th>" + strikes[i] + "</th>" + td_html_profit + "</tr>"
 	$(tr_html_strikes).appendTo('#roiviz_tablebody') ;
 
 
@@ -121,4 +155,4 @@ for(i=0; i<strikes.length; i++)
 $("#roiviz_table td").addClass("small_text");
 $("#roiviz_table th").addClass("small_text");
 
-//$("td:contains('-')").addClass('deepredBg');
+

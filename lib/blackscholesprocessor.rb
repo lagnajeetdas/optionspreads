@@ -54,8 +54,9 @@ class Blackscholesprocessor
 				profit_perc = ((profit/@entry_cost) * 100).round(2)
 				buy_p = buy_p.round(2)
 				sell_p = sell_p.round(2)
+				upside_perc = (((s-@quote)/@quote)*100).round(1)
 				#price_hash = {:days => d, :results => { :strike => s, :closing => closing_p, :buy_p => buy_p, :sell_p => sell_p, :profit => profit }}
-				price_hash = {"days" => d, "strike" => s,  "results" => { "closing" => closing_p, "buy_p" => buy_p, "sell_p" => sell_p, "profit" => profit, "profit_perc" => profit_perc }}
+				price_hash = {"days" => d, "strike" => s,  "results" => { "closing" => closing_p, "buy_p" => buy_p, "sell_p" => sell_p, "profit" => profit, "profit_perc" => profit_perc,  "quote" => @quote, "upside_perc" => upside_perc   }}
 
 				@grid.push(price_hash)
 			end
