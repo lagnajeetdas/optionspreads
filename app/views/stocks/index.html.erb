@@ -27,7 +27,7 @@
 
 
           <tr>
-                <td><%= link_to @ticker[0]['company_name'], stock %></td>
+                <td><%= link_to @ticker[0]['company_name'], stock, data: {disable_with: raw("<i class='fa fa-spinner fa-spin'></i>" + " " +  @ticker[0]['company_name'] + " :  Loading options chain...")} %></td>
                 <td><%= @ticker[0]['symbol'] %></td>
                 <td><%= number_with_precision(@ticker[0]['latest_price'], :precision => 2) %></td>
                 <td><%= stock.target_price_auto %></td>

@@ -53,7 +53,7 @@
 									<%= link_to 'Delete', @stock, method: :delete, data: { confirm: 'Are you sure?' } %> | 
 									<%= link_to 'Back', stocks_path %>
 								<% else %>
-									 <%= link_to 'Add to Watchlist', stocks_path("stock"=>{"ticker"=>@ticker.symbol, "user_id"=>@currentUser}), method: :post %> |
+									 <%= link_to 'Add to Watchlist', stocks_path("stock"=>{"ticker"=>@ticker.symbol, "user_id"=>@currentUser}), method: :post, data: {disable_with: raw("<i class='fa fa-cog fa-spin'></i> Adding and Recalculating...")} %> |
 									<%= link_to 'Back to Search', home_index_path %>
 								<% end %>
 							</div>
@@ -71,7 +71,7 @@
 			                Current Price: <strong><%= @ticker.latest_price %></strong><br/>	
 			                <% if type=="show_from_watchlist" %>
 			                Target Price: <strong><span id="stock_target_price_view"><%= @stock.target_price_auto %></span></strong> &nbsp;
-			                <%= link_to '(Update Target)', targetprice_path(:symbol => @ticker.symbol), method: :post, :remote => true %><br/>
+			                <%= link_to '(Update Target)', targetprice_path(:symbol => @ticker.symbol), method: :post, :remote => true, data: {disable_with: raw("<i class='fa fa-cog fa-spin'></i> Updating...")} %><br/>
 			                <i><div id="targetprice_viz" >               
                 			</div></i>
                 			<% end %>
@@ -107,7 +107,7 @@
 								  <thead class="thead-dark">
 								    <tr>
 								    	<% if type=="show_from_watchlist" %>
-								      	<th></th>
+								      	<th>ROI</th>
 								      	<% end %>
 										<th data-sortable="true" data-field="expiry_date" data-filter-control="select">Expiry</th>
 										<th>Buy Strike</th>
@@ -248,7 +248,7 @@
 																				<% bookmark_icon = "bookmark-o" %>
 																			<% end %>
 
-																				<td><%= link_to (fa_icon bookmark_icon), addoptionbookmark_path(:longleg => longleg_symbol, :shortleg => shortleg_symbol, :underlying => @ticker.symbol, :e_date => item.to_s), method: :post, :remote => true, id: longleg_symbol + shortleg_symbol, size: 50 %></td>
+																				<td><%= link_to (fa_icon bookmark_icon), addoptionbookmark_path(:longleg => longleg_symbol, :shortleg => shortleg_symbol, :underlying => @ticker.symbol, :e_date => item.to_s), method: :post, :remote => true, data: {disable_with: raw("<i class='fa fa-cog fa-spin'></i> Bookmarking..")},  id: longleg_symbol + shortleg_symbol, size: 50  %></td>
 
 
 

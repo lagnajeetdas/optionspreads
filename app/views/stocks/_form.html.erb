@@ -40,7 +40,7 @@
               </div>
 
               <div class="actions">
-                <%= form.submit "Save", class: "btn btn-primary" %>
+                <%= form.button "Save", class: "btn btn-primary", data: {disable_with: raw("<i class='fa fa-cog fa-spin'></i> Saving stock and computing spreads...")} %>
               </div>
 
             </div>
