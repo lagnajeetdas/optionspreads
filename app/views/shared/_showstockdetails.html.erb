@@ -102,7 +102,7 @@
 			                <strong>Option Spreads Scenarios</strong><br/>
 
 			                <% if !expirydates_data.empty? %>
-				                <table class="table table-bordered table-hover"   data-toggle="table" data-pagination="true"  data-show-export="true" data-filter-control="true" data-show-columns="true">
+				                <table class="table table-bordered table-hover"   data-toggle="table" data-pagination="true"  data-show-export="true" data-filter-control="true" data-show-columns="true" data-sort-name="rr" data-sort-order="desc">
 								  <thead class="thead-dark">
 								    <tr>
 								    	<% if type=="show_from_watchlist" %>
@@ -114,7 +114,7 @@
 										<th data-sortable="true" data-field="risk">Risk</th>
 										<th data-sortable="true" data-field="reward">Reward</th>
 										<th data-sortable="true" data-field="perc_change">Upside % Reqd</th>
-										<th data-sortable="true" data-field="rr">R/R</th>
+										<th data-sortable="true" data-field="rr" data-sort-order="desc">R/R</th>
 										<% if type=="show_from_watchlist" %>
 											<th data-field="bookmark">Bookmark</th>
 										<% end %>							      

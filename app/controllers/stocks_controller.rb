@@ -221,6 +221,8 @@ class StocksController < ApplicationController
     @price_grid = (@_price_grid)
     @strikes = (bs.strikes_array)
     @days = (bs.days_array)
+    @labeled_months = (bs.labeled_months_array)
+    @labeled_dates = (bs.labeled_dates_array)
     @current_quote = quote
 
     

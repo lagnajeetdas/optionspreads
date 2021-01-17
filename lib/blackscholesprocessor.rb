@@ -1,6 +1,7 @@
 class Blackscholesprocessor
 	require 'rubygems'
 	require 'options_library'
+	require 'date'
 
 
 	def initialize(symbol, quote, e_date, long_iv, short_iv, dividend, long_strike, short_strike, strategy, entry_cost)
@@ -34,6 +35,8 @@ class Blackscholesprocessor
 		@grid = Array []
 		@days = Array []
 		@strikes = Array []
+		@labeled_dates = Array []
+		@labeled_months = Array []
 
 		#iterate over days
 		r = num_days_till_e_date..0
@@ -42,6 +45,15 @@ class Blackscholesprocessor
 
 			d_years = (d.to_f)/365
 			@days.push(d)
+			
+			#get labeled months
+			x = Date.today + (num_days_till_e_date-d)
+			@labeled_months.push(x.strftime("%b"))
+
+			#get labeled days
+			@labeled_dates.push(x.strftime("%-d"))			
+
+
 			#iterate over strike range to calculate option pricing
 			(floor_price..ceiling_price).step(step_price) do |s|
 				s = s.round(2)
@@ -55,15 +67,15 @@ class Blackscholesprocessor
 				buy_p = buy_p.round(2)
 				sell_p = sell_p.round(2)
 				upside_perc = (((s-@quote)/@quote)*100).round(1)
-				#price_hash = {:days => d, :results => { :strike => s, :closing => closing_p, :buy_p => buy_p, :sell_p => sell_p, :profit => profit }}
+				
+
 				price_hash = {"days" => d, "strike" => s,  "results" => { "closing" => closing_p, "buy_p" => buy_p, "sell_p" => sell_p, "profit" => profit, "profit_perc" => profit_perc,  "quote" => @quote, "upside_perc" => upside_perc   }}
 
 				@grid.push(price_hash)
 			end
 		end
+
 	end
-
-
 
 	def price_grid
 		@grid
@@ -75,6 +87,14 @@ class Blackscholesprocessor
 
 	def strikes_array
 		@strikes
+	end
+
+	def labeled_months_array
+		@labeled_months
+	end
+
+	def labeled_dates_array
+		@labeled_dates
 	end
 
 

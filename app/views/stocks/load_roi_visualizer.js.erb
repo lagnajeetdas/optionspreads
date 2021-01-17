@@ -61,8 +61,10 @@ var current_quote = '<%= escape_javascript( @current_quote ) %>'
 
 var pg = <%= raw json_escape(@price_grid.to_json) %>;
 
-$("#ph").html(pg)
+
 var days = <%= escape_javascript( @days ) %>
+var labeled_months = <%= raw json_escape(@labeled_months.to_json) %>
+var labeled_dates = <%= raw json_escape(@labeled_dates.to_json) %>
 var strikes = <%= escape_javascript( @strikes ) %>
 var q = <%= escape_javascript( @current_quote ) %>
 strikes = strikes.reverse()
@@ -76,15 +78,10 @@ strikes = strikes.filter(onlyUnique);
 	  return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
 	});
 
-html = "<th></th>"
-th_html_days = ""
-$(html).appendTo('#roiviz_tablehead') ;
 
-
-
+//Decide how many days columns to show based on screen size and array size
 var days_step = 1
 var column_threshold = 15
-
 if ($( document ).width() <= 380 )
 {
 	column_threshold = 5
@@ -100,26 +97,60 @@ if (days.length > column_threshold)
 }
 
 
+// Set up header rows for labeled months
+html = "<tr id='labeled_months_row'><th></th></tr>"
+th_html_months = ""
+$(html).appendTo('#roiviz_tablehead') ;
+
+
+// Set up header rows for labeled dates
+html = "<tr id='labeled_dates_row'><th></th></tr>"
+th_html_days = ""
+$(html).appendTo('#roiviz_tablehead') ;
+
+var _months = []
+
 //Iterate over days
-for(i=(days.length-1); i>=0; i = i - days_step)
+//for(i=(days.length-1); i>=0; i = i - days_step)
+for(i=0; i<days.length; i = i + days_step)
 {
-	th_html_days += "<th>" + i + "</th>"
+	th_html_days += "<th align='center'>" + labeled_dates[i] + "</th>"
+	_months.push(labeled_months[i])
+	//th_html_months += "<th>" + labeled_months[i] + "</th>"
 }
 
-if (i!==0)
+if (i!==days.length-1)
 {
 	th_html_days += "<th>Exp</th>"
 }
 th_html_days += "<th>+/-%</th>"
 
-//Add days as headers to table
-$(th_html_days).appendTo('#roiviz_tablehead') ;
+//Add labeled dates as headers to table
+$(th_html_days).appendTo('#labeled_dates_row') ;
+
+//Add labeled months as headers to table
+var count_months, shading;
+shading = 1;
+count_months = _months.reduce((a, c) => (a[c] = (a[c] || 0) + 1, a), Object.create(null));
+var _result = Object.entries(count_months); 
+for (j = 0; j < _result.length; j++)
+{
+	th_html_months += "<th colspan='" + _result[j][1] + "' class='z" + shading + "' align='center'>" + _result[j][0]  + "</th>"
+	if (shading===1) 
+		{shading=2}
+	else
+		{shading=1}
+}
+
+$(th_html_months).appendTo('#labeled_months_row') ;
+
+
+
+
+
 
 
 var tr_html_strikes = ""
-
-
-
 //Iterate over strikes
 for(i=0; i<strikes.length; i++)
 {
