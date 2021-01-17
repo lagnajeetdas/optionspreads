@@ -57,8 +57,6 @@ $("#roiviz_tablebody").empty();
 
 //Initialize variables
 var current_quote = '<%= escape_javascript( @current_quote ) %>'
-//var pg = <%= escape_javascript( @price_grid ) %>
-
 var pg = <%= raw json_escape(@price_grid.to_json) %>;
 
 

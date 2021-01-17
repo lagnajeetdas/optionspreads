@@ -1,4 +1,5 @@
 <div class="container">
+
 	<div class="row">
 		<div class="col-md-10 offset-md-1">
 			<div class="jumbotron jumbotron-fluid">
@@ -229,7 +230,7 @@
 
 																	<tr class="<%= under_target ? 'undertargetprice' : 'normalprice' %>">
 																		<% if type=="show_from_watchlist" %>
-																		<td><%= link_to (fa_icon "eye"), roi_visualizer_path( :symbol => @ticker.symbol,:quote => @ticker.latest_price, :e_date => item.to_s, :long_iv => long_iv, :short_iv => short_iv, :dividend => 0.0, :long_strike => buy_call_strike, :short_strike => sell_call_strike, :strategy => 'Call Debit Spread', :entry_cost => risk.round(1) ), method: :post, :remote => true %></td>
+																		<td><%= link_to (fa_icon "eye"), roi_visualizer_path( :symbol => @ticker.symbol,:quote => @ticker.latest_price, :e_date => item.to_s, :long_iv => long_iv, :short_iv => short_iv, :dividend => 0.0, :long_strike => buy_call_strike, :short_strike => sell_call_strike, :strategy => 'Call Debit Spread', :entry_cost => risk.round(1) ), method: :post, :remote => true, data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>"}  , class: "roi_launch" %></td>
 																		<% end %>
 																		<td><%= item.to_s %></td>
 																		<td><%= buy_call_strike %></td>
@@ -349,6 +350,24 @@
 		</div>
 	</div>
 <% end %>
+
+
+
+
+<script type='text/javascript'>
+
+
+	window.onload = function () {
+
+		$( document ).ready(function() {
+			console.log("ready");
+			
+		});
+   
+	};
+   
+ </script>
+
 
 
 
