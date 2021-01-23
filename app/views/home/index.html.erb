@@ -26,9 +26,7 @@
 												
 					</div>
 					
-					<div id='mydiv' style='display:none'>
-					   TEST
-					 </div>
+					
 
 					<br/>
 
@@ -45,15 +43,13 @@
 <script type='text/javascript'>
 
 
-	window.onload = function () {
-	  	$('#mydiv').hide();
-
-		  
+	//window.onload = function () {
+	document.addEventListener("turbolinks:load", function() {
 		   var demo = new autoComplete({
 		    selector: 'input[name="ticker"]',
 		    minChars: 2,
 		    source: function(term, response){
-		        $.getJSON('https://financialmodelingprep.com/api/v3/search?&limit=10&apikey=69b8bf512c3f3962412228ee02211987', { query: term }, function(data)
+		        $.getJSON('https://financialmodelingprep.com/api/v3/search?&limit=15&apikey=69b8bf512c3f3962412228ee02211987', { query: term }, function(data)
 		        	{ 
 		        		
 	        		
@@ -63,9 +59,12 @@
               			
 			            for(var i = 0; i < data.length; i++)
 			            { 
+			            	var _res = [];
 			                if(data[i].currency == "USD")
 			                {
-			                	res.push(data[i].symbol); 
+			                	_res.push(data[i].symbol);
+			                	_res.push(data[i].name);
+			                	res.push(_res); 
 			                }
 			            }
 			            console.log(res);
@@ -73,12 +72,17 @@
               
 
 		        	});
-		    }
+		    },
+		    renderItem: function (item, search){
+			        search = search.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+			        
+			        return '<div class="autocomplete-suggestion" data-ticker="'+item[0]+'" data-company="'+item[1]+'" data-val="'+item[0]+'"><strong>'+item[0]+'</strong> ' + item[1] + '</div>';
+			    }
 		});
 
 
    
-	};
+	});
    
  </script>
 

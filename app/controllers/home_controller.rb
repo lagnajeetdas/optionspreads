@@ -56,7 +56,9 @@ class HomeController < ApplicationController
     @recommendations = Recommendation.all
     if current_user
       @currentUser = current_user.id
+      @bookmarks = Optionbookmark.select{ |o| o['user_id']==current_user.id}
     end
+
   
   end
 

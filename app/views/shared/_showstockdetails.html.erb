@@ -106,7 +106,7 @@
 				                <table class="table table-bordered table-hover"   data-toggle="table" data-pagination="true"  data-show-export="true" data-filter-control="true" data-show-columns="true" data-sort-name="rr" data-sort-order="desc">
 								  <thead class="thead-dark">
 								    <tr>
-								    	<% if type=="show_from_watchlist" %>
+								    	<% if user_signed_in? %>
 								      	<th>ROI</th>
 								      	<% end %>
 										<th data-sortable="true" data-field="expiry_date" data-filter-control="select">Expiry</th>
@@ -116,7 +116,7 @@
 										<th data-sortable="true" data-field="reward">Reward</th>
 										<th data-sortable="true" data-field="perc_change">Upside % Reqd</th>
 										<th data-sortable="true" data-field="rr" data-sort-order="desc">R/R</th>
-										<% if type=="show_from_watchlist" %>
+										<% if user_signed_in? %>
 											<th data-field="bookmark">Bookmark</th>
 										<% end %>							      
 								      
@@ -229,7 +229,7 @@
 																		<% end %>
 
 																	<tr class="<%= under_target ? 'undertargetprice' : 'normalprice' %>">
-																		<% if type=="show_from_watchlist" %>
+																		<% if user_signed_in? %>
 																		<td><%= link_to (fa_icon "eye"), roi_visualizer_path( :symbol => @ticker.symbol,:quote => @ticker.latest_price, :e_date => item.to_s, :long_iv => long_iv, :short_iv => short_iv, :dividend => 0.0, :long_strike => buy_call_strike, :short_strike => sell_call_strike, :strategy => 'Call Debit Spread', :entry_cost => risk.round(1) ), method: :post, :remote => true, data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>"}  , class: "roi_launch" %></td>
 																		<% end %>
 																		<td><%= item.to_s %></td>
@@ -239,7 +239,7 @@
 																		<td><%= reward.round(1) %></td>
 																		<td><%= perc_change.round(1) %></td>
 																		<td><%= rr_ratio.round(1) %></td>
-																		<% if type=="show_from_watchlist" %>
+																		<% if user_signed_in? %>
 
 																			<% if @bookmarks.detect{ |b| b['shortleg']== shortleg_symbol &&  b['longleg']==longleg_symbol} %>
 
@@ -248,7 +248,7 @@
 																				<% bookmark_icon = "bookmark-o" %>
 																			<% end %>
 
-																				<td><%= link_to (fa_icon bookmark_icon), addoptionbookmark_path(:longleg => longleg_symbol, :shortleg => shortleg_symbol, :underlying => @ticker.symbol, :e_date => item.to_s), method: :post, :remote => true, data: {disable_with: raw("<i class='fa fa-cog fa-spin'></i> Bookmarking..")},  id: longleg_symbol + shortleg_symbol, size: 50  %></td>
+																				<td><%= link_to (fa_icon bookmark_icon), addoptionbookmark_path(:longleg => longleg_symbol, :shortleg => shortleg_symbol, :underlying => @ticker.symbol, :e_date => item.to_s), method: :post, :remote => true, data: {disable_with: raw("<i class='fa fa-cog fa-spin'></i> Bookmarking..")},  id: longleg_symbol + shortleg_symbol, class: "create_bookmark"  %></td>
 
 
 
@@ -329,7 +329,7 @@
 	</div>
 </div>
 
-<% if type=="show_from_watchlist" %>
+<% if user_signed_in? %>
 	<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
 		  	<div class="modal-content">
@@ -340,7 +340,7 @@
 		        </button>
 		      </div>
 		      <div class="modal-body">
-		        <%= render 'roivisualizer' %>
+		        <%= render 'stocks/roivisualizer' %>
 		      </div>
 		      <div class="modal-footer">
 		        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

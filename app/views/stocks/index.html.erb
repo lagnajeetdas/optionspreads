@@ -1,8 +1,9 @@
 
-<%= button_to "Add New Stock to Watchlist", new_stock_path, method: :get, class: "btn btn-outline-success"  %>
+<h3>My Stocks</h3><br/>
+
+<%= button_to "Add New Stock", new_stock_path, method: :get, class: "btn btn-outline-success"  %>
 
 
-<br/>
 
 <table class="table table-bordered table-hover" data-toggle="table" data-search="true" data-pagination="true"  data-mobile-responsive="true" data-sort-name="buy_rating" data-sort-order="desc" >
   <thead class="thead-light">
@@ -90,6 +91,6 @@
 <br>
 
 <% if @stocks.length() > 10 %>
-  <%= button_to "Add New Stock to Watchlist", new_stock_path, class: "btn btn-outline-success"  %>
+  <%= button_to "Add New Stock", new_stock_path, class: "btn btn-outline-success"  %>
 <% end %>
 

@@ -19,17 +19,21 @@
           <%= link_to "Edit Profile", edit_user_registration_path, class: "nav-link"  %>
         </li>
 
-        <li class="nav-item">
-          <%= link_to "My Watchlist", stocks_path, class: "nav-link"  %>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            My Watchlists
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            
+            <%= link_to "Stocks", stocks_path, class: "dropdown-item"  %>
+            <%= link_to "Options", optionbookmarks_path, class: "dropdown-item"  %>
+            <div class="dropdown-divider"></div>
+            <%= link_to "Add Stock", new_stock_path, class: "dropdown-item"  %>
+
+          </div>
         </li>
 
-        <li class="nav-item">
-          <%= link_to "Options Bookmarks", optionbookmarks_path, class: "nav-link"  %>
-        </li>
-
-        <li class="nav-item">
-          <%= link_to "Add Stock", new_stock_path, class: "nav-link"  %>
-        </li>
+        
 
         <li class="nav-item">
           <%= link_to "Log Out", destroy_user_session_path, method: :delete, class: "nav-link"  %>
