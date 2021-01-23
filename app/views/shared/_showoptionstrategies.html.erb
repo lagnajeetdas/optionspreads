@@ -1,0 +1,170 @@
+
+
+
+<table class="table table-bordered table-hover"   data-toggle="table" data-pagination="true"  data-show-export="true" data-filter-control="true" data-show-columns="true" data-sort-name="rr" data-sort-order="desc">
+  <thead class="thead-dark">
+    <tr>
+    	<% if user_signed_in? %>
+      	<th>ROI</th>
+      	<% end %>
+		<th data-sortable="true" data-field="expiry_date" data-filter-control="select">Expiry</th>
+		<th>Buy Strike</th>
+		<th>Sell Strike</th>
+		<th data-sortable="true" data-field="risk">Risk</th>
+		<th data-sortable="true" data-field="reward">Reward</th>
+		<th data-sortable="true" data-field="perc_change">Upside % Reqd</th>
+		<th data-sortable="true" data-field="rr" data-sort-order="desc">R/R</th>
+		<% if user_signed_in? %>
+			<th data-field="bookmark">Bookmark</th>
+		<% end %>							      
+      
+    </tr>
+  </thead>
+
+	<tbody>
+    <!-- For each expiry date, get options chain -->
+		<% expirydates_data.each do |item| %>
+
+			<% url_options_chain_string = baseurl_tradier + "options/chains?symbol=" + @ticker.symbol + "&expiration=" + item + "&greeks=true" %>
+			<% response = HTTParty.get(url_options_chain_string, {headers: {"Authorization" => 'Bearer ' + tradier_api_key}}) %>
+			<% optionchain_data = response.parsed_response['options']['option'] %>
+
+			<% option_strikes_array = Array[] %>
+
+			<!-- Loop through all contracts in option chain of selected expiry date -->
+			<% optionchain_data.each do |contract_item| %>
+				<% if contract_item['option_type'] == "call" && contract_item['root_symbol'] == @ticker.symbol %>										
+					<!--create an array of option strikes -->
+
+					<% option_strikes_array.push(contract_item['strike']) %>
+				<% end %>
+			<% end %>
+
+			
+
+			<!-- Check if option strikes array is not empty -->
+			<% if 1==1 && !option_strikes_array.empty? %>
+				<!--find strike price closest to stock quote to set anchor-->
+				<% h = option_strikes_array.map(&:to_f).sort.group_by{|e| e <=> @ticker.latest_price} %>
+				
+				<% anchor_strike = (h[-1].last || h[1].first) %>
+				<% strike_gap = h[-1].last - h[-1][-2]  %>
+				
+				<!-- Create a strike_gap set array -->
+				<% strike_gap_set = Array[] %>
+				<% anchor_set = Array[] %>
+				<% strike_gap_set.push(strike_gap) %>
+				<% strike_gap_set.push(strike_gap * 2) %>
+				<% strike_gap_set.push(strike_gap * 3) %>
+
+				
+
+				<% if 1==1 %>
+					<% strike_gap_set.each do |sg| %>
+						<!-- Create an anchor set array -->
+						<% anchor_set =  (anchor_strike..anchor_strike*1.3).step(sg).to_a %>
+						
+						<% threshold = [7, anchor_set.length()].min %>
+
+						<!-- Loop through each anchor price in anchor_set -->
+						<% anchor_set.take(threshold).each do |anc_price| %>
+							<% buy_contract_ask_price = -1 %>
+							<% sell_contract_bid_price = -1 %>
+							
+
+							<% risk = -1 %>
+							<% reward = -1 %>
+							<% rr_ratio = -1 %>
+							<% perc_change = -1 %>
+
+							<% buy_call_strike = anc_price %>
+							<% sell_call_strike = anc_price + sg %>
+
+							
+							
+							<!--Get ask price of buy option contract with strike price = buy_call_strike -->
+							<% t_contract_buy = optionchain_data.detect {|contract_item| contract_item['strike'].to_s == buy_call_strike.to_s && contract_item['option_type']=="call" && contract_item['root_symbol'] == @ticker.symbol } %>
+
+							<% longleg_symbol = "" %>
+							<% unless t_contract_buy.nil? %>
+									<% buy_contract_ask_price =  t_contract_buy['ask'] %>
+									<% longleg_symbol = t_contract_buy['symbol'] %>
+									<% long_iv = t_contract_buy['greeks']['ask_iv'] %>
+
+							<% end %>
+
+							<!--Get bid price of sell option contract with strike price = sell_call_strike -->
+							<% t_contract_sell = optionchain_data.detect {|contract_item| contract_item['strike'].to_s == sell_call_strike.to_s && contract_item['option_type']=="call" && contract_item['root_symbol'] == @ticker.symbol } %>
+							<% shortleg_symbol = "" %>
+							<% unless t_contract_sell.nil? %>
+									<% sell_contract_bid_price =  t_contract_sell['bid'] %>
+									<% shortleg_symbol = t_contract_sell['symbol'] %>
+									<% short_iv = t_contract_sell['greeks']['ask_iv'] %>
+							<% end %>
+
+
+
+
+
+							<!-- if both bid and ask of the 2 contracts are valid, calc risk and reward -->
+							<% if buy_contract_ask_price != -1 && sell_contract_bid_price != -1 %>
+								<% risk = 100 * (buy_contract_ask_price.to_f - sell_contract_bid_price.to_f)%>
+								<% reward = (100.0 * sg.to_f) - risk.to_f %>
+								
+								<% if risk != 0 %>
+									<% rr_ratio = reward.to_f / risk.to_f %>
+								<% end %>
+
+								<% perc_change = 100*((sell_call_strike.to_f - @ticker.latest_price)/@ticker.latest_price) %>
+
+										<% under_target = false %>
+										<% if type=="show_from_watchlist" %>
+											<% if !@stock.target_price_auto.nil? %>
+												<% if sell_call_strike<=@stock.target_price_auto.to_f %>
+													<% under_target = true %>
+												<% end %>
+											<% end %>
+										<% end %>
+
+									<tr class="<%= under_target ? 'undertargetprice' : 'normalprice' %>">
+										<% if user_signed_in? %>
+										<td><%= link_to (fa_icon "eye"), roi_visualizer_path( :symbol => @ticker.symbol,:quote => @ticker.latest_price, :e_date => item.to_s, :long_iv => long_iv, :short_iv => short_iv, :dividend => 0.0, :long_strike => buy_call_strike, :short_strike => sell_call_strike, :strategy => 'Call Debit Spread', :entry_cost => risk.round(1) ), method: :post, :remote => true, data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>"}  , class: "roi_launch" %></td>
+										<% end %>
+										<td><%= item.to_s %></td>
+										<td><%= buy_call_strike %></td>
+										<td><%= sell_call_strike %></td>
+										<td><%= risk.round(1) %></td>
+										<td><%= reward.round(1) %></td>
+										<td><%= perc_change.round(1) %></td>
+										<td><%= rr_ratio.round(1) %></td>
+										<% if user_signed_in? %>
+
+											<% if @bookmarks.detect{ |b| b['shortleg']== shortleg_symbol &&  b['longleg']==longleg_symbol} %>
+
+												<% bookmark_icon = "bookmark" %>
+											<% else %>
+												<% bookmark_icon = "bookmark-o" %>
+											<% end %>
+
+												<td><%= link_to (fa_icon bookmark_icon), addoptionbookmark_path(:longleg => longleg_symbol, :shortleg => shortleg_symbol, :underlying => @ticker.symbol, :e_date => item.to_s), method: :post, :remote => true, data: {disable_with: raw("<i class='fa fa-cog fa-spin'></i> Bookmarking..")},  id: longleg_symbol + shortleg_symbol, class: "create_bookmark"  %></td>
+
+
+
+										<% end %>
+									</tr>
+
+							<% end %>
+
+
+						<% end %>
+
+					<% end %>
+				<% end %>
+			<% end %>
+			
+			
+			
+
+		<% end %>
+	</tbody>
+</table>

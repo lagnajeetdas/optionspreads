@@ -235,6 +235,8 @@ class StocksController < ApplicationController
 
   end
 
+
+
   def get_roi_json(pg)
     p pg
     #render json: {status: 'SUCCESS', message: 'Loaded all posts', data: pg}, status: :ok

@@ -137,6 +137,17 @@ class HomeController < ApplicationController
   def calculate_call_debit_spreads
     #Bullish
 
+   @expirydates_data = params[:expirydates_data]
+   @type = params[:type]
+   @symbol_data = params[:symbol]
+   @tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
+   @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
+   @target_price_auto  = params[:target_price_auto]
+   @bookmarks = Optionbookmark.select{ |o| o['user_id']==current_user.id}
+    respond_to do |format|
+      format.js
+    end
+
   end
 
   def calculate_call_credit_spreads
