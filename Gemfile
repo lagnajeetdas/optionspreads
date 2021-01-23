@@ -34,7 +34,7 @@ gem 'kaminari'
 gem 'activerecord-import', '~> 1.0', '>= 1.0.7'
 gem 'options_library', '~> 1.0', '>= 1.0.3'
 gem 'font-awesome-rails', '~> 4.7', '>= 4.7.0.6'
-
+gem 'figaro', '~> 1.2'
 
 
 

@@ -126,7 +126,7 @@ Rails.application.configure do
     domain: "winningspreads.com",
     port: 587,
     user_name: "apikey",
-    password: "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",
+    password: ENV["sg_api_key"],
     authentication: 'plain',
     enable_starttls_auto: true
   }
