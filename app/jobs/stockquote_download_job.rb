@@ -9,12 +9,12 @@ class StockquoteDownloadJob < ApplicationJob
 	    # Finnhub API base parameters
 	    p "@@@@@@@@@@@@@@@@@@@@@ Background Job Initialized  @@@@@@@@@@@@@@@@@@@@"
 
-	    @finnhub_api_key = "sandbox_bv1u7mf48v6o5ed6gpdg"
-	    @finnhub_api_key_prod = "bv1u7mf48v6o5ed6gpd0"
+	    @finnhub_api_key = ENV['finnhub_api_key']
+	    @finnhub_api_key_prod = ENV['finnhub_api_key_prod']
 	  	@finnhub_baseurl = "https://finnhub.io/api/v1/stock/symbol?"
 	  	@finnhub_baseurl_2 = "https://finnhub.io/api/v1/stock/"
-	  	@tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
-	    @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
+	  	@tradier_api_key = ENV['tradier_api_key']
+    	@baseurl_tradier = ENV['baseurl_tradier'] # /options/expirations"
 	  	@exchange = "US"
 	  	@currency = "USD"
 

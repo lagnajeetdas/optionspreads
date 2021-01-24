@@ -1,0 +1,19 @@
+var $table = $('#table_bs')
+var data = <%= raw json_escape(@spreads.to_json) %>;
+
+
+
+$table.bootstrapTable('load', data)
+$table.removeAttr('hidden')
+
+
+function visualizeROI(value, row, index) {
+    var post_string = "dividend=0.0&e_date=" + row.expiry_date + "&entry_cost=" + row.entry_cost + "&long_iv=" + row.buy_contract_iv + "&long_strike=" + row.buy_strike + "&quote=" + row.quote + "&short_iv=" + row.sell_contract_iv + "&short_strike=" + row.sell_strike  + "&strategy=calldebitspread&symbol=" + row.underlying;
+
+    return [
+    "<a class='roi_launch' data-remote='true' rel='nofollow' data-method='post' href='/roi_visualizer?" + post_string + "'>",
+      "<i class='fa fa-eye'></i>",
+      "</a>  ",
+    ].join("")
+  }
+

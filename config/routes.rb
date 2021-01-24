@@ -17,8 +17,8 @@ Rails.application.routes.draw do
   post "/" => 'home#index'
   post "targetprice", to: "stocks#gettarget"
   post "addoptionbookmark", to: "optionbookmarks#addbookmark"
-  post "roi_visualizer", to: "stocks#load_roi_visualizer"
-  post "show_calldebitspreads", to: "home#calculate_call_debit_spreads"
+  post "roi_visualizer", to: "home#load_roi_visualizer"
+  post "calc_spreads", to: "home#calculate_spreads"
   #get "roi_json", to: "stocks#get_roi_json"
   #resources :home do
   #  get :autocomplete_universe_displaysymbol, :on => :collection

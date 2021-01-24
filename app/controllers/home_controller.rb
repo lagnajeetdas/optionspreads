@@ -5,12 +5,15 @@ class HomeController < ApplicationController
   require 'json'
   require 'bootstrap-table-rails'
   require 'livequotetradier'
+  require 'optionexpirydates'
+  require 'optionchains'
+  require 'calculatespreads'
 
   def index
   	@api = StockQuote::Stock.new(api_key: 'pk_34bbabe4cf054befa331a42b695e75b2')
-    @tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
-    @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
-    @universes = Universe.all
+    @tradier_api_key = ENV['tradier_api_key']
+    @baseurl_tradier = ENV['baseurl_tradier'] # /options/expirations"
+    #@universes = Universe.all
     @symbolsplucked  = Universe.pluck(:displaysymbol)
     
   	if params[:ticker] == ""
@@ -49,17 +52,35 @@ class HomeController < ApplicationController
   def show
     require 'uri'
     require 'net/http'
-    p params
     @stock = params[:id] 
-    @tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
-    @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
+    @tradier_api_key = ENV['tradier_api_key']
+    @baseurl_tradier = ENV['baseurl_tradier'] # /options/expirations"
     @recommendations = Recommendation.all
     if current_user
       @currentUser = current_user.id
       @bookmarks = Optionbookmark.select{ |o| o['user_id']==current_user.id}
     end
 
-  
+    begin
+      @ticker = Livequotetradier.new(@stock)
+      @ticker_logo  = (StockQuote::Stock.logo(@stock)).url
+      if !@ticker
+        p "ticker could not be fetched using tradier api"
+        @ticker = StockQuote::Stock.quote(@stock)
+      end
+      if @ticker
+        #Get expiry date of options with API
+        options_e_dates = Optionexpirydates.new(@ticker.symbol)
+        @expirydates_data = options_e_dates.e_dates
+        
+      end
+    rescue StandardError, NameError, NoMethodError, RuntimeError => e
+      p "Rescued: #{e.inspect}"
+      p e.backtrace
+      @ticker = nil
+    else
+    ensure
+    end  
   end
 
   def about
@@ -134,36 +155,60 @@ class HomeController < ApplicationController
 
   end
 
-  def calculate_call_debit_spreads
-    #Bullish
+  def calculate_spreads
+    #Calculate Spreads
+    symbol = params[:symbol]
+    latest_price = params[:latest_price]
+    expirydates_data = params[:expirydates_data]
 
-   @expirydates_data = params[:expirydates_data]
-   @type = params[:type]
-   @symbol_data = params[:symbol]
-   @tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
-   @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
-   @target_price_auto  = params[:target_price_auto]
-   @bookmarks = Optionbookmark.select{ |o| o['user_id']==current_user.id}
+    #Get option chains with API
+    _optionchains = Optionchains.new(symbol, expirydates_data)
+    optionchains_data = _optionchains.chains
+    
+    #calc spreads
+    _spreads = Calculatespreads.new(optionchains_data, latest_price, symbol, expirydates_data)
+    @spreads = _spreads.analysis_results
+    
     respond_to do |format|
-      format.js
+        format.js
     end
+    
+    
+  end
+
+  def load_roi_visualizer
+
+
+    symbol = params[:symbol]
+    quote = params[:quote]
+    e_date = params[:e_date]
+    long_iv = params[:long_iv]
+    short_iv = params[:short_iv]
+    dividend = params[:dividend]
+    long_strike = params[:long_strike]
+    short_strike = params[:short_strike]
+    strategy = params[:strategy]
+    entry_cost = params[:entry_cost]
+
+    bs = Blackscholesprocessor.new(symbol, quote, e_date, long_iv, short_iv, dividend, long_strike, short_strike, strategy, entry_cost)
+    @_price_grid =(bs.price_grid)
+    @price_grid = (@_price_grid)
+    @strikes = (bs.strikes_array)
+    @days = (bs.days_array)
+    @labeled_months = (bs.labeled_months_array)
+    @labeled_dates = (bs.labeled_dates_array)
+    @current_quote = quote
+
+    
+
+    respond_to do |format|
+        format.js 
+    end
+    
+    #get_roi_json(@_price_grid.to_json)
 
   end
 
-  def calculate_call_credit_spreads
-    #Bearish
-
-  end
-
-  def calculate_put_debit_spreads
-    #Bearish
-
-  end
-
-  def calculate_put_credit_spreads
-    #Bullish
-
-  end
 
  
 

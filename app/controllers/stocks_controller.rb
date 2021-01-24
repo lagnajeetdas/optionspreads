@@ -7,6 +7,9 @@ class StocksController < ApplicationController
   require 'bootstrap-table-rails'
   require 'livequotetradier'
   require 'blackscholesprocessor'
+  require 'optionexpirydates'
+  require 'optionchains'
+  require 'calculatespreads'
 
   # GET /stocks
   # GET /stocks.json
@@ -18,14 +21,14 @@ class StocksController < ApplicationController
 
 
 
-    @api = StockQuote::Stock.new(api_key: 'pk_34bbabe4cf054befa331a42b695e75b2')
-    @finnhub_api_key = "sandbox_bv1u7mf48v6o5ed6gpdg"
+    @api = StockQuote::Stock.new(api_key: ENV['iexcloud_api_key'])
+    @finnhub_api_key = ENV['finnhub_api_key']
     
-    @iexcloud_api_key = "pk_34bbabe4cf054befa331a42b695e75b2"
+    @iexcloud_api_key = ENV['iexcloud_api_key']
     @baseurl_iexcloud = "https://cloud.iexapis.com/stable/stock/"
 
-    @tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
-    @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
+    @tradier_api_key = ENV['tradier_api_key']
+    @baseurl_tradier = ENV['baseurl_tradier'] # /options/expirations"
 
     get_watchlist_stocks_live_quotes
 
@@ -46,10 +49,37 @@ class StocksController < ApplicationController
   def show
     require 'uri'
     require 'net/http'
-    @tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
-    @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
+    @tradier_api_key = ENV['tradier_api_key']
+    @baseurl_tradier = ENV['baseurl_tradier'] # /options/expirations"
     @recommendations = Recommendation.all
     @bookmarks = Optionbookmark.select{ |o| o['user_id']==current_user.id}
+    
+    #get stock quotes and setup ticker
+    begin
+      @ticker = Livequotetradier.new(@stock.ticker)
+      @ticker_logo  = (StockQuote::Stock.logo(@stock.ticker)).url
+      if !@ticker
+        p "ticker could not be fetched using tradier api"
+        @ticker = StockQuote::Stock.quote(@stock.ticker)
+      end
+
+      if @ticker
+        #Get expiry date of options with API
+        options_e_dates = Optionexpirydates.new(@ticker.symbol)
+        @expirydates_data = options_e_dates.e_dates
+      end
+
+    rescue StandardError, NameError, NoMethodError, RuntimeError => e
+      p "Rescued: #{e.inspect}"
+      p e.backtrace
+      @ticker = nil
+    else
+    ensure
+    end
+
+
+
+      
   end
 
   # GET /stocks/new
@@ -202,39 +232,7 @@ class StocksController < ApplicationController
       end
   end
 
-  def load_roi_visualizer
-
-
-    symbol = params[:symbol]
-    quote = params[:quote]
-    e_date = params[:e_date]
-    long_iv = params[:long_iv]
-    short_iv = params[:short_iv]
-    dividend = params[:dividend]
-    long_strike = params[:long_strike]
-    short_strike = params[:short_strike]
-    strategy = params[:strategy]
-    entry_cost = params[:entry_cost]
-
-    bs = Blackscholesprocessor.new(symbol, quote, e_date, long_iv, short_iv, dividend, long_strike, short_strike, strategy, entry_cost)
-    @_price_grid =(bs.price_grid)
-    @price_grid = (@_price_grid)
-    @strikes = (bs.strikes_array)
-    @days = (bs.days_array)
-    @labeled_months = (bs.labeled_months_array)
-    @labeled_dates = (bs.labeled_dates_array)
-    @current_quote = quote
-
-    
-
-    respond_to do |format|
-        format.js 
-    end
-    
-    #get_roi_json(@_price_grid.to_json)
-
-  end
-
+  
 
 
   def get_roi_json(pg)

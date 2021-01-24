@@ -13,8 +13,8 @@ class Livequotetradier
     end
 
     def api_call
-      tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
-      baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
+      tradier_api_key = ENV['tradier_api_key']
+      baseurl_tradier = ENV['baseurl_tradier'] # /options/expirations"
 
     
       url_stock_quote_string = baseurl_tradier.to_s + "quotes?symbols=" + @symbol.to_s

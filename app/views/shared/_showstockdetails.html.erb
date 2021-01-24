@@ -7,43 +7,8 @@
 
 					<% begin %>
 
-						<% if type=="show_from_watchlist" %>
-							<% @ticker = Livequotetradier.new(@stock.ticker) %>
-							<% @ticker_logo  = (StockQuote::Stock.logo(@stock.ticker)).url %>
-				        <% else %>
-				        	<% @ticker = Livequotetradier.new(@stock) %>
-				        	<% @ticker_logo  = (StockQuote::Stock.logo(@stock)).url %>
-				        	
-				        <% end %>
-				        
-				        <% if !@ticker %>
-				        	<% p "ticker could not be fetched using tradier api" %>
-							<% if type=="show_from_watchlist" %>
-								<% @ticker = StockQuote::Stock.quote(@stock.ticker) %>
-								
-							<% else %>
-								<% @ticker = StockQuote::Stock.quote(@stock) %>
-								
-							<% end %>
-						<% end %>
-
+				        <% price_target = -1 %>
 						
-						<% price_target = -1 %>
-
-
-						<!-- Get expiry date of options from Tradier API -->
-						<% url_options_expiry_string = @baseurl_tradier + "options/expirations?symbol=" + @ticker.symbol + "&includeAllRoots=true&strikes=false" %>
-						<% response = HTTParty.get(url_options_expiry_string, {headers: {"Authorization" => 'Bearer ' + @tradier_api_key}}) %>
-						
-						
-						
-						<% expirydates_data = Array[] %>
-						<% if response.parsed_response['expirations'] %>
-							<% expirydates_data = response.parsed_response['expirations']['date'] %>
-							
-						<% end %>
-
-
 			            <% if !@ticker %>
 			                The ticker does not exist!
 			            <% else %>
@@ -58,12 +23,7 @@
 								<% end %>
 							</div>
 							<br/><br/>
-
-
-
 			              	<img src="<%= @ticker_logo %>" class="img-thumbnail rounded float-right" >
-
-			              	
 			                <strong><%=  @ticker.company_name %></strong><br/>
 			                
 			                Ticker Symbol: <%= @ticker.symbol %><br/>
@@ -86,9 +46,9 @@
 			                <% reco = @recommendations.select{ |r| r['symbol']==@ticker.symbol } %>
 			                
 			                <% if !reco.empty? %>
-			                  <%= (100 * ( ((reco[0]["buy"]) +  (reco[0]["strongbuy"])) / ( (reco[0]["buy"]) +  (reco[0]["strongbuy"]) +   (reco[0]["sell"]) +  (reco[0]["strongsell"]) +  (reco[0]["hold"]) ) )).round(1) %>% &nbsp; (<%= ( (reco[0]["buy"]) +  (reco[0]["strongbuy"]) +   (reco[0]["sell"]) +  (reco[0]["strongsell"]) +  (reco[0]["hold"]) ).round %> Analyst Ratings) 
+								<%= (100 * ( ((reco[0]["buy"]) +  (reco[0]["strongbuy"])) / ( (reco[0]["buy"]) +  (reco[0]["strongbuy"]) +   (reco[0]["sell"]) +  (reco[0]["strongsell"]) +  (reco[0]["hold"]) ) )).round(1) %>% &nbsp; (<%= ( (reco[0]["buy"]) +  (reco[0]["strongbuy"]) +   (reco[0]["sell"]) +  (reco[0]["strongsell"]) +  (reco[0]["hold"]) ).round %> Analyst Ratings) 
 			                <% else %>
-			                  N/A
+			                	N/A
 			                <% end %>
 			                <br/><br/>	
 			                
@@ -102,27 +62,25 @@
 
 			                <strong>Option Spreads Scenarios</strong><br/>
 
-
 			                
 
-			                <% if !expirydates_data.empty? %>
+			                <% if !@expirydates_data.empty? %>
+			                	<br/>
+			                	<%= link_to "Call Debit Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price), method: :post, :remote => true, data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>Analyzing..."}  %>
 
 			                	
 
-			                	<%= render 'shared/showoptionstrategies', expirydates_data: expirydates_data, type: type, ticker: @ticker, baseurl_tradier: @baseurl_tradier, tradier_api_key: @tradier_api_key %>
-
-				                <div id="table_content">
-				                </div>
-
+								<% if 1==2 %>
+			                		<%= render 'shared/showoptionstrategies', expirydates_data: @expirydates_data, type: type, ticker: @ticker, baseurl_tradier: @baseurl_tradier, tradier_api_key: @tradier_api_key %>
+			                	<% end %>
+			                	<br/><br/>
+			                	<%= render 'shared/showstrategytable' %>
 
 							<% else %>
 								Options data unavailable.
 							<% end %>
 
 			                <br/><br/>
-
-
-			                
 			            <% end %>
 					<% rescue StandardError, RuntimeError => e %>
 						<div class="alert alert-danger" role="alert">
