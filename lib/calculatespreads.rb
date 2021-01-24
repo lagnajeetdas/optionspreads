@@ -6,13 +6,17 @@ class Calculatespreads
 		@optionchain = optionchain
 		@e_dates = e_dates
 		@optionscenario_import = Array[] 
-		call_debit_spreads
+
+		@anchor_range = 0.3
+
+
+		compute_spreads("call", "debit")
 
 		p "Array Length"
 		p @optionscenario_import.length()
 	end
 
-	def call_debit_spreads
+	def compute_spreads(op_type, entry_type)
 
 		begin 
 		  	stock_latest_price = @quote
@@ -25,7 +29,7 @@ class Calculatespreads
 				if !expiry_dates_unique_array.empty?
 					expiry_dates_unique_array.each do |e_date|
 							#optionchains = @optionchain.where(underlying: @symbol).where(option_type: 'call').where(expiration_date: e_date)
-							optionchains  =  @optionchain.select{ |oc| oc[:underlying]==@symbol.to_s && oc[:option_type]=='call' && oc[:expiration_date]==e_date.to_s }
+							optionchains  =  @optionchain.select{ |oc| oc[:underlying]==@symbol.to_s && oc[:option_type]==op_type.to_s && oc[:expiration_date]==e_date.to_s }
 
 							if !optionchains.empty?
 								option_strikes_array = Array[]
@@ -61,12 +65,20 @@ class Calculatespreads
 										
 										strike_gap_set.each do |sg|
 											#Create an anchor set array
-											anchor_set =  (anchor_strike..anchor_strike*1.3).step(sg).to_a 
-											
+											if op_type=="call" && entry_type=="debit"
+												anchor_set =  (anchor_strike..anchor_strike* (1+ @anchor_range) ).step(sg).to_a 
+											elsif op_type=="call" && entry_type=="credit"
+												#reverse range step
+
+												anchor_set = (anchor_strike.to_i).downto(anchor_strike* (1- @anchor_range)).select.with_index { |x, idx| idx % sg.to_i == 0 }.each { |x|  } 
+												#anchor_set =  (anchor_strike..anchor_strike* (1- @anchor_range) ).step(sg).to_a 
+												#anchor_set =  (anchor_strike* (1- @anchor_range)..anchor_strike).step(sg).to_a.reverse 
+											end
+
 											threshold = [5, anchor_set.length()].min
 
 											#Loop through each anchor price in anchor_set
-											#p anchor_set
+											p anchor_set
 											anchor_set.take(threshold).each do |anc_price|
 												buy_contract_ask_price = -1
 												sell_contract_bid_price = -1
@@ -76,17 +88,22 @@ class Calculatespreads
 												reward = -1 
 												rr_ratio = -1 
 												perc_change = -1
+												entry_cost = -1
 
-												#p "buy strike"
-												buy_call_strike = anc_price 
-												#p "sell strike"
-												sell_call_strike = anc_price + sg
+
+												p buy_call_strike = anc_price 
+
+												if op_type=="call" && entry_type=="debit"
+													p sell_call_strike = anc_price + sg
+												elsif op_type=="call" && entry_type=="credit"
+													p sell_call_strike = anc_price - sg
+												end
 
 												
 												
 												#Get ask price of buy option contract with strike price = buy_call_strike 
 
-												t_contract_buy = optionchains.detect {|contract_item| (contract_item[:strike]).to_f == buy_call_strike && contract_item[:expiration_date]==e_date.to_s  }
+												p t_contract_buy = optionchains.detect {|contract_item| (contract_item[:strike]).to_f == buy_call_strike && contract_item[:expiration_date]==e_date.to_s  }
 
 												unless t_contract_buy.nil?
 														#p "buy contract ask"
@@ -108,11 +125,20 @@ class Calculatespreads
 
 												#if both bid and ask of the 2 contracts are valid, calc risk and reward
 												if buy_contract_ask_price != -1 && sell_contract_bid_price != -1 
-													#p "risk"
-													risk = 100 * (buy_contract_ask_price.to_f - sell_contract_bid_price.to_f)
-													
-													#p "reward"
-													reward = (100.0 * sg.to_f) - risk.to_f
+
+													entry_cost = 100 * (buy_contract_ask_price.to_f - sell_contract_bid_price.to_f)
+
+													if entry_type=="debit"
+														risk = 100 * (buy_contract_ask_price.to_f - sell_contract_bid_price.to_f)
+													else
+														risk = (100.0 * sg.to_f) + entry_cost.to_f
+													end
+
+													if entry_type=="debit"
+														reward = (100.0 * sg.to_f) - risk.to_f
+													else
+														reward = -1 * entry_cost.to_f
+													end
 													
 													if risk != 0
 														rr_ratio = reward.to_f / risk.to_f
@@ -120,7 +146,7 @@ class Calculatespreads
 
 													perc_change = 100*((sell_call_strike.to_f - stock_latest_price)/stock_latest_price)
 												
-													@optionscenario_import.push({underlying: @symbol, expiry_date: e_date, buy_strike: buy_call_strike, sell_strike: sell_call_strike, risk: risk.round(1), reward: reward.round(1), rr_ratio: rr_ratio.round(1), perc_change: perc_change.round(1), buy_contract_symbol: buy_contract_symbol, sell_contract_symbol: sell_contract_symbol, buy_contract_iv: buy_contract_iv , sell_contract_iv: sell_contract_iv, quote: stock_latest_price, entry_cost: risk.round(1) })
+													@optionscenario_import.push({underlying: @symbol, expiry_date: e_date, buy_strike: buy_call_strike, sell_strike: sell_call_strike, risk: risk.round(1), reward: reward.round(1), rr_ratio: rr_ratio.round(1), perc_change: perc_change.round(1), buy_contract_symbol: buy_contract_symbol, sell_contract_symbol: sell_contract_symbol, buy_contract_iv: buy_contract_iv , sell_contract_iv: sell_contract_iv, quote: stock_latest_price, entry_cost: entry_cost.round(1) })
 												end
 											end
 										end
