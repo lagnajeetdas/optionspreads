@@ -1,16 +1,24 @@
 class Calculatespreads
 	
-	def initialize(optionchain, quote, symbol, e_dates)
+	def initialize(optionchain, quote, symbol, e_dates, strategy)
 		@quote = quote.to_f
 		@symbol = symbol
 		@optionchain = optionchain
 		@e_dates = e_dates
 		@optionscenario_import = Array[] 
-
+		@strategy = strategy
 		@anchor_range = 0.3
 
-
-		compute_spreads("call", "debit")
+		case @strategy
+		  	when "call-debit"
+				compute_spreads("call", "debit")
+		  	when "call-credit"
+		  		compute_spreads("call", "credit")
+		  	when "put-debit"
+		  		compute_spreads("put", "debit")
+		  	when "put-credit"
+		  		compute_spreads("put", "credit")
+		end
 
 		p "Array Length"
 		p @optionscenario_import.length()

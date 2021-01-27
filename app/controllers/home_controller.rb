@@ -160,13 +160,14 @@ class HomeController < ApplicationController
     symbol = params[:symbol]
     latest_price = params[:latest_price]
     expirydates_data = params[:expirydates_data]
+    @strategy = params[:strategy]
 
     #Get option chains with API
     _optionchains = Optionchains.new(symbol, expirydates_data)
     optionchains_data = _optionchains.chains
     
     #calc spreads
-    _spreads = Calculatespreads.new(optionchains_data, latest_price, symbol, expirydates_data)
+    _spreads = Calculatespreads.new(optionchains_data, latest_price, symbol, expirydates_data, @strategy)
     @spreads = _spreads.analysis_results
     
     respond_to do |format|

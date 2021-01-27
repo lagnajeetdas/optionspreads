@@ -1,7 +1,10 @@
 var $table = $('#table_bs')
 var data = <%= raw json_escape(@spreads.to_json) %>;
+var strategy =  '<%= escape_javascript( @strategy ) %>'
 
-
+$("#strategy_description_text").html(strategy)
+$('.collapse').collapse()
+$("#scenario_analysis_label").removeAttr('hidden')
 
 $table.bootstrapTable('load', data)
 $table.removeAttr('hidden')

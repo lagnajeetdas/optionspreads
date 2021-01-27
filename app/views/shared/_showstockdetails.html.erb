@@ -2,7 +2,8 @@
 
 	<div class="row">
 		<div class="col-md-10 offset-md-1">
-			<div class="jumbotron jumbotron-fluid">
+			<!--<div class="jumbotron jumbotron-fluid">-->
+			<div class="shadow p-3 mb-5 bg-white rounded">
 				<div class="container">
 
 					<% begin %>
@@ -60,15 +61,43 @@
 			                
 			                <br/>
 
-			                <strong>Option Spreads Scenarios</strong><br/>
+			                <strong>Options Strategies </strong><br/>
 
 			                
 
 			                <% if !@expirydates_data.empty? %>
 			                	<br/>
-			                	<%= link_to "Call Debit Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price), method: :post, :remote => true, data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>Analyzing..."}  %>
 
-			                	
+			                		<div>
+					                
+					                	<%= link_to "Bull Call Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "call-debit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn",  data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>Analyzing...", toggle: "collapse"}  %>
+	
+
+					                	<%= link_to "Bear Call Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "call-credit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>Analyzing...", toggle: "collapse"}  %>
+
+
+
+					                	<%= link_to "Bull Put Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "put-credit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>Analyzing...", toggle: "collapse"}  %>
+
+
+					                	
+					                	<%= link_to "Bear Put Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "put-debit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>Analyzing...", toggle: "collapse"}  %>
+					                </div>
+
+					            <br/><br/>
+			               		
+								    <div class="collapse multi-collapse" >
+								      <div class="card card-body" id="strategy_description_text">
+								        Some placeholder content for the first collapse component of this multi-collapse example. 
+								      </div>
+								    </div>
+								<br/>
+
+								<span id="scenario_analysis_label" hidden><strong>Top Winning Scenarios</strong></span>
+
+
+
+
 
 								<% if 1==2 %>
 			                		<%= render 'shared/showoptionstrategies', expirydates_data: @expirydates_data, type: type, ticker: @ticker, baseurl_tradier: @baseurl_tradier, tradier_api_key: @tradier_api_key %>
