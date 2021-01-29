@@ -70,21 +70,21 @@
 
 			                		<div>
 					                
-					                	<%= link_to "Bull Call Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "call-debit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn",  data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>Analyzing...", toggle: "collapse"}  %>
+					                	<%= link_to "Bull Call Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "call-debit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn call-debit",  data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>Analyzing...", toggle: "collapse"}  %>
 	
 
-					                	<%= link_to "Bear Call Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "call-credit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>Analyzing...", toggle: "collapse"}  %>
+					                	<%= link_to "Bear Call Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "call-credit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn call-credit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>Analyzing...", toggle: "collapse"}  %>
 
 
 
-					                	<%= link_to "Bull Put Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "put-credit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>Analyzing...", toggle: "collapse"}  %>
+					                	<%= link_to "Bull Put Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "put-credit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn put-credit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>Analyzing...", toggle: "collapse"}  %>
 
 
 					                	
-					                	<%= link_to "Bear Put Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "put-debit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>Analyzing...", toggle: "collapse"}  %>
+					                	<%= link_to "Bear Put Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "put-debit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn put-debit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>Analyzing...", toggle: "collapse"}  %>
 					                </div>
 
-					            <br/><br/>
+					            <br/>
 			               		
 								    <div class="collapse multi-collapse" >
 								      <div class="card card-body" id="strategy_description_text">

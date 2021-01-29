@@ -2,9 +2,21 @@ var $table = $('#table_bs')
 var data = <%= raw json_escape(@spreads.to_json) %>;
 var strategy =  '<%= escape_javascript( @strategy ) %>'
 
-$("#strategy_description_text").html(strategy)
+//House Keeping
+$(".strategy-btn").removeClass("btn-primary").addClass( "btn-outline-primary" );
+$("." + strategy).removeClass( "btn-outline-primary" ).addClass( "btn-primary" );
 $('.collapse').collapse()
 $("#scenario_analysis_label").removeAttr('hidden')
+switch(strategy) {
+  case "call-debit":
+    $("#strategy_description_text").html("Bull Call or Call Debit spread is a bullish options trading strategy that involves buying a call option and simultaneously selling a call option that's further away from the long call with same expiration date.")
+    break;
+  case "call-credit":
+    $("#strategy_description_text").html("Bear Call or Call Credit spread is a bearish-neutral options trading strategy that involves selling a call option and simultaneously buying a call option that's further away from the short call with same expiration date.")
+    break;
+  default:
+    // code block
+} 
 
 $table.bootstrapTable('load', data)
 $table.removeAttr('hidden')
@@ -20,3 +32,4 @@ function visualizeROI(value, row, index) {
     ].join("")
   }
 
+//add function Bookmark

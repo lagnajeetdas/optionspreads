@@ -67,6 +67,9 @@ class StocksController < ApplicationController
         #Get expiry date of options with API
         options_e_dates = Optionexpirydates.new(@ticker.symbol)
         @expirydates_data = options_e_dates.e_dates
+
+        cached_optionchain_result(@ticker.symbol, @expirydates_data)
+        
       end
 
     rescue StandardError, NameError, NoMethodError, RuntimeError => e
@@ -230,6 +233,16 @@ class StocksController < ApplicationController
 
         end
       end
+  end
+
+  def cached_optionchain_result(symbol, expirydate)
+    Rails.cache.fetch([symbol, :cached_optionchain_result], expires_in: 15.minutes) do
+        # Only executed if the cache does not already have a value for this key
+        puts "Making API Call to get option chains..."
+        #Get option chains with API
+        _optionchains = Optionchains.new(symbol, expirydate)
+        @optionchains_data = _optionchains.chains
+    end
   end
 
   

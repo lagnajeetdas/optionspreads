@@ -72,7 +72,9 @@ class HomeController < ApplicationController
         #Get expiry date of options with API
         options_e_dates = Optionexpirydates.new(@ticker.symbol)
         @expirydates_data = options_e_dates.e_dates
-        
+
+        cached_optionchain_result(@ticker.symbol, @expirydates_data)
+       
       end
     rescue StandardError, NameError, NoMethodError, RuntimeError => e
       p "Rescued: #{e.inspect}"
@@ -160,11 +162,9 @@ class HomeController < ApplicationController
     symbol = params[:symbol]
     latest_price = params[:latest_price]
     expirydates_data = params[:expirydates_data]
+    optionchains_data = cached_optionchain_result(symbol, expirydates_data)
     @strategy = params[:strategy]
-
-    #Get option chains with API
-    _optionchains = Optionchains.new(symbol, expirydates_data)
-    optionchains_data = _optionchains.chains
+ 
     
     #calc spreads
     _spreads = Calculatespreads.new(optionchains_data, latest_price, symbol, expirydates_data, @strategy)
@@ -208,6 +208,16 @@ class HomeController < ApplicationController
     
     #get_roi_json(@_price_grid.to_json)
 
+  end
+
+  def cached_optionchain_result(symbol, expirydate)
+    Rails.cache.fetch([symbol, :cached_optionchain_result], expires_in: 15.minutes) do
+        # Only executed if the cache does not already have a value for this key
+        puts "Making API Call to get option chains..."
+        #Get option chains with API
+        _optionchains = Optionchains.new(symbol, expirydate)
+        @optionchains_data = _optionchains.chains
+    end
   end
 
 
