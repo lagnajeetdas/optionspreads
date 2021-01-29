@@ -28,7 +28,7 @@ class Blackscholesprocessor
 
 		#initialize days and price ranges
 		num_days_till_e_date = (Date.parse(@e_date) - Date.today).to_i
-		ceiling_price = ([@long_strike, @short_strike].max) * 1.2
+		ceiling_price = ([@long_strike, @short_strike, @quote].max) * 1.2
 		floor_price = ([@long_strike, @short_strike, @quote].min) * 0.8
 		step_price = 0.05 * (@quote).to_f
 		p = 0.0
@@ -59,11 +59,27 @@ class Blackscholesprocessor
 				s = s.round(2)
 				#option library gem calculator
 				@strikes.push(s)
-				buy_p = Option::Calculator.price_call( s, @long_strike, d_years, @interest, @iv, @dividend ) 
-				sell_p = Option::Calculator.price_call( s, @short_strike, d_years, @interest, @iv, @dividend ) 
+				if @strategy=="call-debit" or @strategy=="call-credit"
+					buy_p = Option::Calculator.price_call( s, @long_strike, d_years, @interest, @iv, @dividend ) 
+					sell_p = Option::Calculator.price_call( s, @short_strike, d_years, @interest, @iv, @dividend ) 
+				else
+					buy_p = Option::Calculator.price_put( s, @long_strike, d_years, @interest, @iv, @dividend ) 
+					sell_p = Option::Calculator.price_put( s, @short_strike, d_years, @interest, @iv, @dividend ) 
+				end
 				closing_p = (buy_p - sell_p) * 100
-				profit = (closing_p - @entry_cost).round(0)
-				profit_perc = ((profit/@entry_cost) * 100).round(2)
+
+				if @strategy=="call-debit" or @strategy=="put-debit"
+					profit = (closing_p - @entry_cost).round(0)
+					profit_perc = ((profit/@entry_cost) * 100).round(2)
+				elsif @strategy=="call-credit" or @strategy=="put-credit"
+					profit = (closing_p + (@entry_cost*-1)).round(0)
+					profit_perc = ((profit/(@entry_cost + ((@long_strike-@short_strike)*100))) * 100).round(2)
+					if @strategy == "put-credit"
+						profit_perc = ((profit/(@entry_cost + ((@short_strike-@long_strike)*100))) * 100).round(2)
+					end
+				end
+				
+				
 				buy_p = buy_p.round(2)
 				sell_p = sell_p.round(2)
 				upside_perc = (((s-@quote)/@quote)*100).round(1)

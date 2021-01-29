@@ -58,8 +58,8 @@ class Calculatespreads
 								#Check if option strikes array is not empty 
 								if 1==1 && !option_strikes_array.empty?
 									#find strike price closest to stock quote to set anchor
-									h = option_strikes_array.map(&:to_f).sort.group_by{|e| e <=> stock_latest_price.to_f}
-									if 1==1 && !h.empty?
+									p h = option_strikes_array.map(&:to_f).sort.group_by{|e| e <=> stock_latest_price.to_f}
+									if 1==1 && !h.empty? && !h[-1].nil?
 										anchor_strike = (h[-1].last || h[1].first)
 										strike_gap = h[-1].last - h[-1][-2]
 										
@@ -73,11 +73,11 @@ class Calculatespreads
 										
 										strike_gap_set.each do |sg|
 											#Create an anchor set array
-											if op_type=="call" && entry_type=="debit"
+											spread_type = op_type + "-" + entry_type
+											if spread_type == "call-debit" or spread_type == "put-credit" 
 												anchor_set =  (anchor_strike..anchor_strike* (1+ @anchor_range) ).step(sg).to_a 
-											elsif op_type=="call" && entry_type=="credit"
+											elsif spread_type == "call-credit" or spread_type == "put-debit" 
 												#reverse range step
-
 												anchor_set = (anchor_strike.to_i).downto(anchor_strike* (1- @anchor_range)).select.with_index { |x, idx| idx % sg.to_i == 0 }.each { |x|  } 
 												#anchor_set =  (anchor_strike..anchor_strike* (1- @anchor_range) ).step(sg).to_a 
 												#anchor_set =  (anchor_strike* (1- @anchor_range)..anchor_strike).step(sg).to_a.reverse 
@@ -101,9 +101,9 @@ class Calculatespreads
 
 												p buy_call_strike = anc_price 
 
-												if op_type=="call" && entry_type=="debit"
+												if spread_type == "call-debit" or spread_type == "put-credit"
 													p sell_call_strike = anc_price + sg
-												elsif op_type=="call" && entry_type=="credit"
+												elsif spread_type == "call-credit" or spread_type == "put-debit"
 													p sell_call_strike = anc_price - sg
 												end
 

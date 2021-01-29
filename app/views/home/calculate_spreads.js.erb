@@ -9,10 +9,16 @@ $('.collapse').collapse()
 $("#scenario_analysis_label").removeAttr('hidden')
 switch(strategy) {
   case "call-debit":
-    $("#strategy_description_text").html("Bull Call or Call Debit spread is a bullish options trading strategy that involves buying a call option and simultaneously selling a call option that's further away from the long call with same expiration date.")
+    $("#strategy_description_text").html("The Bull Call Spread is an options strategy involving the purchase of a Call with a lower strike and the selling of a Call with a higher strike.")
     break;
   case "call-credit":
-    $("#strategy_description_text").html("Bear Call or Call Credit spread is a bearish-neutral options trading strategy that involves selling a call option and simultaneously buying a call option that's further away from the short call with same expiration date.")
+    $("#strategy_description_text").html("The Bear Call Spread is an options strategy involving the purchase of a Call with a higher strike and the selling of a Call with a lower strike.")
+    break;
+  case "put-debit":
+    $("#strategy_description_text").html("The Bear Put Spread is an options strategy that involves the purchase of a Put Option with a higher strike and the selling of another Put Option with a lower strike.")
+    break;
+  case "put-credit":
+    $("#strategy_description_text").html("The Bull Put Spread is an options strategy that involves the purchase of a Put Option with a lower strike and the selling of another Put Option with a higher strike.")
     break;
   default:
     // code block
@@ -23,7 +29,7 @@ $table.removeAttr('hidden')
 
 
 function visualizeROI(value, row, index) {
-    var post_string = "dividend=0.0&e_date=" + row.expiry_date + "&entry_cost=" + row.entry_cost + "&long_iv=" + row.buy_contract_iv + "&long_strike=" + row.buy_strike + "&quote=" + row.quote + "&short_iv=" + row.sell_contract_iv + "&short_strike=" + row.sell_strike  + "&strategy=calldebitspread&symbol=" + row.underlying;
+    var post_string = "dividend=0.0&e_date=" + row.expiry_date + "&entry_cost=" + row.entry_cost + "&long_iv=" + row.buy_contract_iv + "&long_strike=" + row.buy_strike + "&quote=" + row.quote + "&short_iv=" + row.sell_contract_iv + "&short_strike=" + row.sell_strike  + "&strategy=" + strategy +  "&symbol=" + row.underlying;
 
     return [
     "<a class='roi_launch' data-remote='true' rel='nofollow' data-method='post' href='/roi_visualizer?" + post_string + "'>",

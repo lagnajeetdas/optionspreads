@@ -236,7 +236,7 @@ class StocksController < ApplicationController
   end
 
   def cached_optionchain_result(symbol, expirydate)
-    Rails.cache.fetch([symbol, :cached_optionchain_result], expires_in: 15.minutes) do
+    Rails.cache.fetch([symbol, :cached_optionchain_result], expires_in: 30.minutes) do
         # Only executed if the cache does not already have a value for this key
         puts "Making API Call to get option chains..."
         #Get option chains with API
