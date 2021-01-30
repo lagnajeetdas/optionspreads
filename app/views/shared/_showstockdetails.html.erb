@@ -39,22 +39,23 @@
 			            		<% end %>
 			            		<span class= "<%= ticker_pricechange_style %>" ><%= sprintf("%+g",number_with_precision((@ticker.change_percent), :precision => 2, :delimiter => ',')) %>%</span>
 
-			            		<!-- Buy Rating -->
-	                			<% reco = Array[] %>
-				                
-				                <% reco = @recommendations.select{ |r| r['symbol']==@ticker.symbol } %>
-				                <% if !reco.empty? %>
-				            		<span class="buy_rating_header">
-					            		
-						                
-						                
-											<%= (100 * ( ((reco[0]["buy"]) +  (reco[0]["strongbuy"])) / ( (reco[0]["buy"]) +  (reco[0]["strongbuy"]) +   (reco[0]["sell"]) +  (reco[0]["strongsell"]) +  (reco[0]["hold"]) ) )).round(1) %>% Buy 
-					            	</span>
-				                <% end %>
+			            		
 				            </div>
 				            <div class="price_details_header">
 				            	<span>
 				            		52 Wk Range: <%= @ticker.week52_low %> -  <%= @ticker.week52_high %> 
+				            	</span>
+
+				            	<span>
+				            		<% reco = Array[] %>
+				                
+					                <% reco = @recommendations.select{ |r| r['symbol']==@ticker.symbol } %>
+					                <% if !reco.empty? %>
+					            		<span>
+												&nbsp;&nbsp;<%= (100 * ( ((reco[0]["buy"]) +  (reco[0]["strongbuy"])) / ( (reco[0]["buy"]) +  (reco[0]["strongbuy"]) +   (reco[0]["sell"]) +  (reco[0]["strongsell"]) +  (reco[0]["hold"]) ) )).round(1) %>% Buy &nbsp;
+						            	</span>
+					                <% end %>
+
 				            	</span>
 				            	<br/>
 				            	<% if type=="show_from_watchlist" %>
