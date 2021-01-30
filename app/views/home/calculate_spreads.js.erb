@@ -7,22 +7,52 @@ $(".strategy-btn").removeClass("btn-primary").addClass( "btn-outline-primary" );
 $("." + strategy).removeClass( "btn-outline-primary" ).addClass( "btn-primary" );
 $('.collapse').collapse()
 $("#scenario_analysis_label").removeAttr('hidden')
+$table.bootstrapTable('updateColumnTitle', {
+        field: 'buy_strike',
+        title: 'Buy Strike'
+      })
+$table.bootstrapTable('updateColumnTitle', {
+        field: 'sell_strike',
+        title: 'Sell Strike'
+      })
 switch(strategy) {
   case "call-debit":
     $("#strategy_description_text").html("The Bull Call Spread is an options strategy involving the purchase of a Call with a lower strike and the selling of a Call with a higher strike.")
     break;
   case "call-credit":
     $("#strategy_description_text").html("The Bear Call Spread is an options strategy involving the purchase of a Call with a higher strike and the selling of a Call with a lower strike.")
+    $table.bootstrapTable('updateColumnTitle', {
+        field: 'entry_cost',
+        title: 'Cost (Cr.)'
+      })
     break;
   case "put-debit":
     $("#strategy_description_text").html("The Bear Put Spread is an options strategy that involves the purchase of a Put Option with a higher strike and the selling of another Put Option with a lower strike.")
     break;
   case "put-credit":
     $("#strategy_description_text").html("The Bull Put Spread is an options strategy that involves the purchase of a Put Option with a lower strike and the selling of another Put Option with a higher strike.")
+    $table.bootstrapTable('updateColumnTitle', {
+        field: 'entry_cost',
+        title: 'Cost (Cr.)'
+      })
+    break;
+  case "long-straddle":
+    $("#strategy_description_text").html("The Long Straddle is an options strategy involving the purchase of a Call and a Put option with the same strike.")
+    $table.bootstrapTable('updateColumnTitle', {
+        field: 'buy_strike',
+        title: 'Buy Call Str.'
+      })
+    $table.bootstrapTable('updateColumnTitle', {
+        field: 'sell_strike',
+        title: 'Buy Put Str.'
+      })
     break;
   default:
     // code block
 } 
+
+
+
 
 $table.bootstrapTable('load', data)
 $table.removeAttr('hidden')

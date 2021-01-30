@@ -164,10 +164,11 @@ class HomeController < ApplicationController
     expirydates_data = params[:expirydates_data]
     optionchains_data = cached_optionchain_result(symbol, expirydates_data)
     @strategy = params[:strategy]
+    @target = params[:target]
  
     
     #calc spreads
-    _spreads = Calculatespreads.new(optionchains_data, latest_price, symbol, expirydates_data, @strategy)
+    _spreads = Calculatespreads.new(optionchains_data, latest_price, symbol, expirydates_data, @strategy, @target)
     @spreads = _spreads.analysis_results
     
     respond_to do |format|
