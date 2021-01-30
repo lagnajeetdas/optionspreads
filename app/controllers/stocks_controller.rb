@@ -79,10 +79,7 @@ class StocksController < ApplicationController
     else
     ensure
     end
-
-
-
-      
+ 
   end
 
   # GET /stocks/new

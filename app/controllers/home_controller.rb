@@ -178,9 +178,7 @@ class HomeController < ApplicationController
   end
 
   def load_roi_visualizer
-
-
-    symbol = params[:symbol]
+   symbol = params[:symbol]
     quote = params[:quote]
     e_date = params[:e_date]
     long_iv = params[:long_iv]
@@ -200,7 +198,6 @@ class HomeController < ApplicationController
     @labeled_dates = (bs.labeled_dates_array)
     @current_quote = quote
 
-    
 
     respond_to do |format|
         format.js 
