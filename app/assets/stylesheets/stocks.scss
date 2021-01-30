@@ -179,3 +179,39 @@ table.roi th{
 {
   font-size: 12px;
 }
+
+
+
+
+
+
+.price_header{
+  font-size: 2rem;
+}
+.price_change_header{
+  padding-left: 10px;
+  font-size: 24px;
+}
+.positiveColor{
+  color: #00873c;
+}
+.negativeColor{
+  color: #eb0f29;
+}
+.buy_rating_header{
+  margin-left: 20px;
+  padding-left: 7px;
+  padding-right: 7px;
+  background: #f2f2f2;
+  border-radius: 40px;
+  height: 20px;
+  display: inline-flex;
+  font-size: 12px;
+  width: 60px;  
+}
+
+.price_details_header{
+  font-size: 10px;
+  color: gray;
+}
+

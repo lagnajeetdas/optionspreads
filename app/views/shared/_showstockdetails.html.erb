@@ -1,7 +1,7 @@
 <div class="container">
 
 	<div class="row">
-		<div class="col-md-10 offset-md-1">
+		<div class="col-md-12 offset-md-0">
 			<!--<div class="jumbotron jumbotron-fluid">-->
 			<div class="shadow p-3 mb-5 bg-white rounded">
 				<div class="container">
@@ -24,42 +24,53 @@
 								<% end %>
 							</div>
 							<br/><br/>
-			              	<img src="<%= @ticker_logo %>" class="img-thumbnail rounded float-right" >
-			                <strong><%=  @ticker.company_name %></strong><br/>
+			              	<img src="<%= @ticker_logo %>" class="img-thumbnail rounded float-right" style="max-height: 100px;" >
+			                <div class="company_header">
+				                <h5><%=  @ticker.company_name %> (<%= @ticker.symbol %>)</h5>
+			            	</div>
+
+			            	<div >
+			            		<span class="price_header"><strong><%= @ticker.latest_price %></strong></span>
+
+			            		<% if @ticker.change_percent>=0 %>
+			            			<% ticker_pricechange_style = "ticker_pricechange_style positiveColor" %>
+			            		<% else %>
+			            			<% ticker_pricechange_style = "ticker_pricechange_style negativeColor" %>
+			            		<% end %>
+			            		<span class= "<%= ticker_pricechange_style %>" ><%= sprintf("%+g",number_with_precision((@ticker.change_percent), :precision => 2, :delimiter => ',')) %>%</span>
+
+			            		<!-- Buy Rating -->
+	                			<% reco = Array[] %>
+				                
+				                <% reco = @recommendations.select{ |r| r['symbol']==@ticker.symbol } %>
+				                <% if !reco.empty? %>
+				            		<span class="buy_rating_header">
+					            		
+						                
+						                
+											<%= (100 * ( ((reco[0]["buy"]) +  (reco[0]["strongbuy"])) / ( (reco[0]["buy"]) +  (reco[0]["strongbuy"]) +   (reco[0]["sell"]) +  (reco[0]["strongsell"]) +  (reco[0]["hold"]) ) )).round(1) %>% &nbsp; (<%= ( (reco[0]["buy"]) +  (reco[0]["strongbuy"]) +   (reco[0]["sell"]) +  (reco[0]["strongsell"]) +  (reco[0]["hold"]) ).round %> Analyst Ratings) 
+					            	</span>
+				                <% end %>
+				            </div>
+				            <div class="price_details_header">
+				            	<span>
+				            		52 Wk Range: <%= @ticker.week52_low %> -  <%= @ticker.week52_high %> 
+				            	</span>
+				            	<br/>
+				            	<% if type=="show_from_watchlist" %>
+					                Target Price: <strong><span id="stock_target_price_view"><%= @stock.target_price_auto %></span></strong> &nbsp;
+					                <%= link_to '(Update Target)', targetprice_path(:symbol => @ticker.symbol), method: :post, :remote => true, data: {disable_with: raw("<i class='fa fa-cog fa-spin'></i> Updating...")} %><br/>
+					                <i><div id="targetprice_viz" >               
+		                			</div></i>
+	                			<% end %>
+
+				            </div>
 			                
-			                Ticker Symbol: <%= @ticker.symbol %><br/>
+
 			                
-			                Current Price: <strong><%= @ticker.latest_price %></strong><br/>	
-			                <% if type=="show_from_watchlist" %>
-			                Target Price: <strong><span id="stock_target_price_view"><%= @stock.target_price_auto %></span></strong> &nbsp;
-			                <%= link_to '(Update Target)', targetprice_path(:symbol => @ticker.symbol), method: :post, :remote => true, data: {disable_with: raw("<i class='fa fa-cog fa-spin'></i> Updating...")} %><br/>
-			                <i><div id="targetprice_viz" >               
-                			</div></i>
-                			<% end %>
 
                 			<br/>
 
-                			Buy Rating: 
-
-                			<!-- Buy Rating -->
-                			<% reco = Array[] %>
-			                
-			                <% reco = @recommendations.select{ |r| r['symbol']==@ticker.symbol } %>
-			                
-			                <% if !reco.empty? %>
-								<%= (100 * ( ((reco[0]["buy"]) +  (reco[0]["strongbuy"])) / ( (reco[0]["buy"]) +  (reco[0]["strongbuy"]) +   (reco[0]["sell"]) +  (reco[0]["strongsell"]) +  (reco[0]["hold"]) ) )).round(1) %>% &nbsp; (<%= ( (reco[0]["buy"]) +  (reco[0]["strongbuy"]) +   (reco[0]["sell"]) +  (reco[0]["strongsell"]) +  (reco[0]["hold"]) ).round %> Analyst Ratings) 
-			                <% else %>
-			                	N/A
-			                <% end %>
-			                <br/><br/>	
-			                
-
-			                Percent Change: <%= number_with_precision((@ticker.change_percent), :precision => 2, :delimiter => ',') %>%<br/>
-			                52 Week High: <%= @ticker.week52_high %> <br/>
-			                52 Week Low: <%= @ticker.week52_low %> <br/>
-
-			                
-			                <br/>
 
 			                <strong>Options Strategies </strong><br/>
 
