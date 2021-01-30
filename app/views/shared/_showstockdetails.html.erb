@@ -82,6 +82,9 @@
 
 					                	
 					                	<%= link_to "Bear Put Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "put-debit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn put-debit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>Analyzing...", toggle: "collapse"}  %>
+
+
+					                	
 					                </div>
 
 					            <br/>
