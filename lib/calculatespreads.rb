@@ -65,7 +65,7 @@ class Calculatespreads
 									#find strike price closest to stock quote to set anchor
 									h = option_strikes_array.map(&:to_f).sort.group_by{|e| e <=> stock_latest_price.to_f}
 									if 1==1 && !h.empty? && !h[-1].nil?
-										p anchor_strike = (h[-1].last || h[1].first)
+										anchor_strike = (h[-1].last || h[1].first)
 										strike_gap = h[-1].last - h[-1][-2]
 										
 										#Create a strike_gap set array
@@ -75,7 +75,7 @@ class Calculatespreads
 										strike_gap_set.push(strike_gap * 2)
 										strike_gap_set.push(strike_gap * 3)
 										strike_gap_set.push(strike_gap * 4)
-										p strike_gap_set
+										strike_gap_set
 										
 										strike_gap_set.each do |sg|
 											#Create an anchor set array
@@ -91,10 +91,10 @@ class Calculatespreads
 												#anchor_set = anchor_set.map(&:to_f).uniq
 											end
 
-											threshold = [7, anchor_set.length()].min
+											threshold = [6, anchor_set.length()].min
 
 											#Loop through each anchor price in anchor_set
-											p anchor_set
+											anchor_set
 											anchor_set.take(threshold).each do |anc_price|
 												
 												buy_contract_ask_price_call = -1
@@ -114,16 +114,16 @@ class Calculatespreads
 												entry_cost = -1
 
 
-												p buy_call_strike = anc_price
-												p buy_put_strike = anc_price 
+												buy_call_strike = anc_price
+												buy_put_strike = anc_price 
 
 												if strategy == "call-debit" or strategy == "put-credit"
-													p sell_call_strike = anc_price + sg
+													sell_call_strike = anc_price + sg
 												elsif strategy == "call-credit" or strategy == "put-debit"
-													p sell_call_strike = anc_price - sg
+													sell_call_strike = anc_price - sg
 												elsif strategy =="long-straddle" or strategy == "short-straddle"
-													p sell_call_strike = -1
-													p sell_put_strike = -1
+													sell_call_strike = -1
+													sell_put_strike = -1
 												end
 												
 
@@ -192,7 +192,7 @@ class Calculatespreads
 													if strategy == "call-debit" or strategy== "put-debit"
 														reward = (100.0 * sg.to_f) - risk.to_f
 													elsif strategy == "long-straddle"
-														p target
+														target
 														if target != -1 && !target.nil?
 															reward = (100*((target - buy_call_strike).to_i).abs).to_f - risk.to_f
 														else
