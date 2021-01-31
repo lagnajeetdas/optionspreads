@@ -122,7 +122,34 @@
 			                		<%= render 'shared/showoptionstrategies', expirydates_data: @expirydates_data, type: type, ticker: @ticker, baseurl_tradier: @baseurl_tradier, tradier_api_key: @tradier_api_key %>
 			                	<% end %>
 			                	<br/><br/>
-			                	<%= render 'shared/showstrategytable' %>
+
+
+			                	<!-- Nav tabs -->
+								<ul hidden class="nav nav-tabs" id="ScenarioTabs" role="tablist">
+								  <li class="nav-item" role="presentation">
+								    <a class="nav-link active" id="table-tab" data-toggle="tab" href="#table_content" role="tab" aria-controls="table_content" aria-selected="true">Table</a>
+								  </li>
+								  <li class="nav-item" role="presentation">
+								    <a class="nav-link" id="bubblchart-tab" data-toggle="tab" href="#bubblchart_content" role="tab" aria-controls="bubblchart_content" aria-selected="false">Chart</a>
+								  </li>
+								</ul>
+
+								<!-- Tab panes -->
+								<div class="tab-content">
+								  <div class="tab-pane active" id="table_content" role="tabpanel" aria-labelledby="table-tab">
+								  		<%= render 'shared/showstrategytable' %>
+								  </div>
+										<div class="tab-pane" id="bubblchart_content" role="tabpanel" aria-labelledby="bubblchart-tab">
+											<div class="row">
+												<div class="col-lg-8">
+													<canvas id="myChart"></canvas>
+												</div>
+												<div class="col-6 col-lg-4">
+											</div>
+										</div>
+										</div>
+								</div>
+
 
 							<% else %>
 								Options data unavailable.

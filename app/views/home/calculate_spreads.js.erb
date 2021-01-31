@@ -1,6 +1,9 @@
+function normalize_num(val, max, min) { return (val - min) / (max - min); }
+
 var $table = $('#table_bs')
 var data = <%= raw json_escape(@spreads.to_json) %>;
 var strategy =  '<%= escape_javascript( @strategy ) %>'
+var expirydates_data =  <%= raw json_escape(@expirydates_data.to_json) %>;
 
 //House Keeping
 $(".strategy-btn").removeClass("btn-primary").addClass( "btn-outline-primary" );
@@ -55,6 +58,7 @@ switch(strategy) {
 
 $table.bootstrapTable('load', data)
 $table.removeAttr('hidden')
+$("#ScenarioTabs").removeAttr('hidden')
 
 
 function visualizeROI(value, row, index) {
@@ -68,3 +72,145 @@ function visualizeROI(value, row, index) {
   }
 
 //add function Bookmark
+
+
+
+
+//Add Chart
+
+//Add Dataset
+
+var COLORS = [
+    '#4dc9f6',
+    '#f67019',
+    '#f53794',
+    '#537bc4',
+    '#acc236',
+    '#166a8f',
+    '#00a950',
+    '#58595b',
+    '#8549ba',
+    '#4dc9f6',
+    '#f67019',
+    '#f53794',
+    '#4dc9f6',
+    '#f67019',
+    '#f53794'
+  ];
+
+var bubbleChartData = {
+      animation: {
+        duration: 10000
+      },
+      datasets: []
+    };
+
+function addDatasetToChart(exp_date, metrics, dataset_count)
+{
+
+  var newDataset = {
+        label: String(exp_date),
+        backgroundColor: COLORS[Math.min(dataset_count,COLORS.length-1)],
+        borderColor: COLORS[Math.min(dataset_count,COLORS.length-1)],
+        borderWidth: 1,
+        data: []
+      };
+
+  var max_reward = Math.max.apply(Math, metrics.map(function(o) { return o.reward; }));
+  var min_reward = Math.min.apply(Math, metrics.map(function(o) { return o.reward; }));
+
+  for (var index = 0; index < metrics.length; index++) {
+
+      if(metrics[index].reward>0 && metrics[index].rr_ratio>0.5)
+      {
+        newDataset.data.push({
+          x: metrics[index].perc_change,
+          y: metrics[index].rr_ratio,
+          r: 10 * normalize_num(Math.abs(metrics[index].reward),max_reward,min_reward),
+          l1: metrics[index].buy_strike
+        });
+      }
+    }
+
+  return newDataset;
+}
+
+
+for(i=0;i<expirydates_data.length;i++)
+{
+  var filtered_data_expiry_date = data.filter(d => d.expiry_date == expirydates_data[i]);
+  
+  if(filtered_data_expiry_date.length>0)
+  {
+  bubbleChartData.datasets.push(addDatasetToChart(expirydates_data[i], filtered_data_expiry_date, i))
+  }
+}
+
+var chart_canvas = document.getElementById('myChart')
+var ctx = document.getElementById('myChart').getContext('2d');
+var chart = new Chart(ctx, {
+    // The type of chart we want to create
+    type: 'bubble',
+
+    // The data for our dataset
+    data: bubbleChartData,
+
+    // Configuration options go here
+    options: {
+          responsive: true,
+          title: {
+            display: true,
+            text: 'Winning Options Strategies',
+            fontColor: 'black',
+            fontSize: 14
+          },
+          tooltips: {
+            mode: 'point'
+          },
+          scales: {
+            yAxes: [{
+              scaleLabel: {
+                display: true,
+                labelString: 'R/R',
+                fontColor: 'black'
+              },
+              gridLines:{
+                lineWidth: .5
+              }
+            }],
+            xAxes: [{
+              scaleLabel: {
+                display: true,
+                labelString: '% change in underlying price',
+                fontColor: 'black'
+              },
+              gridLines:{
+                lineWidth: .5
+              }
+            }]
+          },
+          legend: {
+            labels: {
+                // This more specific font property overrides the global property
+                fontColor: 'black',
+                boxWidth: 20
+            }
+          } 
+        }
+});
+
+chart.update();
+
+chart_canvas.onclick = function(evt) {
+   var activePoint = chart.getElementAtEvent(evt)[0];
+   if (activePoint){
+     var data = activePoint._chart.data;
+     var datasetIndex = activePoint._datasetIndex;
+     var label = data.datasets[datasetIndex].label;
+     var value = data.datasets[datasetIndex].data[activePoint._index];
+     console.log(label, value);
+    }
+};
+
+
+
