@@ -30,9 +30,13 @@ switch(strategy) {
     break;
   case "put-debit":
     $("#strategy_description_text").html("The Bear Put Spread is an options strategy that involves the purchase of a Put Option with a higher strike and the selling of another Put Option with a lower strike.")
+    $(".l1_strike_label").html("Buy Put Strike");
+    $(".l2_strike_label").html("Sell Put Strike");
     break;
   case "put-credit":
     $("#strategy_description_text").html("The Bull Put Spread is an options strategy that involves the purchase of a Put Option with a lower strike and the selling of another Put Option with a higher strike.")
+    $(".l1_strike_label").html("Buy Put Strike");
+    $(".l2_strike_label").html("Sell Put Strike");
     $table.bootstrapTable('updateColumnTitle', {
         field: 'entry_cost',
         title: 'Cost (Cr.)'
@@ -66,7 +70,7 @@ function visualizeROI(value, row, index) {
 
     return [
     "<a class='roi_launch' data-remote='true' rel='nofollow' data-method='post' href='/roi_visualizer?" + post_string + "'>",
-      "<i class='fa fa-eye'></i>",
+      "<i class='fa fa-money'></i>",
       "</a>  ",
     ].join("")
   }
@@ -81,19 +85,19 @@ function visualizeROI(value, row, index) {
 //Add Dataset
 
 var COLORS = [
-    '#4dc9f6',
-    '#f67019',
-    '#f53794',
-    '#537bc4',
-    '#acc236',
-    '#166a8f',
-    '#00a950',
-    '#58595b',
-    '#8549ba',
-    '#4dc9f6',
-    '#f67019',
-    '#f53794',
-    '#4dc9f6',
+    '#032425',
+    '#5eb1bf',
+    '#075f5f',
+    '#a2d729',
+    '#b497d6',
+    '#3943b7',
+    '#7b7554',
+    '#69ddff',
+    '#521945',
+    '#824a5e',
+    '#824a5e',
+    '#94616c',
+    '#fa824c',
     '#f67019',
     '#f53794'
   ];
@@ -126,8 +130,17 @@ function addDatasetToChart(exp_date, metrics, dataset_count)
         newDataset.data.push({
           x: metrics[index].perc_change,
           y: metrics[index].rr_ratio,
-          r: 10 * normalize_num(Math.abs(metrics[index].reward),max_reward,min_reward),
-          l1: metrics[index].buy_strike
+          r: 15 * normalize_num(Math.abs(metrics[index].reward),max_reward,min_reward),
+          l1strike: metrics[index].buy_strike,
+          l2strike: metrics[index].sell_strike,
+          risk: metrics[index].risk,
+          reward: metrics[index].reward,
+          l1_iv: metrics[index].buy_contract_iv,
+          l2_iv: metrics[index].sell_contract_iv,
+          expiry_date: String(exp_date),
+          entry_cost: metrics[index].entry_cost,
+          quote: metrics[index].quote,
+          underlying: metrics[index].underlying
         });
       }
     }
@@ -160,9 +173,12 @@ var chart = new Chart(ctx, {
           responsive: true,
           title: {
             display: true,
-            text: 'Winning Options Strategies',
+            text: ['Y Axis: R/R | X Axis: % Change in Price', 'Size: Bubble sizes '],
             fontColor: 'black',
-            fontSize: 14
+            fontSize: 12,
+            fontStyle: 'normal',
+            position: 'top'
+
           },
           tooltips: {
             mode: 'point'
@@ -171,7 +187,7 @@ var chart = new Chart(ctx, {
             yAxes: [{
               scaleLabel: {
                 display: true,
-                labelString: 'R/R',
+                labelString: 'Reward to Risk (R/R) Ratio',
                 fontColor: 'black'
               },
               gridLines:{
@@ -208,7 +224,16 @@ chart_canvas.onclick = function(evt) {
      var datasetIndex = activePoint._datasetIndex;
      var label = data.datasets[datasetIndex].label;
      var value = data.datasets[datasetIndex].data[activePoint._index];
-     console.log(label, value);
+     
+     $(".contract-card").removeAttr("hidden");
+     $(".leg-1-strike").val(value.l1strike);
+     $(".leg-2-strike").val(value.l2strike);
+     $(".risk-input").val(value.risk);
+     $(".reward-input").val(value.reward);
+     $(".rr-input").val(value.y);
+     var post_string = "dividend=0.0&e_date=" + value.expiry_date + "&entry_cost=" + value.entry_cost + "&long_iv=" + value.l1_iv + "&long_strike=" + value.l1strike + "&quote=" + value.quote + "&short_iv=" + value.l2_iv + "&short_strike=" + value.l2strike  + "&strategy=" + strategy +  "&symbol=" + value.underlying;
+     $(".p_l_viz_btn").attr("href", '/roi_visualizer?' + post_string )
+
     }
 };
 

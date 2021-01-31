@@ -82,21 +82,21 @@
 
 			                		<div>
 					                
-					                	<%= link_to "Bull Call Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "call-debit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn call-debit",  data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>Analyzing...", toggle: "collapse"}  %>
+					                	<%= link_to "Bull Call Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "call-debit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn call-debit",  data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
 	
 
-					                	<%= link_to "Bear Call Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "call-credit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn call-credit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>Analyzing...", toggle: "collapse"}  %>
+					                	<%= link_to "Bear Call Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "call-credit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn call-credit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
 
 
 
-					                	<%= link_to "Bull Put Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "put-credit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn put-credit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>Analyzing...", toggle: "collapse"}  %>
+					                	<%= link_to "Bull Put Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "put-credit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn put-credit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
 
 
 					                	
-					                	<%= link_to "Bear Put Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "put-debit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn put-debit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>Analyzing...", toggle: "collapse"}  %>
+					                	<%= link_to "Bear Put Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "put-debit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn put-debit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
 
 					                <% if 1==2 %>
-					                	<%= link_to "Long Straddle", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "long-straddle", :target => -1), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn long-straddle", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>Analyzing...", toggle: "collapse"}  %>
+					                	<%= link_to "Long Straddle", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "long-straddle", :target => -1), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn long-straddle", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
 					                <% end %>
 
 
@@ -130,7 +130,7 @@
 								    <a class="nav-link active" id="table-tab" data-toggle="tab" href="#table_content" role="tab" aria-controls="table_content" aria-selected="true">Table</a>
 								  </li>
 								  <li class="nav-item" role="presentation">
-								    <a class="nav-link" id="bubblchart-tab" data-toggle="tab" href="#bubblchart_content" role="tab" aria-controls="bubblchart_content" aria-selected="false">Chart</a>
+								    <a class="nav-link" id="bubblchart-tab" data-toggle="tab" href="#bubblchart_content" role="tab" aria-controls="bubblchart_content" aria-selected="false">Chart (Beta)</a>
 								  </li>
 								</ul>
 
@@ -144,9 +144,52 @@
 												<div class="col-lg-8">
 													<canvas id="myChart"></canvas>
 												</div>
-												<div class="col-6 col-lg-4">
+												<div class="col-lg-4">
+													<br/><br/>
+													<div class="contract-card" hidden>
+													
+		  												Contract Details<br/><br/>		
+														<div class="row">
+														  	<div class="col">
+																
+																
+																<span class="l1_strike_label">Buy Call Strike</span>
+																
+																<input readonly type="text" class="form-control leg-1-strike" aria-label="Dollar amount (with dot and two decimal places)">
+															</div>
+														  	<div class="col">
+																
+																
+																<span class="l2_strike_label">Sell Call Strike</span>
+																
+																<input readonly type="text" class="form-control leg-2-strike" aria-label="Dollar amount (with dot and two decimal places)">
+
+															</div>
+														</div>
+														<div class="row">
+															<div class="col-6 col-md-4">
+																<span>Risk</span>
+																<input readonly type="text" class="form-control risk-input" aria-label="Dollar amount (with dot and two decimal places)">
+															</div>
+															<div class="col-6 col-md-4">
+																<span>Reward</span>
+																<input readonly type="text" class="form-control reward-input" aria-label="Dollar amount (with dot and two decimal places)">
+															</div>
+															<div class="col-6 col-md-4">
+																<span>R/R</span>
+																<input readonly type="text" class="form-control rr-input" aria-label="Dollar amount (with dot and two decimal places)">
+															</div>
+														</div>
+														<br/>
+														<div class="row">
+
+															<div class="col">
+																<a class="btn btn-sm strategy-btn btn-primary p_l_viz_btn" data-disable-with="<i class='fa fa-spinner fa-spin'></i>&nbsp;Loading..." data-toggle="collapse" data-remote="true" rel="nofollow" data-method="post" href="">View P/L</a>
+															</div>
+														</div>
+													</div>													
+												</div>
 											</div>
-										</div>
 										</div>
 								</div>
 
@@ -212,7 +255,7 @@
 	<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
 	  	<div class="modal-content">
 	      <div class="modal-header">
-	        <h5 class="modal-title" id="exampleModalLabel">Profit Visualizer</h5>
+	        <h5 class="modal-title" id="exampleModalLabel">💰💰💰 &nbsp;Profit & Loss Visualizer</h5>
 	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 	          <span aria-hidden="true">&times;</span>
 	        </button>
