@@ -70,7 +70,7 @@ function visualizeROI(value, row, index) {
 
     return [
     "<a class='roi_launch' data-remote='true' rel='nofollow' data-method='post' href='/roi_visualizer?" + post_string + "'>",
-      "<i class='fa fa-money'></i>",
+      "<i class='fa fa-eye'></i>",
       "</a>  ",
     ].join("")
   }
@@ -159,6 +159,8 @@ for(i=0;i<expirydates_data.length;i++)
   }
 }
 
+
+
 var chart_canvas = document.getElementById('myChart')
 var ctx = document.getElementById('myChart').getContext('2d');
 var chart = new Chart(ctx, {
@@ -171,9 +173,10 @@ var chart = new Chart(ctx, {
     // Configuration options go here
     options: {
           responsive: true,
+          maintainAspectRatio: false,
           title: {
             display: true,
-            text: ['Y Axis: R/R | X Axis: % Change in Price', 'Size: Bubble sizes '],
+            text: ['X Axis: % Change in Price  |   Y Axis: Reward/Risk Ratio' , 'Size: Profit '],
             fontColor: 'black',
             fontSize: 12,
             fontStyle: 'normal',
