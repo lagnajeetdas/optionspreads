@@ -1,7 +1,7 @@
 <div class="container">
 
 	<div class="row">
-		<div class="col-md-12 offset-md-0">
+		<div class="col-lg-12 offset-lg-0">
 			<!--<div class="jumbotron jumbotron-fluid">-->
 			<div class="shadow p-3 mb-5 bg-white rounded">
 				<div class="container">
@@ -15,8 +15,8 @@
 			            <% else %>
 			            	<div class="float-right">
 			            		<% if type=="show_from_watchlist" %>
-					              	<%= link_to 'Edit', edit_stock_path(@stock) %> | 
-									<%= link_to 'Delete', @stock, method: :delete, data: { confirm: 'Are you sure?' } %> | 
+					              	
+									<%= link_to 'Remove from Watchlist', @stock, method: :delete, data: { confirm: 'Are you sure?' } %> | 
 									<%= link_to 'Back', stocks_path %>
 								<% else %>
 									 <%= link_to 'Add to Watchlist', stocks_path("stock"=>{"ticker"=>@ticker.symbol, "user_id"=>@currentUser}), method: :post, data: {disable_with: raw("<i class='fa fa-cog fa-spin'></i> Adding and Recalculating...")} %> |
@@ -112,7 +112,7 @@
 								    </div>
 								<br/>
 
-								<span id="scenario_analysis_label" hidden>Winning Scenarios</span>
+								<span id="scenario_analysis_label" hidden><strong>Winning Scenarios</strong></span>
 
 
 
@@ -238,8 +238,8 @@
 
 
 					<% if type=="show_from_watchlist" %>
-		              	<%= link_to 'Edit', edit_stock_path(@stock) %> | 
-						<%= link_to 'Delete', @stock, method: :delete, data: { confirm: 'Are you sure?' } %> | 
+		              	
+						<%= link_to 'Remove from Watchlist', @stock, method: :delete, data: { confirm: 'Are you sure?' } %> | 
 						<%= link_to 'Back', stocks_path %>
 					<% else %>
 						

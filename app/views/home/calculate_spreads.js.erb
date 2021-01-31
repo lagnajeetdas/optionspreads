@@ -127,12 +127,18 @@ var bubbleChartData = {
 function addDatasetToChart(exp_date, metrics, dataset_count)
 {
 
+  var dataset_hidden = false;
+  if (dataset_count>5)
+    {
+      dataset_hidden=true
+    }
   var newDataset = {
         label: String(exp_date),
         backgroundColor: COLORS[Math.min(dataset_count,COLORS.length-1)],
         borderColor: COLORS[Math.min(dataset_count,COLORS.length-1)],
         borderWidth: 1,
-        data: []
+        data: [],
+        hidden: dataset_hidden
       };
 
   var max_reward = Math.max.apply(Math, metrics.map(function(o) { return o.reward; }));
@@ -224,8 +230,10 @@ var chart = new Chart(ctx, {
             }]
           },
           legend: {
+            display: true,
             labels: {
                 // This more specific font property overrides the global property
+                
                 fontColor: 'black',
                 boxWidth: 20
             }
