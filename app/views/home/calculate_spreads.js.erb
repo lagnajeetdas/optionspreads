@@ -11,6 +11,7 @@ $("." + strategy).removeClass( "btn-outline-primary" ).addClass( "btn-primary" )
 $("#scenario_analysis_label").removeAttr('hidden')
 $(".myBubbleChartHolder").empty();
 $(".contract-card").attr("hidden", true);
+$(".contract-info-expdate").html("");
 $table.bootstrapTable('updateColumnTitle', {
         field: 'buy_strike',
         title: 'Buy Strike'
@@ -100,11 +101,11 @@ $(".myBubbleChartHolder").append(canvas_html)
 //Add Dataset
 
 var COLORS = [
-    '#032425',
-    '#5eb1bf',
+    '#00b4d8',
+    '#0077b6',
     '#075f5f',
     '#a2d729',
-    '#b497d6',
+    '#ee6c4d',
     '#3943b7',
     '#7b7554',
     '#69ddff',
@@ -119,7 +120,7 @@ var COLORS = [
 
 var bubbleChartData = {
       animation: {
-        duration: 10000
+        duration: 50000
       },
       datasets: []
     };
@@ -241,7 +242,6 @@ var chart = new Chart(ctx, {
         }
 });
 
-chart.update();
 
 chart_canvas.onclick = function(evt) {
    var activePoint = chart.getElementAtEvent(evt)[0];
@@ -259,7 +259,9 @@ chart_canvas.onclick = function(evt) {
      $(".rr-input").val(value.y);
      var post_string = "dividend=0.0&e_date=" + value.expiry_date + "&entry_cost=" + value.entry_cost + "&long_iv=" + value.l1_iv + "&long_strike=" + value.l1strike + "&quote=" + value.quote + "&short_iv=" + value.l2_iv + "&short_strike=" + value.l2strike  + "&strategy=" + strategy +  "&symbol=" + value.underlying;
      $(".p_l_viz_btn").attr("href", '/roi_visualizer?' + post_string )
-
+     $(".contract-info-expdate").html(" expiring on " + value.expiry_date)
+     $(".contract-info-expdate").css('color', activePoint._model.backgroundColor);
+     
     }
 };
 
