@@ -167,10 +167,14 @@ class HomeController < ApplicationController
     optionchains_data = cached_optionchain_result(symbol, @expirydates_data)
     @strategy = params[:strategy]
     @target = params[:target]
+    jump = params[:jump]
+    #maxrisk = params[:maxrisk]
+    #minreturn = params[:minreturn]
+    #minrr = params[:minrr]
  
     
     #calc spreads
-    _spreads = Calculatespreads.new(optionchains_data, latest_price, symbol, @expirydates_data, @strategy, @target)
+    _spreads = Calculatespreads.new(optionchains_data, latest_price, symbol, @expirydates_data, @strategy, @target, jump)
     @spreads = _spreads.analysis_results
     
     respond_to do |format|

@@ -1,17 +1,30 @@
-function normalize_num(val, max, min) { return (val - min) / (max - min); }
-
 var $table = $('#table_bs')
 var data = <%= raw json_escape(@spreads.to_json) %>;
 var strategy =  '<%= escape_javascript( @strategy ) %>'
 var expirydates_data =  <%= raw json_escape(@expirydates_data.to_json) %>;
 
+
+function normalize_num(val, max, min) { return (val - min) / (max - min); }
+
+function AddStrategyToUpdateFilter(strategy)
+{
+  var _href = ($("#update_scenario_btn").attr('href'));
+  var new_href = _href.replace(/strategy=[a-z0-9!$*\-]*/, "" )
+  new_href = new_href + "&strategy=" + strategy
+  $("#update_scenario_btn").attr('href',new_href)
+}
+
 //House Keeping
 $(".strategy-btn").removeClass("btn-primary").addClass( "btn-outline-primary" );
 $("." + strategy).removeClass( "btn-outline-primary" ).addClass( "btn-primary" );
-$("#scenario_analysis_label").removeAttr('hidden')
+$(".scenario").removeAttr('hidden')
 $(".myBubbleChartHolder").empty();
 $(".contract-card").attr("hidden", true);
 $(".contract-info-expdate").html("");
+$("#update_scenario_btn").data('strategy',strategy); //set data attribute of update filter btn
+
+AddStrategyToUpdateFilter(strategy);
+
 $table.bootstrapTable('updateColumnTitle', {
         field: 'buy_strike',
         title: 'Buy Strike'
@@ -76,7 +89,7 @@ switch(strategy) {
 
 $table.bootstrapTable('load', data)
 $table.removeAttr('hidden')
-$("#ScenarioTabs").removeAttr('hidden')
+
 
 
 function visualizeROI(value, row, index) {
@@ -129,7 +142,7 @@ function addDatasetToChart(exp_date, metrics, dataset_count)
 {
 
   var dataset_hidden = false;
-  if (dataset_count>5)
+  if (dataset_count>1)
     {
       dataset_hidden=true
     }
@@ -264,6 +277,14 @@ chart_canvas.onclick = function(evt) {
      
     }
 };
+
+
+
+//Slider
+
+
+
+
 
 
 

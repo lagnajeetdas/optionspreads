@@ -16,11 +16,11 @@ class Filtermainexpirydates
 
 		@e_dates.each do |e|
 
-			p e.to_s
+			#p e.to_s
 			if expirycalendars.include? e.to_s
 
 				@e_dates_new.push(e.to_s)
-				p "Added " + e.to_s
+				#p "Added " + e.to_s
 			end
 		end
 

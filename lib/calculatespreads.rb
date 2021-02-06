@@ -1,13 +1,13 @@
 class Calculatespreads
 	
-	def initialize(optionchain, quote, symbol, e_dates, strategy, target)
+	def initialize(optionchain, quote, symbol, e_dates, strategy, target, jump)
 		@quote = quote.to_f
 		@symbol = symbol
 		@optionchain = optionchain
 		@e_dates = e_dates
 		@optionscenario_import = Array[] 
 		@strategy = strategy
-		@anchor_range = 0.3
+		@anchor_range = (jump.to_f)/100
 		@target = target.to_f
 
 		case @strategy
@@ -215,15 +215,18 @@ class Calculatespreads
 
 												if strategy == "call-debit" or strategy == "put-credit" or strategy == "call-credit" or strategy == "put-debit"
 													perc_change = 100*((sell_call_strike.to_f - stock_latest_price)/stock_latest_price)
-													@optionscenario_import.push({underlying: @symbol, expiry_date: e_date, buy_strike: buy_call_strike, sell_strike: sell_call_strike, risk: risk.round(1), reward: reward.round(1), rr_ratio: rr_ratio.round(1), perc_change: perc_change.round(1), buy_contract_symbol: buy_contract_symbol_call, sell_contract_symbol: sell_contract_symbol_call, buy_contract_iv: buy_contract_iv_call , sell_contract_iv: sell_contract_iv_call, quote: stock_latest_price, entry_cost: entry_cost.round(1) })
+													if perc_change.abs<(@anchor_range*100)
+														@optionscenario_import.push({underlying: @symbol, expiry_date: e_date, buy_strike: buy_call_strike, sell_strike: sell_call_strike, risk: risk.round(1), reward: reward.round(1), rr_ratio: rr_ratio.round(1), perc_change: perc_change.round(1), buy_contract_symbol: buy_contract_symbol_call, sell_contract_symbol: sell_contract_symbol_call, buy_contract_iv: buy_contract_iv_call , sell_contract_iv: sell_contract_iv_call, quote: stock_latest_price, entry_cost: entry_cost.round(1) })
+													end
 												elsif strategy== "long-straddle"
 													if target != -1 && !target.nil?
 														perc_change = 100*((target.to_f - stock_latest_price)/stock_latest_price)
 													else
 														perc_change = Float::INFINITY
 													end
+													
 													@optionscenario_import.push({underlying: @symbol, expiry_date: e_date, buy_strike: buy_call_strike, sell_strike: buy_put_strike, risk: risk.round(1), reward: reward.round(1), rr_ratio: rr_ratio.round(1), perc_change: perc_change.round(1), buy_contract_symbol: buy_contract_symbol_call, sell_contract_symbol: buy_contract_symbol_put, buy_contract_iv: buy_contract_iv_call , sell_contract_iv: buy_contract_iv_put, quote: stock_latest_price, entry_cost: entry_cost.round(1) })
-											
+													
 													 
 												end
 											end

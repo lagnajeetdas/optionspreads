@@ -175,6 +175,11 @@ table.roi th{
   margin-top: 5px;
 }
 
+.p_l_viz_btn
+{
+  margin-top: 5px;
+}
+
 #table_bs
 {
   font-size: 12px;
@@ -226,3 +231,24 @@ table.roi th{
   font-size: 14px;
 }
 
+
+
+
+.scenario_filters{
+  background: beige;
+  padding: 15px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+.scenario_analysis_label{
+  font-size: 10px;
+}
+.scenario_filters_headers{
+  font-size: 10px;
+}
+
+#price_jump_range_text{
+  max-width: 35px;
+  font-size: 14px;
+  text-align: center;
+}

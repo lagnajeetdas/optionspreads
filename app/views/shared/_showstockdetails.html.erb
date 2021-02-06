@@ -82,18 +82,18 @@
 
 			                		<div>
 					                
-					                	<%= link_to "Bull Call Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "call-debit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn call-debit",  data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
+					                	<%= link_to "Bull Call Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "call-debit", :jump => 30.0), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn call-debit",  data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
 	
 
-					                	<%= link_to "Bear Call Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "call-credit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn call-credit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
+					                	<%= link_to "Bear Call Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "call-credit", :jump => 30.0), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn call-credit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
 
 
 
-					                	<%= link_to "Bull Put Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "put-credit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn put-credit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
+					                	<%= link_to "Bull Put Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "put-credit", :jump => 30.0), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn put-credit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
 
 
 					                	
-					                	<%= link_to "Bear Put Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "put-debit"), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn put-debit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
+					                	<%= link_to "Bear Put Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "put-debit", :jump => 30.0), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn put-debit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
 
 					                <% if 1==2 %>
 					                	<%= link_to "Long Straddle", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "long-straddle", :target => -1), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn long-straddle", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
@@ -112,7 +112,8 @@
 								    </div>
 								<br/>
 
-								<span id="scenario_analysis_label" hidden><strong>Risk & Rewards of Winning Scenarios</strong></span>
+								<span class="scenario" id="scenario_analysis_label" hidden><strong>Risk & Rewards of Winning Scenarios</strong></span>
+								<span class="scenario" style="float: right;" hidden><button id="toggle_filter_btn" class="btn btn-sm btn-outline-primary" data-disable-with="<i class='fa fa-spinner fa-spin'></i>&nbsp;Loading..."><i class='fa fa-sliders'></i>&nbsp;Configure</button></span>
 
 
 
@@ -123,9 +124,32 @@
 			                	<% end %>
 			                	<br/><br/>
 
+			                	<div hidden class="scenario_filters">
+
+				                	<label class="scenario_filters_headers" for="price_jump_range_slider">Max Price Jump %</label>
+				                	<div class="row">
+				                		<div class="col-lg-6 col-sm-6 col-xs-8">
+				                			
+											<input type="range" class="custom-range" min="0" max="100" step="0.5" value="30" id="price_jump_range_slider" onchange="updateTextInput(this.value);" >
+										</div>
+										<div class="col-lg-3 col-sm-6 col-xs-4" >
+											+/- &nbsp;<input for="price_jump_range_slider" type="text" id="price_jump_range_text" value="30" onchange="updateSliderInput(this.value);">&nbsp;%
+											
+										</div>
+										<div class="col-lg-3">
+											<%= link_to "Update Scenarios", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "", :jump => 0.30), method: :post, :remote => true, class: "",  data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Calculating...", toggle: "collapse"}, id: "update_scenario_btn"  %>
+										</div>
+										
+											
+										
+										
+									</div>
+								</div>
+
+								
 
 			                	<!-- Nav tabs -->
-								<ul hidden class="nav nav-tabs" id="ScenarioTabs" role="tablist">
+								<ul hidden class="nav nav-tabs scenario" id="ScenarioTabs" role="tablist">
 								  <li class="nav-item" role="presentation">
 								    <a class="nav-link active" id="table-tab" data-toggle="tab" href="#table_content" role="tab" aria-controls="table_content" aria-selected="true">Table</a>
 								  </li>
@@ -192,7 +216,7 @@
 														<div class="row">
 
 															<div class="col">
-																<a class="btn btn-sm strategy-btn btn-primary p_l_viz_btn" data-disable-with="<i class='fa fa-spinner fa-spin'></i>&nbsp;Loading..." data-toggle="collapse" data-remote="true" rel="nofollow" data-method="post" href="">View P/L</a>
+																<a class="btn btn-sm btn-outline-primary p_l_viz_btn" data-disable-with="<i class='fa fa-spinner fa-spin'></i>&nbsp;Loading..." data-toggle="collapse" data-remote="true" rel="nofollow" data-method="post" href="">View P/L</a>
 															</div>
 														</div>
 													</div>													
@@ -290,10 +314,50 @@
 
 		$( document ).ready(function() {
 			console.log("ready");
+			$(".scenario_filters").hide();
+
 			
 		});
    
 	};
+
+	function updateTextInput(val) {
+	          document.getElementById('price_jump_range_text').value=val;
+	          updateQuery("jump", val)
+	        }
+
+	function updateSliderInput(val) {
+	          document.getElementById('price_jump_range_slider').value=val; 
+	          console.log($(".strategy-btn").attr('href'));
+	          updateQuery("jump", val)
+	        }
+
+	function updateQuery(attribute, val){
+		$( ".strategy-btn, #update_scenario_btn" ).each(function() {
+			var _href = ($(this).attr('href'));
+			
+			if(attribute=="jump") {var new_href = _href.replace(/\&jump=\d*\.?\d*/, "&" + attribute + "=" + val )}
+
+			if(attribute=="maxrisk") {var new_href = _href.replace(/\&maxrisk=\d*\.?\d*/, "&" + attribute + "=" + val )}
+
+			if(attribute=="minreturn") {var new_href = _href.replace(/\&minreturn=\d*\.?\d*/, "&" + attribute + "=" + val )}
+
+			if(attribute=="minrr") {var new_href = _href.replace(/\&minrr=\d*\.?\d*/, "&" + attribute + "=" + val )}
+
+		  		
+		  	$( this ).attr('href',new_href)
+		});
+		
+		
+		
+	}
+
+	$("#toggle_filter_btn").click(function() {
+			console.log("clicked");
+			$(".scenario_filters").removeAttr('hidden')
+		 	$(".scenario_filters").toggle();
+
+		});
    
  </script>
 
