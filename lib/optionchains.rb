@@ -1,13 +1,18 @@
 class Optionchains
 	require 'httparty'
     require 'json'
+    require 'filtermainexpirydates'
 	
 	def initialize(symbol, e_dates)
 		@symbol = symbol
-		@e_dates = e_dates
+		
 		@optionchain_import = Array[]
 		@baseurl_tradier = ENV['baseurl_tradier']
 		@tradier_api_key = ENV['tradier_api_key']
+
+		
+		@e_dates = e_dates
+		
 
 		if @e_dates.kind_of?(Array)
 			@e_dates.each do |item|

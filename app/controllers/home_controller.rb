@@ -8,10 +8,9 @@ class HomeController < ApplicationController
   require 'optionexpirydates'
   require 'optionchains'
   require 'calculatespreads'
-  require 'filtermainexpirydates'
 
   def index
-    fed = Filtermainexpirydates.new
+    
 
   	@api = StockQuote::Stock.new(api_key: 'pk_34bbabe4cf054befa331a42b695e75b2')
     @tradier_api_key = ENV['tradier_api_key']
