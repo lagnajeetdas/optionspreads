@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_09_122612) do
+ActiveRecord::Schema.define(version: 2021_02_06_142052) do
 
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer "priority", default: 0, null: false
@@ -25,6 +25,13 @@ ActiveRecord::Schema.define(version: 2021_01_09_122612) do
     t.datetime "created_at", precision: 6
     t.datetime "updated_at", precision: 6
     t.index ["priority", "run_at"], name: "delayed_jobs_priority"
+  end
+
+  create_table "expirycalendars", force: :cascade do |t|
+    t.string "year"
+    t.string "expiry_date"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "optionbookmarks", force: :cascade do |t|

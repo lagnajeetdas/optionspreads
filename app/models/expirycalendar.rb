@@ -1,0 +1,2 @@
+class Expirycalendar < ApplicationRecord
+end
