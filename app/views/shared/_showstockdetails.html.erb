@@ -143,16 +143,16 @@
 									
 				                	<div class="row">
 			                			
-										<div class="col-md-2 col-4" >
+										<div class="col-md-2 col-6" >
 											<label class="scenario_filters_headers" for="maxrisk_input">Max Risk ($)</label><br/>
 											<input type="number" id="maxrisk_input" value="5000" onchange="updateQuery('maxrisk', this.value);" class="filter_input_text_large">&nbsp;
 											
 										</div>
-										<div class="col-md-2 col-4" >
+										<div class="col-md-2 col-6" >
 											<label class="scenario_filters_headers" for="minreturn_input">Min Reward ($)</label><br/>
 											<input type="number" id="minreturn_input" value="100" onchange="updateQuery('minreward', this.value);" class="filter_input_text_large">&nbsp;
 										</div>
-										<div class="col-md-2 col-4">
+										<div class="col-md-2">
 											<br/>
 											<%= link_to "Update", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "", :jump => 0.20, :maxrisk => 5000, :minreward => 100, :minrr => 0.1), method: :post, :remote => true, class: "btn btn-sm btn-outline-primary",  data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Calculating...", toggle: "collapse"}, id: "update_scenario_btn"  %>
 										</div>
