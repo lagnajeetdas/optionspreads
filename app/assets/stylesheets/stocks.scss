@@ -247,8 +247,14 @@ table.roi th{
   font-size: 10px;
 }
 
-#price_jump_range_text{
-  max-width: 35px;
+.filter_input_text{
+  max-width: 37px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.filter_input_text_large{
+  max-width: 60px;
   font-size: 14px;
   text-align: center;
 }

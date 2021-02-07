@@ -168,13 +168,13 @@ class HomeController < ApplicationController
     @strategy = params[:strategy]
     @target = params[:target]
     jump = params[:jump]
-    #maxrisk = params[:maxrisk]
-    #minreturn = params[:minreturn]
-    #minrr = params[:minrr]
+    maxrisk = params[:maxrisk]
+    minreward = params[:minreward]
+    minrr = params[:minrr]
  
     
     #calc spreads
-    _spreads = Calculatespreads.new(optionchains_data, latest_price, symbol, @expirydates_data, @strategy, @target, jump)
+    _spreads = Calculatespreads.new(optionchains_data, latest_price, symbol, @expirydates_data, @strategy, @target, jump, maxrisk, minreward, minrr)
     @spreads = _spreads.analysis_results
     
     respond_to do |format|

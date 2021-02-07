@@ -82,18 +82,18 @@
 
 			                		<div>
 					                
-					                	<%= link_to "Bull Call Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "call-debit", :jump => 20.0), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn call-debit",  data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
+					                	<%= link_to "Bull Call Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "call-debit", :jump => 20.0, :maxrisk => 5000, :minreward => 100, :minrr => 0.1), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn call-debit",  data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
 	
 
-					                	<%= link_to "Bear Call Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "call-credit", :jump => 20.0), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn call-credit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
+					                	<%= link_to "Bear Call Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "call-credit", :jump => 20.0, :maxrisk => 5000, :minreward => 100, :minrr => 0.1), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn call-credit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
 
 
 
-					                	<%= link_to "Bull Put Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "put-credit", :jump => 20.0), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn put-credit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
+					                	<%= link_to "Bull Put Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "put-credit", :jump => 20.0, :maxrisk => 5000, :minreward => 100, :minrr => 0.1), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn put-credit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
 
 
 					                	
-					                	<%= link_to "Bear Put Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "put-debit", :jump => 20.0), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn put-debit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
+					                	<%= link_to "Bear Put Spreads", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "put-debit", :jump => 20.0, :maxrisk => 5000, :minreward => 100, :minrr => 0.1), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn put-debit", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
 
 					                <% if 1==2 %>
 					                	<%= link_to "Long Straddle", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "long-straddle", :target => -1), method: :post, :remote => true, class: "btn btn-outline-primary btn-sm strategy-btn long-straddle", data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Analyzing...", toggle: "collapse"}  %>
@@ -126,24 +126,39 @@
 
 			                	<div hidden class="scenario_filters">
 
-				                	<label class="scenario_filters_headers" for="price_jump_range_slider">Max Price Jump %</label>
+				                	
 				                	<div class="row">
-				                		<div class="col-lg-6 col-sm-6 col-xs-8">
-				                			
+				                		
+				                		<div class="col-lg-4 col-sm-6 col-7">
+				                			<label class="scenario_filters_headers" for="price_jump_range_slider">Max Price Jump %</label>
 											<input type="range" class="custom-range" min="0" max="100" step="0.5" value="20" id="price_jump_range_slider" onchange="updateTextInput(this.value);" >
 										</div>
-										<div class="col-lg-3 col-sm-6 col-xs-4" >
-											+/- &nbsp;<input for="price_jump_range_slider" type="text" id="price_jump_range_text" value="20" onchange="updateSliderInput(this.value);">&nbsp;%
+										<div class="col-lg-2 col-sm-6 col-5" >
+											<label></label><br/>
+											+/- &nbsp;<input for="price_jump_range_slider" type="text" id="price_jump_range_text" class="filter_input_text" value="20" onchange="updateSliderInput(this.value);">&nbsp;%
 											
 										</div>
-										<div class="col-lg-3">
-											<%= link_to "Update Scenarios", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "", :jump => 0.20), method: :post, :remote => true, class: "",  data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Calculating...", toggle: "collapse"}, id: "update_scenario_btn"  %>
-										</div>
-										
-											
-										
-										
 									</div>
+
+									
+				                	<div class="row">
+			                			
+										<div class="col-md-2 col-4" >
+											<label class="scenario_filters_headers" for="maxrisk_input">Max Risk ($)</label><br/>
+											<input type="number" id="maxrisk_input" value="5000" onchange="updateQuery('maxrisk', this.value);" class="filter_input_text_large">&nbsp;
+											
+										</div>
+										<div class="col-md-2 col-4" >
+											<label class="scenario_filters_headers" for="minreturn_input">Min Reward ($)</label><br/>
+											<input type="number" id="minreturn_input" value="100" onchange="updateQuery('minreward', this.value);" class="filter_input_text_large">&nbsp;
+										</div>
+										<div class="col-md-2 col-4">
+											<br/>
+											<%= link_to "Update", calc_spreads_path( :expirydates_data => @expirydates_data, :symbol => @ticker.symbol, :latest_price => @ticker.latest_price, :strategy => "", :jump => 0.20, :maxrisk => 5000, :minreward => 100, :minrr => 0.1), method: :post, :remote => true, class: "btn btn-sm btn-outline-primary",  data: {disable_with: "<i class='fa fa-spinner fa-spin'></i>&nbsp;Calculating...", toggle: "collapse"}, id: "update_scenario_btn"  %>
+										</div>
+
+									</div>
+									
 								</div>
 
 								
@@ -339,7 +354,7 @@
 
 			if(attribute=="maxrisk") {var new_href = _href.replace(/\&maxrisk=\d*\.?\d*/, "&" + attribute + "=" + val )}
 
-			if(attribute=="minreturn") {var new_href = _href.replace(/\&minreturn=\d*\.?\d*/, "&" + attribute + "=" + val )}
+			if(attribute=="minreward") {var new_href = _href.replace(/\&minreward=\d*\.?\d*/, "&" + attribute + "=" + val )}
 
 			if(attribute=="minrr") {var new_href = _href.replace(/\&minrr=\d*\.?\d*/, "&" + attribute + "=" + val )}
 
