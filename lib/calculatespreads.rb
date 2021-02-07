@@ -7,13 +7,16 @@ class Calculatespreads
 		@e_dates = e_dates
 		@optionscenario_import = Array[] 
 		@strategy = strategy
-		@anchor_range = (jump.to_f)/100
 		@target = target.to_f
-		@maxrisk = maxrisk.to_f
-		@minreward = minreward.to_f
-		@minrr = minrr.to_f
 		@max_number_anchors = 10
 
+
+		@anchor_range = ((jump.to_f) if !jump.empty?) || 30.0
+		@maxrisk = (maxrisk.to_f if !maxrisk.empty?) || 5000
+		@minreward = (minreward.to_f if !minreward.empty?) || 100
+		@minrr = (minrr.to_f if !minrr.empty?) || 0.1
+
+		@anchor_range = @anchor_range/100
 		case @strategy
 		  	when "call-debit"
 				compute_spreads("call", "debit", "call-debit")
