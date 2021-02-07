@@ -1,0 +1,2 @@
+class Optiondownloadlog < ApplicationRecord
+end

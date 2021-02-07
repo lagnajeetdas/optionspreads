@@ -12,6 +12,7 @@ class HomeController < ApplicationController
   def index
     
     #test jobs on load
+    #StockquoteDownloadJob.perform_later("delete_all_options")
     #OptionsGetterJob.perform_later("get")
 
 

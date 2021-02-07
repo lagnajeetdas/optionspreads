@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  activity: MyString
+  execution_time: 2021-02-07 21:25:56
+  count: 1
+
+two:
+  activity: MyString
+  execution_time: 2021-02-07 21:25:56
+  count: 1

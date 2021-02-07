@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_06_142052) do
+ActiveRecord::Schema.define(version: 2021_02_07_203015) do
 
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer "priority", default: 0, null: false
@@ -72,6 +72,15 @@ ActiveRecord::Schema.define(version: 2021_02_06_142052) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["universe_id"], name: "index_optionchains_on_universe_id"
+  end
+
+  create_table "optiondownloadlogs", force: :cascade do |t|
+    t.string "activity"
+    t.datetime "execution_time"
+    t.integer "count"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "function_name"
   end
 
   create_table "optionhighopeninterests", force: :cascade do |t|
