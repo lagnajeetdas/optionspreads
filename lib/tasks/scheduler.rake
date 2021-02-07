@@ -23,6 +23,12 @@ task :download_optionchains => :environment do
   puts "done."
 end
 
+task :get_option_chains_entire_universe => :environment do
+  puts "Getting option chains from tradier for universe..."
+    OptionsGetterJob.perform_later("get")
+  puts "done."
+end
+
 
 task :download_stock_quotes => :environment do
   puts "Download stock quotes from tradier and saving to DB..."

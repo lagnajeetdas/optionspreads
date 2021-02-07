@@ -5,6 +5,7 @@ class Filtermainexpirydates
 	def initialize(e_dates)
 		@e_dates = e_dates
 		@e_dates_new = Array []
+
 		#filldates
 		filter_main_expiry_dates
 	end
@@ -23,6 +24,10 @@ class Filtermainexpirydates
 				#p "Added " + e.to_s
 			end
 		end
+
+		#if !@limit.empty?
+		#	@e_dates_new = @e_dates_new.take([@limit, @e_dates_new.length()].min)
+		#end
 
 	end
 

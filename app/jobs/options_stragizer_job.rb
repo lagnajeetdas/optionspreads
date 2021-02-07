@@ -1,10 +1,10 @@
 class OptionsStragizerJob < ApplicationJob
-   
+
 	
   def perform(service_name)
 	    # Do something later
-	    @tradier_api_key = "iBjlJhQDEEBh4FIawWLCRyUJAgaP"
-	    @baseurl_tradier = "https://sandbox.tradier.com/v1/markets/" # /options/expirations"
+	    @tradier_api_key = ENV['tradier_api_key']
+    	@baseurl_tradier = ENV['baseurl_tradier'] # /options/expirations"
 
 	    #get_option_expirydates(ticker: symbol)
 		universes = Universe.pluck(:displaysymbol)
