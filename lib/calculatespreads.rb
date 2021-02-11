@@ -81,6 +81,8 @@ class Calculatespreads
 										strike_gap_set.push(strike_gap)
 										strike_gap_set.push(strike_gap * 2)
 										strike_gap_set.push(strike_gap * 3)
+										
+
 										if strike_gap<=10
 											strike_gap_set.push(strike_gap * 4)
 											strike_gap_set.push(strike_gap * 5)

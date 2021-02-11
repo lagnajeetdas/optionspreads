@@ -51,6 +51,23 @@
       <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
       <button class="btn btn-dark my-2 my-sm-0" type="submit">Search</button>
     </form>-->
+
+    <% unless ["search", "home","index"].include?(params[:action]) %>
+      <%= form_tag root_path, :method => 'POST', id: "search-form-universal" do %>
+                <div class="input-group" id= "search-data-universal" class="form-search search-data">
+                  
+                    <%= text_field_tag 'ticker', nil, placeholder: "Search", class: "form-control search-input" %>
+
+
+                  
+                  <div class="input-group-append">
+                    <%= button_tag fa_icon("search"), class: "btn btn-outline-success", data: {disable_with: raw("<i class='fa fa-spinner fa-spin'></i>")} %>
+                  </div>
+                </div>
+
+
+      <% end %>
+    <% end %>
   </div>
 </nav>
 
