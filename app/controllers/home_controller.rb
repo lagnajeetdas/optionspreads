@@ -8,6 +8,7 @@ class HomeController < ApplicationController
   require 'optionexpirydates'
   require 'optionchains'
   require 'calculatespreads'
+  require 'logusersearch'
 
   def index
     
@@ -30,7 +31,20 @@ class HomeController < ApplicationController
       _symbol = params[:ticker]
       _symbol = _symbol.upcase
       _symbol = _symbol.strip
-    	begin
+      
+      begin 
+        if current_user
+          usersearch = Logusersearch.new(_symbol, current_user.email)
+
+        else
+          usersearch = Logusersearch.new(_symbol, "")
+
+        end
+      rescue StandardError, NameError, NoMethodError, RuntimeError => e
+          p "Rescued: #{e.inspect}"
+      end
+    	
+      begin
   		    #_stock = StockQuote::Stock.quote(_symbol) # to validate if stock symbol is valid
           #if _stock
 
