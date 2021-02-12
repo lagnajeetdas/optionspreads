@@ -146,7 +146,7 @@ class OptionsGetterJob < ApplicationJob
 					##Store Spreads Scenarios in an temp variable scenario_import
 					if !ar.empty? 
 						ar.each do |scenario|
-							scenario_import.push(strategy: s.to_s, underlying: au, expiry_date: (scenario[:expiry_date]).to_s, buy_strike: (scenario[:buy_strike]), sell_strike: (scenario[:sell_strike]), risk: (scenario[:risk]), reward: (scenario[:reward]), rr_ratio: (scenario[:rr_ratio]), perc_change: (scenario[:perc_change]), buy_contract_symbol: (scenario[:buy_contract_symbol]).to_s, sell_contract_symbol: (scenario[:sell_contract_symbol]).to_s, buy_contract_iv: (scenario[:buy_contract_iv]), sell_contract_iv: (scenario[:sell_contract_iv])  )
+							scenario_import.push(strategy: s.to_s, underlying: au, quote: quotes[0],  expiry_date: (scenario[:expiry_date]).to_s, buy_strike: (scenario[:buy_strike]), sell_strike: (scenario[:sell_strike]), risk: (scenario[:risk]), reward: (scenario[:reward]), rr_ratio: (scenario[:rr_ratio]), perc_change: (scenario[:perc_change]), buy_contract_symbol: (scenario[:buy_contract_symbol]).to_s, sell_contract_symbol: (scenario[:sell_contract_symbol]).to_s, buy_contract_iv: (scenario[:buy_contract_iv]), sell_contract_iv: (scenario[:sell_contract_iv])  )
 						end
 					end	
 
