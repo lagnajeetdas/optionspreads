@@ -98,9 +98,9 @@ class OptionsGetterJob < ApplicationJob
 		c = 0
 		strategies_list = ["call-debit"]
 		jump = "30.0"
-		maxrisk = "500.0"
-		minreward = "100.0"
-		minrr = "1.5"
+		maxrisk = "450.0"
+		minreward = "5.0"
+		minrr = "1.2"
 
 		update_optiondowload_log("calculate_spreads","Started", c)
 		
