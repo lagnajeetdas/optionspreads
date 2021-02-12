@@ -110,7 +110,7 @@ class OptionsGetterJob < ApplicationJob
 
 		#Extract all underlying symbols, fast
 		all_underlyings = Optionchain.pluck(:root_symbol).uniq
-		all_oc = Optionchain.all
+		#all_oc = Optionchain.all
 		#####################################
 
 		#Retrieve option chains from DB for a given underlying
@@ -121,14 +121,14 @@ class OptionsGetterJob < ApplicationJob
 			
 			begin
 
-				oc = all_oc.select{ |a| a['root_symbol']==au}
+				#oc = all_oc.select{ |a| a['root_symbol']==au}
 				#oc = Optionchain.where(root_symbol: au)
-				# oc = Optionchain.find_by_sql(
-				#      "SELECT
-				#         *
-				#       FROM optionchains
-				#       WHERE optionchains.root_symbol='" + au.to_s + "'"
-				#       )
+				oc = Optionchain.find_by_sql(
+				      "SELECT
+				         *
+				       FROM optionchains
+				       WHERE optionchains.root_symbol='" + au.to_s + "'"
+				       )
 				
 
 				#extract expiry dates array from option chain
