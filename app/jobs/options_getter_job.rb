@@ -96,39 +96,75 @@ class OptionsGetterJob < ApplicationJob
 	def calculate_spreads_main_loop
 		#Variables
 		c = 0
-		strategies_list = ["call-debit","call-credit","put-debit","put-credit"]
+		strategies_list = ["call-debit"]
 		jump = "30.0"
 		maxrisk = "500.0"
 		minreward = "100.0"
-		minrr = "1.0"
+		minrr = "1.5"
+
+		update_optiondowload_log("calculate_spreads","Started", c)
+		
+		#Delete all existing calculations from database
+		p "Number of scenarios deleted : " + (Optionscenario.delete_all).to_s
+
 
 		#Extract all underlying symbols, fast
 		all_underlyings = Optionchain.pluck(:root_symbol).uniq
+		all_oc = Optionchain.all
 		#####################################
-
-		update_optiondowload_log("calculate_spreads","Started", c)
 
 		#Retrieve option chains from DB for a given underlying
 		all_underlyings.each do |au|
+			scenario_import = Array[]
+
 			p c.to_s + ". " + au.to_s
-			oc = Optionchain.where(root_symbol: au)
+			
+			begin
 
-			#extract expiry dates array from option chain
-			e_dates = oc.pluck(:expiration_date).uniq
-			#p e_dates
-			quotes = oc.pluck(:quote).uniq
-			#p quotes[0]
+				oc = all_oc.select{ |a| a['root_symbol']==au}
+				#oc = Optionchain.where(root_symbol: au)
+				# oc = Optionchain.find_by_sql(
+				#      "SELECT
+				#         *
+				#       FROM optionchains
+				#       WHERE optionchains.root_symbol='" + au.to_s + "'"
+				#       )
+				
+
+				#extract expiry dates array from option chain
+				e_dates = oc.pluck(:expiration_date).uniq
+				#p e_dates
+				quotes = oc.pluck(:quote).uniq
+				#p quotes[0]
 
 
-			#Loop through strategies_list
-			strategies_list.each do |s|
-				#optionchain, quote, symbol, e_dates, strategy, target, jump, maxrisk, minreward, minrr
-				p s
-				cs = Calculatespreads.new(oc,quotes[0], au, e_dates, s, -1, jump, maxrisk, minreward, minrr )	
-				#cs.analysis_results
+				#Loop through strategies_list
+				strategies_list.each do |s|
+					p s
+					cs = Calculatespreads.new(oc,quotes[0], au, e_dates, s, -1, jump, maxrisk, minreward, minrr )	
+					ar = cs.analysis_results
+					##Store Spreads Scenarios in an temp variable scenario_import
+					if !ar.empty? 
+						ar.each do |scenario|
+							scenario_import.push(strategy: s.to_s, underlying: au, expiry_date: (scenario[:expiry_date]).to_s, buy_strike: (scenario[:buy_strike]), sell_strike: (scenario[:sell_strike]), risk: (scenario[:risk]), reward: (scenario[:reward]), rr_ratio: (scenario[:rr_ratio]), perc_change: (scenario[:perc_change]), buy_contract_symbol: (scenario[:buy_contract_symbol]).to_s, sell_contract_symbol: (scenario[:sell_contract_symbol]).to_s, buy_contract_iv: (scenario[:buy_contract_iv]), sell_contract_iv: (scenario[:sell_contract_iv])  )
+						end
+					end	
+
+				end
+
+				#Push to DB
+				if !scenario_import.empty?
+					Optionscenario.import scenario_import
+					scenario_import = Array[]
+				end			
+
+			rescue StandardError, NameError, NoMethodError, RuntimeError => e
+				p "Error getting options " 
+				p "Rescued: #{e.inspect}"
+			else
+			ensure
+				scenario_import = Array[]
 			end
-
-			##Store in DB
 
 			c = c + 1
 		end

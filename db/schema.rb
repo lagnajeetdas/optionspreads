@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_12_172317) do
+ActiveRecord::Schema.define(version: 2021_02_12_190536) do
 
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer "priority", default: 0, null: false
@@ -115,6 +115,7 @@ ActiveRecord::Schema.define(version: 2021_02_12_172317) do
     t.float "sell_contract_iv"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "strategy"
   end
 
   create_table "recommendations", force: :cascade do |t|

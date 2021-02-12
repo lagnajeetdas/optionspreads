@@ -15,6 +15,7 @@ class HomeController < ApplicationController
     #StockquoteDownloadJob.perform_later("delete_all_options")
     #OptionsGetterJob.perform_later("get")
     #OptionsGetterJob.perform_later("calculate_spreads")
+    #OptionsStragizerJob.perform_later("delete_old_option_spreads")
 
 
   	@api = StockQuote::Stock.new(api_key: 'pk_34bbabe4cf054befa331a42b695e75b2')
