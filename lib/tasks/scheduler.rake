@@ -36,9 +36,9 @@ task :download_stock_quotes => :environment do
   puts "done."
 end
 
-task :calculate_options_spreads => :environment do
+task :calculate_spreads => :environment do
   puts "Compute option spreads using saved data from db..."
-    OptionsStragizerJob.perform_later("calc_op_spreads")
+    OptionsGetterJob.perform_later("calculate_spreads")
   puts "done."
 end
 

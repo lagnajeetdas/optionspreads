@@ -32,8 +32,7 @@ class Calculatespreads
 		  		compute_spreads("sell-call-put-same", "credit", "short-straddle")
 		end
 
-		p "Array Length"
-		p @optionscenario_import.length()
+		p "Num of spreads: " + (@optionscenario_import.length()).to_s
 	end
 
 	def compute_spreads(op_type, entry_type, strategy="default", target = -1)
