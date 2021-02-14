@@ -11,6 +11,7 @@ class StocksController < ApplicationController
   require 'optionchains'
   require 'calculatespreads'
 
+
   # GET /stocks
   # GET /stocks.json
   def index
@@ -173,7 +174,17 @@ class StocksController < ApplicationController
       p "updated in db"
     end
 
-   
+  end
+
+  def gettarget_bulk
+
+    #Extract ticker symbols of current user's stocks, fast
+    stocks_in_watchlist = Stock.select{ |s| s['user_id']==current_user.id}
+    _tickers = stocks_in_watchlist.pluck(:ticker)
+
+    #Execute a delayed job in background queue
+    TargetGetterJob.perform_later(_tickers)
+
   end
 
   def compute_buy_rating
@@ -200,10 +211,10 @@ class StocksController < ApplicationController
   def get_watchlist_stocks_live_quotes
 
 
-      last_page = ((@stocks.count)/25)+1
+      last_page = ((@stocks.count)/50)+1
       (1..last_page).each do |p|  
         symbols_arr = Kaminari.paginate_array(@stocks.pluck(:ticker))
-        symbols = symbols_arr.page(p).per(25)  #tested till 25.. can it be increased?
+        symbols = symbols_arr.page(p).per(50)  #tested till 25.. can it be increased?
         symbols = symbols.map!(&:upcase)
         symbols_string = symbols.join(",")
         

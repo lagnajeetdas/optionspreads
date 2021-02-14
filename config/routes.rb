@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   post "addoptionbookmark", to: "optionbookmarks#addbookmark"
   post "roi_visualizer", to: "home#load_roi_visualizer"
   post "calc_spreads", to: "home#calculate_spreads"
+  post "get_targets_for_watchlist", to: "stocks#gettarget_bulk"
   #get "roi_json", to: "stocks#get_roi_json"
   #resources :home do
   #  get :autocomplete_universe_displaysymbol, :on => :collection

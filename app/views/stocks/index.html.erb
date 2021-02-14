@@ -1,9 +1,23 @@
 
-<h3>My Stocks</h3><br/>
-
-<%= button_to "Add New Stock", new_stock_path, method: :get, class: "btn btn-outline-success"  %>
+<h3>My Watchlist</h3><br/>
 
 
+
+<div class="dropdown">
+  <a class="btn btn-outline-success dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Watchlist Actions
+  </a>
+
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+    <%= link_to "Add New Stock to Watchlist", new_stock_path, method: :get, class: "dropdown-item" %>
+
+    <% if current_user.email=="lagnajeetdas@gmail.com" %>
+      <%= link_to "Update Analyst Targets", get_targets_for_watchlist_path, method: :post, class: "dropdown-item" %>
+    <% end %>
+    <a class="dropdown-item disabled" href="#">Analyze Option Strategies for All Stocks</a>
+    <a class="dropdown-item disabled" href="#">Analyze Option Strategies for Watchlist Stocks</a>
+  </div>
+</div>
 
 <table class="table table-bordered table-hover" data-toggle="table" data-search="true" data-pagination="true"  data-mobile-responsive="true" data-sort-name="buy_rating" data-sort-order="desc" >
   <thead class="thead-light">
