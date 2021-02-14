@@ -27,6 +27,10 @@ class OptionsGetterJob < ApplicationJob
 		universes = Universe.pluck(:displaysymbol)
 		universe_ids = Universe.pluck(:id)
 
+		#Download live stock quotes into local DB
+		lq_universe = Livequotetradier.new(universes,1)
+
+
 		#loop through each underlying in universe 
 		universes.each do |u|
 			p c.to_s + ". " + u.to_s
@@ -37,9 +41,14 @@ class OptionsGetterJob < ApplicationJob
 				e_dates = Array[]
 				optionchain_import = Array[]
 
-				##Get Live Stock Quote
-				lq = Livequotetradier.new(u)
-				_quote = lq.latest_price
+				##Get Live Stock Quote from local DB or direct API call
+				if ((Stockprice.where(symbol: u)).last)
+					_quote = ((Stockprice.where(symbol: u)).last)['last']
+				else
+					lq = Livequotetradier.new(u)
+					_quote = lq.latest_price
+					p "Queried latest price using API"
+				end
 				##################			
 
 				##Get Expiry Dates
