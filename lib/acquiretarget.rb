@@ -11,7 +11,7 @@ class Acquiretarget
 
 
 	def target_api_call
-	    # Call Alpha vantage API company profile to get target price
+	    ## Call Alpha vantage API company profile to get target price
 	    
 	    baseurl_alphavantage = ENV['baseurl_alphavantage']
 	    alphavantage_apikey = ENV['alphavantage_apikey']
