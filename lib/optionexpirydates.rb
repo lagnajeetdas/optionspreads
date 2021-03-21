@@ -34,7 +34,7 @@ class Optionexpirydates
 		end
 
 		#Filter only regular expiry dates
-		if 1==2
+		if 1==2 #temp - should be done through user preferences
 			begin
 				fed = Filtermainexpirydates.new(@expirydates_data)
 				@expirydates_data_revised = fed.new_exp_dates

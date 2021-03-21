@@ -90,7 +90,7 @@ switch(strategy) {
 $table.bootstrapTable('load', data)
 $table.removeAttr('hidden')
 
-
+// function Visualize ROI
 
 function visualizeROI(value, row, index) {
     var post_string = "dividend=0.0&e_date=" + row.expiry_date + "&entry_cost=" + row.entry_cost + "&long_iv=" + row.buy_contract_iv + "&long_strike=" + row.buy_strike + "&quote=" + row.quote + "&short_iv=" + row.sell_contract_iv + "&short_strike=" + row.sell_strike  + "&strategy=" + strategy +  "&symbol=" + row.underlying;
@@ -102,7 +102,20 @@ function visualizeROI(value, row, index) {
     ].join("")
   }
 
-//add function Bookmark
+
+
+
+//function Option Bookmark
+
+function bookmarkOptionStrategy(value, row, index) {
+    var post_string = "underlying=" + row.underlying + "&longleg=" + row.buy_contract_symbol + "&shortleg=" + row.sell_contract_symbol + "&e_date=" + row.expiry_date + "&func=" + row.underlying;
+
+    return [
+    "<a class='option_bookmark' id='bm_" + row.buy_contract_symbol + row.sell_contract_symbol + "' data-remote='true' rel='nofollow' data-method='post' href='/addoptionbookmark?" + post_string + "'>",
+      "<i class='fa fa-bookmark-o'></i>",
+      "</a>  ",
+    ].join("")
+  }
 
 
 

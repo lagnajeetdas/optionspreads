@@ -1,9 +1,22 @@
-if ("<%= escape_javascript( @bookmark_flag ) %>"==1)
+var bookmark_flag = "<%= escape_javascript( @bookmark_flag ) %>"
+
+if (bookmark_flag==1)
 {
 	
-	$("#<%= escape_javascript(@longleg + @shortleg) %>").html("<%= escape_javascript( fa_icon 'bookmark' ) %>"); 
+	$("#bm_<%= escape_javascript(@longleg + @shortleg) %>").html("<%= escape_javascript( fa_icon 'bookmark' ) %>"); 
+	$('.toast').toast('show');
+	$(".toast-body").html("Strategy is added to <%= escape_javascript(link_to "Bookmarks", optionbookmarks_path)  %>");
+
+
 }
 else
 {
-	$("#<%= escape_javascript(@longleg + @shortleg) %>").html("<%= escape_javascript( fa_icon 'bookmark-o' ) %>"); 
+	$("#bm_<%= escape_javascript(@longleg + @shortleg) %>").html("<%= escape_javascript( fa_icon 'bookmark-o' ) %>"); 
+	$('.toast').toast('show');
+	$(".toast-body").html("Strategy is removed from <%= escape_javascript(link_to "Bookmarks", optionbookmarks_path)  %>");
+
 }
+
+
+
+
