@@ -34,15 +34,19 @@ class Optionexpirydates
 		end
 
 		#Filter only regular expiry dates
-		begin
-			fed = Filtermainexpirydates.new(@expirydates_data)
-			@expirydates_data_revised = fed.new_exp_dates
-		rescue StandardError, NameError, NoMethodError, RuntimeError => e
-			@expirydates_data_revised = @expirydates_data
-			p "Rescued: #{e.inspect}"
-			p e.backtrace
+		if 1==2
+			begin
+				fed = Filtermainexpirydates.new(@expirydates_data)
+				@expirydates_data_revised = fed.new_exp_dates
+			rescue StandardError, NameError, NoMethodError, RuntimeError => e
+				@expirydates_data_revised = @expirydates_data
+				p "Rescued: #{e.inspect}"
+				p e.backtrace
+			else
+			ensure
+			end
 		else
-		ensure
+			@expirydates_data_revised = @expirydates_data
 		end
 
 	end
