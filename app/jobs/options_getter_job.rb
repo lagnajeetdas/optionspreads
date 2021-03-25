@@ -221,8 +221,8 @@ class OptionsGetterJob < ApplicationJob
 
 
 				#Filter relevant contracts with strike and quote filters, then Calculate premium ratio
-				ar = oc.select { |o| o.underlying==au and o.strike<=maxstrike and o.strike<o.quote and o.strike/o.quote < max_strike_to_quote}
-				p ar
+				ar = oc.select { |o| o.underlying==au and o.bid>0.1 and o.strike<=maxstrike and o.strike<o.quote and o.strike/o.quote < max_strike_to_quote}
+				
 				##Store calcs an temp variable scenario_import
 				if !ar.empty? 
 					ar.each do |scenario|
