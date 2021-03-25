@@ -12,6 +12,8 @@ class OptionsGetterJob < ApplicationJob
 				get_main_loop
 			when "calculate_spreads"
 				calculate_spreads_main_loop
+			when "calculate_put_sells"
+				calculate_put_sells
 		end
 	end
 
@@ -27,7 +29,7 @@ class OptionsGetterJob < ApplicationJob
 		universes = Universe.pluck(:displaysymbol)
 		universe_ids = Universe.pluck(:id)
 
-		#Download live stock quotes into local DB
+		#Download ALL live stock quotes into local DB
 		lq_universe = Livequotetradier.new(universes,1)
 
 
@@ -183,11 +185,83 @@ class OptionsGetterJob < ApplicationJob
 	end
 
 
+	def calculate_put_sells
+		#Variables
+		c = 0
+		maxstrike = 30.0
+		max_strike_to_quote = 0.95
+		
+		update_optiondowload_log("calculate_put_sells","Started", c)
+		
+		#Delete all existing options put sell calculations from database
+		p "Number of options put sells scenarios deleted : " + (Optionputsell.delete_all).to_s
+
+
+		#Extract all underlying symbols, fast
+		all_underlyings = Optionchain.pluck(:root_symbol).uniq
+		#all_oc = Optionchain.all
+		#####################################
+
+		#Retrieve option chains from DB for a given underlying
+		all_underlyings.each do |au|
+			putsell_import = Array[]
+
+			p c.to_s + ". " + au.to_s
+			
+			begin
+
+				#oc = all_oc.select{ |a| a['root_symbol']==au}
+				#oc = Optionchain.where(root_symbol: au)
+				oc = Optionchain.find_by_sql(
+				      "SELECT
+				         *
+				       FROM optionchains
+				       WHERE optionchains.root_symbol='" + au.to_s + "'"
+				       )
+
+
+				#Filter relevant contracts with strike and quote filters, then Calculate premium ratio
+				ar = oc.select { |o| o.underlying==au and o.strike<=maxstrike and o.strike<o.quote and o.strike/o.quote < max_strike_to_quote}
+				p ar
+				##Store calcs an temp variable scenario_import
+				if !ar.empty? 
+					ar.each do |scenario|
+						premium_ratio = scenario[:bid] / scenario [:strike]
+						putsell_import.push(underlying: au, optionsymbol: scenario[:symbol], expiry_date: scenario[:expiration_date], quote: scenario[:quote], strike: scenario[:strike], bid: scenario[:bid], ask: scenario[:ask], premiumratio: premium_ratio)
+					end
+				end	
+
+				
+
+				#Push to DB
+				if !putsell_import.empty?
+					Optionputsell.import putsell_import
+					putsell_import = Array[]
+				end			
+
+			rescue StandardError, NameError, NoMethodError, RuntimeError => e
+				p "Error calculating put sells " 
+				p "Rescued: #{e.inspect}"
+			else
+			ensure
+				putsell_import = Array[]
+			end
+
+			c = c + 1
+		end
+
+		update_optiondowload_log("calculate_put_sells","Finished", c)
+
+	end
+
 
 	def update_optiondowload_log(activity,update_type, count)
 		p update_type + " " + count.to_s + " underlyings at " + (DateTime.now()).to_s
 		uol = Updateoptionlog.new(activity, update_type, (DateTime.now()), count)
 	end
+
+
+
 
 	
 

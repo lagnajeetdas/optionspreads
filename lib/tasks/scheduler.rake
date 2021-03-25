@@ -23,11 +23,28 @@ task :download_optionchains => :environment do
   puts "done."
 end
 
+
+
+
 task :get_option_chains_entire_universe => :environment do
   puts "Getting option chains from tradier for universe..."
     OptionsGetterJob.perform_later("get")
   puts "done."
 end
+
+task :calculate_spreads => :environment do
+  puts "Compute option spreads using saved option chain data from db..."
+    OptionsGetterJob.perform_later("calculate_spreads")
+  puts "done."
+end
+
+task :calculate_put_sells => :environment do
+  puts "Compute put sells using saved option chain data from db..."
+    OptionsGetterJob.perform_later("calculate_put_sells")
+  puts "done."
+end
+
+
 
 
 task :download_stock_quotes => :environment do
@@ -36,11 +53,6 @@ task :download_stock_quotes => :environment do
   puts "done."
 end
 
-task :calculate_spreads => :environment do
-  puts "Compute option spreads using saved data from db..."
-    OptionsGetterJob.perform_later("calculate_spreads")
-  puts "done."
-end
 
 task :calculate_high_open_interest_options => :environment do
   puts "Select top 500 open interest options and save to db to serve to client fast..."

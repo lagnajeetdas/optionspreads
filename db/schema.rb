@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_14_123800) do
+ActiveRecord::Schema.define(version: 2021_03_25_175646) do
 
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer "priority", default: 0, null: false
@@ -98,6 +98,21 @@ ActiveRecord::Schema.define(version: 2021_02_14_123800) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "option_type"
+  end
+
+  create_table "optionputsells", force: :cascade do |t|
+    t.string "underlying"
+    t.string "optionsymbol"
+    t.float "strike"
+    t.float "quote"
+    t.float "bid"
+    t.float "ask"
+    t.float "premiumratio"
+    t.string "expiry_date"
+    t.string "industry"
+    t.string "company"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "optionscenarios", force: :cascade do |t|

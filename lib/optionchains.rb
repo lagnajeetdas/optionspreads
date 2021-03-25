@@ -26,7 +26,7 @@ class Optionchains
 	def apicall_optionchains(expirydate)
 		begin 
  	
-		  	#api call to tradier to fetch option chains for a selected expiry date
+		  	#api call to tradier to fetch option chains for a selected expiry date and underlying
 		  	url_options_chain_string = @baseurl_tradier + "options/chains?symbol=" + @symbol + "&expiration=" + expirydate + "&greeks=true"
 			response = HTTParty.get(url_options_chain_string, {headers: {"Authorization" => 'Bearer ' + @tradier_api_key}})
 
