@@ -223,18 +223,21 @@ class OptionsGetterJob < ApplicationJob
 				#Filter relevant contracts with strike and quote filters, then Calculate premium ratio
 				ar = oc.select { |o| o.underlying==au and o.bid>0.1 and o.option_type=="put" and o.strike<=maxstrike and o.strike<o.quote and o.strike/o.quote < max_strike_to_quote}
 				
-				
+
 				if (Stockprofile.where(symbol: au))
-					p _industry = (Stockprofile.where(symbol: au))[0].industry
+					_industry = (Stockprofile.where(symbol: au))[0].industry
 				else
 					_industry = ""
 				end
+
+				_company = (Universe.where(displaysymbol: au))[0].description
+
 				##Store calcs an temp variable scenario_import
 				if !ar.empty?
 
 					ar.each do |scenario|
 						premium_ratio = scenario[:bid] / scenario [:strike]
-						putsell_import.push(underlying: au, optionsymbol: scenario[:symbol], expiry_date: scenario[:expiration_date], quote: scenario[:quote], strike: scenario[:strike], bid: scenario[:bid], ask: scenario[:ask], premiumratio: premium_ratio, option_type: scenario[:option_type], industry: _industry)
+						putsell_import.push(underlying: au, optionsymbol: scenario[:symbol], expiry_date: scenario[:expiration_date], quote: scenario[:quote], strike: scenario[:strike], bid: scenario[:bid], ask: scenario[:ask], premiumratio: premium_ratio, option_type: scenario[:option_type], industry: _industry, company: _company)
 					end
 				end	
 
