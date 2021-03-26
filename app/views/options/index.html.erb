@@ -1,4 +1,7 @@
 <div class="container">
+
+  <h3>Options Observer</h3>
+
   <!-- Nav tabs -->
   <ul class="nav nav-pills" id="myTab" role="tablist">
     <li class="nav-item">
@@ -6,6 +9,9 @@
     </li>
     <li class="nav-item">
       <a class="nav-link" id="call_debit_spreads-tab" data-toggle="tab" href="#call_debit_spreads" role="tab" aria-controls="call_debit_spreads" aria-selected="false">Bullish Spreads</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="sell_puts-tab" data-toggle="tab" href="#sell_puts" role="tab" aria-controls="sell_puts" aria-selected="false">Sell Puts</a>
     </li>
     
   </ul>
@@ -69,6 +75,7 @@
                 <thead class="thead-dark">
                   <tr>
                     <th data-sortable="true" data-field="underlying_scenario_call_debit" data-filter-control="select">Underlying</th>
+                    <th data-sortable="true" data-field="description_scenario_call_debit" data-filter-control="select">Description</th>
                     <th data-field="expiry_scenario_call_debit" data-filter-control="select">Expiry</th>
                     <th data-field="industry_scenario_call_debit" data-filter-control="select">Industry</th>
                     <th data-sortable="true" data-field="quote_scenario_call_debit">Stock Price</th>
@@ -86,9 +93,10 @@
 
                     <tr>
                       <td><%= best_rr.underlying %></td>
+                      <td><%= best_rr.company %></td>
                       <td><%= best_rr.expiry_date %></td>
                       <td><%= best_rr.industry %></td>
-                      <td><%= best_rr.stock_quote %></td>
+                      <td><%= best_rr.quote %></td>
                       <td><%= best_rr.buy_strike.round(1)  %></td>
                       <td><%= best_rr.sell_strike.round(1) %></td>
                       <td><%= best_rr.risk.round(1) %></td>
@@ -100,7 +108,48 @@
                   <% end %>
                 </tbody>
               </table>
+    </div>
 
+
+    <div class="tab-pane" id="sell_puts" role="tabpanel" aria-labelledby="sell_puts-tab">
+      <br/>
+      <h5>Sell Puts </h5>
+      <p>Analyzed <%= @Optionputsells_count %>  scenarios </p>
+      <br/>
+
+              <table class="table table-bordered table-hover"   data-toggle="table" data-pagination="true"  data-filter-control="true">
+                <thead class="thead-dark">
+                  <tr>
+                    <th data-sortable="true" data-field="underlying_sell_puts" data-filter-control="select">Underlying</th>
+                    <th data-sortable="true" data-field="description_sell_puts" data-filter-control="select">Description</th>
+                    <th data-field="expiry_sell_puts" data-filter-control="select">Expiry</th>
+                    <th data-field="industry_sell_puts" data-filter-control="select">Industry</th>
+                    <th data-sortable="true" data-field="quote_sell_puts">Stock Price</th>
+                    <th data-sortable="true" data-field="strike_sell_puts">Strike</th>
+                    <th data-sortable="true" data-field="bid_sell_puts">Bid</th>
+                    <th data-sortable="true" data-field="premiumratio_sell_puts">Premium Ratio</th>
+                    
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <% @best_sp_options.each do |best_sp| %>
+
+                    <tr>
+                      <td><%= best_sp.underlying %></td>
+                      <td><%= best_sp.company %></td>
+                      <td><%= best_sp.expiry_date %></td>
+                      <td><%= best_sp.industry %></td>
+                      <td><%= best_sp.quote %></td>
+                      <td><%= best_sp.strike.round(1)  %></td>
+                      <td><%= best_sp.bid.round(1) %></td>
+                      <td><%= best_sp.premiumratio.round(2) %></td>
+
+
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
 
 
     </div>

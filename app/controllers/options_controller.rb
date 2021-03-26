@@ -13,6 +13,7 @@ class OptionsController < ApplicationController
   		@universes = Universe.pluck(:displaysymbol)
       #@optionchain_count = Optionchain.pluck(:symbol).count
       @Optionscenario_count = Optionscenario.pluck(:id).count
+      @Optionputsells_count = Optionputsell.pluck(:id).count
 
   		#OptionsStragizerJob.perform_later("calc_top_option_spreads")
       #StockquoteDownloadJob.perform_later("refresh_options")
@@ -24,7 +25,9 @@ class OptionsController < ApplicationController
 
 
       @high_open_interest = Optionhighopeninterest.all
-      @best_rr_options = Topoptionscenario.all
+      @best_rr_options = Optionscenario.all
+      @best_sp_options = Optionputsell.all
+      
     end
 
   	def show

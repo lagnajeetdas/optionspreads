@@ -148,6 +148,22 @@ class OptionsGetterJob < ApplicationJob
 				quotes = oc.pluck(:quote).uniq
 				#p quotes[0]
 
+				_company = (Universe.where(displaysymbol: au))[0].description
+				_industry = ""
+
+				begin 
+					if (Stockprofile.where(symbol: au))
+						_industry = (Stockprofile.where(symbol: au))[0].industry
+					else
+						_industry = ""
+					end
+				rescue StandardError, NameError, NoMethodError, RuntimeError => e
+					p "Error getting industry for  " + au 
+					p "Rescued: #{e.inspect}"
+				end
+
+				
+
 
 				#Loop through strategies_list
 				strategies_list.each do |s|
@@ -157,7 +173,7 @@ class OptionsGetterJob < ApplicationJob
 					##Store Spreads Scenarios in an temp variable scenario_import
 					if !ar.empty? 
 						ar.each do |scenario|
-							scenario_import.push(strategy: s.to_s, underlying: au, quote: quotes[0],  expiry_date: (scenario[:expiry_date]).to_s, buy_strike: (scenario[:buy_strike]), sell_strike: (scenario[:sell_strike]), risk: (scenario[:risk]), reward: (scenario[:reward]), rr_ratio: (scenario[:rr_ratio]), perc_change: (scenario[:perc_change]), buy_contract_symbol: (scenario[:buy_contract_symbol]).to_s, sell_contract_symbol: (scenario[:sell_contract_symbol]).to_s, buy_contract_iv: (scenario[:buy_contract_iv]), sell_contract_iv: (scenario[:sell_contract_iv])  )
+							scenario_import.push(strategy: s.to_s, underlying: au, quote: quotes[0],  expiry_date: (scenario[:expiry_date]).to_s, buy_strike: (scenario[:buy_strike]), sell_strike: (scenario[:sell_strike]), risk: (scenario[:risk]), reward: (scenario[:reward]), rr_ratio: (scenario[:rr_ratio]), perc_change: (scenario[:perc_change]), buy_contract_symbol: (scenario[:buy_contract_symbol]).to_s, sell_contract_symbol: (scenario[:sell_contract_symbol]).to_s, buy_contract_iv: (scenario[:buy_contract_iv]), sell_contract_iv: (scenario[:sell_contract_iv]), industry: _industry, company: _company  )
 						end
 					end	
 
@@ -224,13 +240,21 @@ class OptionsGetterJob < ApplicationJob
 				ar = oc.select { |o| o.underlying==au and o.bid>0.1 and o.option_type=="put" and o.strike<=maxstrike and o.strike<o.quote and o.strike/o.quote < max_strike_to_quote}
 				
 
-				if (Stockprofile.where(symbol: au))
-					_industry = (Stockprofile.where(symbol: au))[0].industry
-				else
-					_industry = ""
-				end
+				
 
 				_company = (Universe.where(displaysymbol: au))[0].description
+				_industry = ""
+
+				begin 
+					if (Stockprofile.where(symbol: au))
+						_industry = (Stockprofile.where(symbol: au))[0].industry
+					else
+						_industry = ""
+					end
+				rescue StandardError, NameError, NoMethodError, RuntimeError => e
+					p "Error getting industry for  " + au 
+					p "Rescued: #{e.inspect}"
+				end
 
 				##Store calcs an temp variable scenario_import
 				if !ar.empty?
