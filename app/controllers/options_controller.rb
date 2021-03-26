@@ -34,7 +34,7 @@ class OptionsController < ApplicationController
                and (optionputsells.strike / optionputsells.quote) <= 0.9
                ORDER BY optionputsells.premiumratio DESC, 
                (optionputsells.strike / optionputsells.quote) ASC
-               LIMIT 2000
+               LIMIT 500
                "
                )
 
@@ -48,7 +48,7 @@ class OptionsController < ApplicationController
                and optionscenarios.reward>50 
                and optionscenarios.perc_change<20
                ORDER BY optionscenarios.rr_ratio DESC, optionscenarios.perc_change ASC 
-               LIMIT 1000
+               LIMIT 500
                "
                )
 
