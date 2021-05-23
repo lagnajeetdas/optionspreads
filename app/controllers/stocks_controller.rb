@@ -19,6 +19,7 @@ class StocksController < ApplicationController
     @stocks = Stock.select{ |s| s['user_id']==current_user.id}
     @tickers = Array[]
     @recommendations = Recommendation.all
+    @stockprofiles = Stockprofile.all
 
 
 

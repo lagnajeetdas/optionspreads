@@ -24,6 +24,7 @@
     <tr>
       <th data-sortable="true" data-field="company">Company</th>
       <th data-sortable="true" data-field="symbol">Ticker</th>
+      <th data-sortable="true" data-field="industry" >Industry</th>
       <th data-sortable="true" data-field="quote">Quote $</th>
       <th data-sortable="true" data-field="target">Target $</th>
       <th data-sortable="true" data-field="gaptotarget">Gap to Target %</th>
@@ -44,6 +45,16 @@
           <tr>
                 <td><%= link_to @ticker[0]['company_name'], stock, data: {disable_with: raw("<i class='fa fa-spinner fa-spin'></i>" + " " +  @ticker[0]['company_name'] + " :  Loading options chain...")} %></td>
                 <td><%= @ticker[0]['symbol'] %></td>
+
+                <% s_profile = Array[] %>
+                <% s_profile = @stockprofiles.select { |s| s['symbol']==@ticker[0]['symbol'] } %>
+                
+                <% if !s_profile.empty? %>
+                  <td><%= s_profile[0]["industry"] %></td>
+                <% else %>
+                  <td> -- </td>
+                <% end %>
+
                 <td><%= number_with_precision(@ticker[0]['latest_price'], :precision => 2) %></td>
                 <td><%= stock.target_price_auto %></td>
                 <td><%= number_with_precision(100 * ((stock.target_price_auto.to_f - @ticker[0]['latest_price'].to_f)/@ticker[0]['latest_price'].to_f),  :precision => 2) %></td>
@@ -54,7 +65,7 @@
                 <% reco = @recommendations.select{ |r| r['symbol']==@ticker[0]['symbol'] } %>
                 
                 <% if !reco.empty? %>
-                  <td><%=(100 * ( ((reco[0]["buy"]) +  (reco[0]["strongbuy"])) / ( (reco[0]["buy"]) +  (reco[0]["strongbuy"]) +   (reco[0]["sell"]) +  (reco[0]["strongsell"]) +  (reco[0]["hold"]) ) )).round(1) %></td>
+                  <td><%=(100 * ( ((reco[-1]["buy"]) +  (reco[-1]["strongbuy"])) / ( (reco[-1]["buy"]) +  (reco[-1]["strongbuy"]) +   (reco[-1]["sell"]) +  (reco[-1]["strongsell"]) +  (reco[-1]["hold"]) ) )).round(1) %></td>
                 <% else %>
                   <td>0.0</td>
                 <% end %>

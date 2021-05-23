@@ -111,6 +111,7 @@ class StockquoteDownloadJob < ApplicationJob
 				    	@recommendation = Recommendation.new(buy: recommendation_ary_stock[0]['buy'], hold: recommendation_ary_stock[0]['hold'], period: recommendation_ary_stock[0]['period'], sell: recommendation_ary_stock[0]['sell'], strongbuy: recommendation_ary_stock[0]['strongBuy'], strongsell: recommendation_ary_stock[0]['strongSell'], symbol: security['displaysymbol'] )
 				    	if @recommendation.save
 					      p "Saved recommendation to db " + security['displaysymbol'].to_s
+					      #should delete recommendation from other periods for that symbol
 					    else
 					      p "Did not save recommendation to db " + security['displaysymbol'].to_s
 					    end
