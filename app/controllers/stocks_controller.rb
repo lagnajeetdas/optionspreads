@@ -60,6 +60,7 @@ class StocksController < ApplicationController
     begin
       @ticker = Livequotetradier.new(@stock.ticker)
       @ticker_logo  = (StockQuote::Stock.logo(@stock.ticker)).url
+      @ticker_company_whatitdoes  = (StockQuote::Stock.company(@stock.ticker))
       if !@ticker
         p "ticker could not be fetched using tradier api"
         @ticker = StockQuote::Stock.quote(@stock.ticker)

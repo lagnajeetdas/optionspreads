@@ -66,11 +66,19 @@
 		                		
 
 	                			<% end %>
+	                			
+	                			<% if @ticker_company_whatitdoes %>
+		                			<br/>
+		                			<%= @ticker_company_whatitdoes.industry %> &nbsp; &nbsp; | &nbsp; &nbsp;   <%= @ticker_company_whatitdoes.sector %> &nbsp; &nbsp; | &nbsp; &nbsp;   <%= @ticker_company_whatitdoes.country %>
+		                			<br/>
+		                			<%= @ticker_company_whatitdoes.description %>
+	                			<% end %>
 
 				            </div>
-			                
 
-			                
+
+				            
+			                			                
 
                 			<br/>
 
